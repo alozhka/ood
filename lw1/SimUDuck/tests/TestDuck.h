@@ -7,8 +7,10 @@
 class TestDuck : public Duck
 {
 public:
-	TestDuck(std::unique_ptr<IDanceBehavior>&& danceBehavior)
-		: Duck(std::make_unique<FlyNoWay>(), std::make_unique<MuteQuackBehavior>(), std::move(danceBehavior))
+	explicit TestDuck(std::unique_ptr<IDanceBehavior>&& danceBehavior)
+		: Duck(std::make_unique<FlyNoWay>(),
+			  std::make_unique<MuteQuackBehavior>(),
+			  std::move(danceBehavior))
 	{
 	}
 

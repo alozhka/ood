@@ -10,6 +10,9 @@ int main()
 {
 	MallardDuck mallardDuck;
 	PlayWithDuck(mallardDuck);
+	mallardDuck.Fly();
+	mallardDuck.Fly();
+	mallardDuck.Fly();
 
 	RedheadDuck redheadDuck;
 	PlayWithDuck(redheadDuck);
@@ -25,36 +28,6 @@ int main()
 
 	modelDuck.SetFlyBehavior(std::make_unique<FlyWithWings>());
 	PlayWithDuck(modelDuck);
-
-	// Демонстрация нового функционала: кряканье после каждого второго полёта
-	std::cout << "=== Демонстрация кряканья от удовольствия после каждого второго полёта ===" << std::endl;
-	
-	MallardDuck pleasureDuck;
-	std::cout << "\nУтка кряква демонстрирует полёты с удовольствием:" << std::endl;
-	pleasureDuck.Display();
-	
-	std::cout << "Полёт 1: ";
-	pleasureDuck.FlyWithPleasure();
-	
-	std::cout << "Полёт 2: ";
-	pleasureDuck.FlyWithPleasure();
-	
-	std::cout << "Полёт 3: ";
-	pleasureDuck.FlyWithPleasure();
-	
-	std::cout << "Полёт 4: ";
-	pleasureDuck.FlyWithPleasure();
-
-	// Демонстрация с нелетающей уткой
-	std::cout << "\nРезиновая утка (не умеет летать) пытается летать с удовольствием:" << std::endl;
-	RubberDuck rubberPleasureDuck;
-	rubberPleasureDuck.Display();
-	
-	std::cout << "Попытка полёта 1: ";
-	rubberPleasureDuck.FlyWithPleasure();
-	
-	std::cout << "Попытка полёта 2: ";
-	rubberPleasureDuck.FlyWithPleasure();
 
 	return EXIT_SUCCESS;
 }

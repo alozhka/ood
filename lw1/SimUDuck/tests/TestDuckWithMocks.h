@@ -1,21 +1,21 @@
 #pragma once
 
 #include "../lib/Duck/Duck.h"
-#include "../lib/Duck/Dance/NoDance.h"
 
 class TestDuckWithMocks : public Duck
 {
 public:
 	TestDuckWithMocks(std::unique_ptr<IFlyBehavior>&& flyBehavior,
-					  std::unique_ptr<IQuackBehavior>&& quackBehavior)
+					  std::unique_ptr<IQuackBehavior>&& quackBehavior,
+					  std::unique_ptr<IDanceBehavior>&& danceBehavior)
 		: Duck(std::move(flyBehavior),
 			   std::move(quackBehavior),
-			   std::make_unique<NoDance>())
+			   std::move(danceBehavior))
 	{
 	}
 
 	void Display() const override
 	{
-		// Пустая реализация для тестирования
+		std::cout << "Test duck";
 	}
 };

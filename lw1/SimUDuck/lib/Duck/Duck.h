@@ -7,7 +7,6 @@
 #include <cassert>
 #include <iostream>
 #include <memory>
-#include <vector>
 
 class Duck
 {
@@ -34,11 +33,6 @@ public:
 	}
 
 	void Fly() const
-	{
-		m_flyBehavior->Fly();
-	}
-
-	void FlyWithPleasure() const
 	{
 		m_flyBehavior->Fly([this] -> void {
 			m_quackBehavior->Quack();

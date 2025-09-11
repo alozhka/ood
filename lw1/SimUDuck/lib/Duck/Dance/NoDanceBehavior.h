@@ -2,7 +2,7 @@
 
 #include "IDanceBehavior.h"
 
-class NoDance : public IDanceBehavior
+class NoDanceBehavior : public IDanceBehavior
 {
 public:
 	void Dance() const override {}

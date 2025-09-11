@@ -29,28 +29,14 @@ add_executable(SimUDuck main.cpp
         lib/Duck/Quack/QuackBehavior.h
         lib/Duck/Quack/SqueakBehavior.h
         lib/Duck/Dance/IDanceBehavior.h
-        lib/Duck/Dance/WaltzDance.h
-        lib/Duck/Dance/MinuetDance.h
-        lib/Duck/Dance/NoDance.h)
+        lib/Duck/Dance/WaltzDanceBehavior.h
+        lib/Duck/Dance/MinuetDanceBehavior.h
+        lib/Duck/Dance/NoDanceBehavior.h)
 
 enable_testing()
 
-add_executable(DanceTests tests/DanceTests.cpp
+add_executable(DuckBehaviorTests tests/DuckBehaviorTests.cpp
         tests/MockDanceBehavior.h
-        tests/TestDuck.h
-        lib/Duck/Duck.h
-        lib/Duck/Fly/FlyNoWay.h
-        lib/Duck/Fly/IFlyBehavior.h
-        lib/Duck/Quack/IQuakBehavior.h
-        lib/Duck/Quack/MuteQuackBehavior.h
-        lib/Duck/Dance/IDanceBehavior.h)
-
-target_link_libraries(DanceTests 
-  gtest_main
-  gtest
-)
-
-add_executable(FlightPleasureTests tests/FlightPleasureTests.cpp
         tests/MockFlyBehavior.h
         tests/MockQuackBehavior.h
         tests/TestDuckWithMocks.h
@@ -58,14 +44,14 @@ add_executable(FlightPleasureTests tests/FlightPleasureTests.cpp
         lib/Duck/Fly/FlyNoWay.h
         lib/Duck/Fly/IFlyBehavior.h
         lib/Duck/Quack/IQuakBehavior.h
+        lib/Duck/Quack/MuteQuackBehavior.h
         lib/Duck/Dance/IDanceBehavior.h
-        lib/Duck/Dance/NoDance.h)
+        lib/Duck/Dance/NoDanceBehavior.h)
 
-target_link_libraries(FlightPleasureTests 
+target_link_libraries(DuckBehaviorTests 
   gtest_main
   gtest
 )
 
 include(GoogleTest)
-gtest_discover_tests(DanceTests)
-gtest_discover_tests(FlightPleasureTests)
+gtest_discover_tests(DuckBehaviorTests)

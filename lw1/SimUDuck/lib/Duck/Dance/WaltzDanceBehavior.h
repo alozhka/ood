@@ -3,7 +3,7 @@
 #include "IDanceBehavior.h"
 #include <iostream>
 
-class WaltzDance : public IDanceBehavior
+class WaltzDanceBehavior : public IDanceBehavior
 {
 public:
 	void Dance() const override

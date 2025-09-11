@@ -6,4 +6,6 @@ class FlyNoWay : public IFlyBehavior
 {
 public:
 	void Fly() override {}
+
+	void Fly(const std::function<void()>& onSpecialFlight) override {}
 };

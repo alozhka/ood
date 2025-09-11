@@ -50,5 +50,22 @@ target_link_libraries(DanceTests
   gtest
 )
 
+add_executable(FlightPleasureTests tests/FlightPleasureTests.cpp
+        tests/MockFlyBehavior.h
+        tests/MockQuackBehavior.h
+        tests/TestDuckWithMocks.h
+        lib/Duck/Duck.h
+        lib/Duck/Fly/FlyNoWay.h
+        lib/Duck/Fly/IFlyBehavior.h
+        lib/Duck/Quack/IQuakBehavior.h
+        lib/Duck/Dance/IDanceBehavior.h
+        lib/Duck/Dance/NoDance.h)
+
+target_link_libraries(FlightPleasureTests 
+  gtest_main
+  gtest
+)
+
 include(GoogleTest)
 gtest_discover_tests(DanceTests)
+gtest_discover_tests(FlightPleasureTests)

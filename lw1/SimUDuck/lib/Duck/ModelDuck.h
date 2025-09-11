@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Dance/NoDance.h"
 #include "Duck.h"
 #include "Fly/FlyNoWay.h"
 #include "Quack/QuackBehavior.h"
@@ -8,7 +9,7 @@ class ModelDuck : public Duck
 {
 public:
 	ModelDuck()
-		: Duck(std::make_unique<FlyNoWay>(), std::make_unique<QuackBehavior>())
+		: Duck(std::make_unique<FlyNoWay>(), std::make_unique<QuackBehavior>(), std::make_unique<NoDance>())
 	{
 	}
 
@@ -16,6 +17,4 @@ public:
 	{
 		std::cout << "I'm model duck" << std::endl;
 	}
-
-	void Dance() override {}
 };

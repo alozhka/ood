@@ -6,32 +6,6 @@
 #include "lib/DuckFunctions.h"
 #include <cstdlib>
 
-using Strategy = std::function<int(int x, int y)>;
-class Context
-{
-public:
-	void SetStrategy(const Strategy& s)
-	{
-		m_strategy = s;
-	}
-
-	[[nodiscard]] int Perform(int x, int y) const
-	{
-		if (m_strategy)
-		{
-			return m_strategy(x, y);
-		}
-		return 0;
-	}
-
-private:
-	Strategy m_strategy;
-};
-
-int AddStrategy(int x, int y)
-{
-	return x < y;
-}
 int main()
 {
 	MallardDuck mallardDuck;
@@ -52,7 +26,7 @@ int main()
 	ModelDuck modelDuck;
 	PlayWithDuck(modelDuck);
 
-	modelDuck.SetFlyBehavior(FlyWithWings);
+	modelDuck.SetFlyBehavior(CreateFlyWithWings());
 	PlayWithDuck(modelDuck);
 
 	return EXIT_SUCCESS;

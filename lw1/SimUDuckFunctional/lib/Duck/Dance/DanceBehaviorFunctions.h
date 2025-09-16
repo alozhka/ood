@@ -5,12 +5,12 @@
 
 using DanceFunction = std::function<void()>;
 
-inline DanceFunction CreateNoDanceBehavior()
+inline DanceFunction CreateNoDance()
 {
 	return [] {};
 }
 
-inline DanceFunction CreateWaltzDanceBehavior()
+inline DanceFunction CreateWaltzDance()
 {
 	return [] {
 		std::cout << "I'm dancing waltz" << std::endl;
@@ -18,7 +18,7 @@ inline DanceFunction CreateWaltzDanceBehavior()
 }
 
 // Функция для создания поведения "танцует менуэт"
-inline DanceFunction CreateMinuetDanceBehavior()
+inline DanceFunction CreateMinuetDance()
 {
 	return [] {
 		std::cout << "I'm dancing minuet" << std::endl;

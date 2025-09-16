@@ -6,7 +6,7 @@ class MallardDuck : public Duck
 {
 public:
 	MallardDuck()
-		: Duck(FlyWithWings, CreateQuackBehavior(), CreateWaltzDanceBehavior())
+		: Duck(CreateFlyWithWings(), CreateQuack(), CreateWaltzDance())
 	{
 	}
 

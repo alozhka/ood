@@ -125,7 +125,7 @@ TEST_F(FunctionalDuckBehaviorTest, SetFlyBehaviorWorks)
 	GetOutput(); // Очищаем вывод
 	
 	// Устанавливаем новое поведение полёта
-	model.SetFlyBehavior(FlyWithWings());
+	model.SetFlyBehavior(CreateFlyWithWings());
 	
 	// Теперь может летать
 	model.Fly();

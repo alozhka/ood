@@ -6,7 +6,7 @@ class RedheadDuck : public Duck
 {
 public:
 	RedheadDuck()
-		: Duck(FlyWithWings, CreateQuackBehavior(), CreateMinuetDanceBehavior())
+		: Duck(CreateFlyWithWings(), CreateQuack(), CreateMinuetDance())
 	{
 	}
 

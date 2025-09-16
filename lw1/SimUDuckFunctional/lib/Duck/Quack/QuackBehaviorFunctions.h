@@ -5,21 +5,21 @@
 
 using QuackFunction = std::function<void()>;
 
-inline QuackFunction CreateQuackBehavior()
+inline QuackFunction CreateQuack()
 {
 	return []() -> void {
 		std::cout << "Quack" << std::endl;
 	};
 }
 
-inline QuackFunction CreateSqueakBehavior()
+inline QuackFunction CreateSqueak()
 {
 	return [] {
 		std::cout << "Squeak" << std::endl;
 	};
 }
 
-inline QuackFunction CreateMuteQuackBehavior()
+inline QuackFunction CreateMuteQuack()
 {
 	return [] {};
 }

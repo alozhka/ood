@@ -37,9 +37,7 @@ enable_testing()
 
 add_executable(DuckBehaviorTests tests/DuckBehaviorTests.cpp
         tests/MockDanceBehavior.h
-        tests/MockFlyBehavior.h
-        tests/MockQuackBehavior.h
-        tests/TestDuckWithMocks.h
+        tests/MockDuck.h
         lib/Duck/Duck.h
         lib/Duck/Fly/FlyNoWay.h
         lib/Duck/Fly/IFlyBehavior.h

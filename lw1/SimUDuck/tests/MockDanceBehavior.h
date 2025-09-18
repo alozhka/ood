@@ -7,20 +7,20 @@ class MockDanceBehavior : public IDanceBehavior
 {
 public:
 	MockDanceBehavior()
-		: m_wasCalled(false)
+		: m_callCount(0)
 	{
 	}
 
 	void Dance() const override
 	{
-		m_wasCalled = true;
+		++m_callCount;
 	}
 
-	bool WasCalled() const
+	int GetCallCount() const
 	{
-		return m_wasCalled;
+		return m_callCount;
 	}
 
 private:
-	mutable bool m_wasCalled;
+	mutable int m_callCount;
 };

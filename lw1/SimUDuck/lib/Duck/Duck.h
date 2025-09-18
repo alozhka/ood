@@ -5,6 +5,7 @@
 #include "Dance/IDanceBehavior.h"
 
 #include <cassert>
+#include <functional>
 #include <iostream>
 #include <memory>
 
@@ -15,7 +16,7 @@ public:
 		std::unique_ptr<IQuackBehavior>&& quackBehavior,
 		std::unique_ptr<IDanceBehavior>&& danceBehavior)
 		: m_quackBehavior(std::move(quackBehavior))
-		, m_danceBehavior(std::move(danceBehavior))
+		  , m_danceBehavior(std::move(danceBehavior))
 	{
 		assert(m_quackBehavior);
 		assert(m_danceBehavior);
@@ -34,9 +35,14 @@ public:
 
 	void Fly() const
 	{
-		m_flyBehavior->Fly([this] -> void {
-			m_quackBehavior->Quack();
-		});
+		std::cout << "Flight #" << m_flyBehavior->GetFlyCount() + 1 << std::endl;
+
+		m_flyBehavior->Fly();
+
+		if (m_flyBehavior->GetFlyCount() % 2 == 0)
+		{
+			Quack();
+		}
 	}
 
 	void Dance() const

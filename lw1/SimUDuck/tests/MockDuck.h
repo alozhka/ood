@@ -1,19 +1,25 @@
 #pragma once
 
+#include "MockFlyBehavior.h"
+#include "MockQuackBehavior.h"
 #include "../lib/Duck/Duck.h"
-#include "../lib/Duck/Quack/QuackBehavior.h"
 
-class MockDuck : public Duck {
+class MockDuck final : public Duck
+{
 public:
-    explicit MockDuck(std::unique_ptr<IDanceBehavior> &&danceBehavior)
-        : Duck(
-            std::make_unique<FlyNoWay>(),
-            std::make_unique<QuackBehavior>(),
-            std::move(danceBehavior)
-        ) {
-    }
+	explicit MockDuck(
+		std::unique_ptr<IQuackBehavior>&& quackBehavior,
+		std::unique_ptr<IFlyBehavior>&& flyBehavior,
+		std::unique_ptr<IDanceBehavior>&& danceBehavior)
+		: Duck(
+			std::move(flyBehavior),
+			std::move(quackBehavior),
+			std::move(danceBehavior)
+			) {}
 
-    void Display() const override {
-        std::cout << "Mock duck";
-    }
+	void Display() const override
+	{
+		std::cout << "Mock duck";
+	}
 };
+

@@ -44,7 +44,9 @@ add_executable(DuckBehaviorTests tests/DuckBehaviorTests.cpp
         lib/Duck/Quack/IQuakBehavior.h
         lib/Duck/Quack/MuteQuackBehavior.h
         lib/Duck/Dance/IDanceBehavior.h
-        lib/Duck/Dance/NoDanceBehavior.h)
+        lib/Duck/Dance/NoDanceBehavior.h
+        tests/MockFlyBehavior.h
+        tests/MockQuackBehavior.h)
 
 target_link_libraries(DuckBehaviorTests 
   gtest_main

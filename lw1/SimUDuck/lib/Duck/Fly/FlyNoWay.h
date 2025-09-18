@@ -2,10 +2,13 @@
 
 #include "IFlyBehavior.h"
 
-class FlyNoWay : public IFlyBehavior
+class FlyNoWay final : public IFlyBehavior
 {
 public:
 	void Fly() override {}
 
-	void Fly(const std::function<void()>& onSpecialFlight) override {}
+	int GetFlyCount() override
+	{
+		return 0;
+	}
 };

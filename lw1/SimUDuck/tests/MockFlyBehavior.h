@@ -4,9 +4,6 @@
 class MockFlyBehavior final : public IFlyBehavior
 {
 public:
-	explicit MockFlyBehavior(bool flyable = true)
-		: m_flyable(flyable) {}
-
 	void Fly() override
 	{
 		++m_flyCounter;
@@ -17,7 +14,11 @@ public:
 		return m_flyCounter;
 	}
 
+	bool IsFlyable() override
+	{
+		return true;
+	}
+
 private:
 	int m_flyCounter = 0;
-	bool m_flyable;
 };

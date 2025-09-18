@@ -14,6 +14,11 @@ public:
 		return m_quackCounter;
 	}
 
+	bool IsQuackable() override
+	{
+		return true;
+	}
+
 private:
 	int m_quackCounter = 0;
 };

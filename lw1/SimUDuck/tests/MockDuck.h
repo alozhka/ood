@@ -1,7 +1,5 @@
 #pragma once
 
-#include "MockFlyBehavior.h"
-#include "MockQuackBehavior.h"
 #include "../lib/Duck/Duck.h"
 
 class MockDuck final : public Duck
@@ -22,4 +20,3 @@ public:
 		std::cout << "Mock duck";
 	}
 };
-

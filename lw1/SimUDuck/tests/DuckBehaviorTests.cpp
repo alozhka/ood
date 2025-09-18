@@ -1,10 +1,13 @@
 #include "MockDanceBehavior.h"
 #include "MockDuck.h"
+#include "MockFlyBehavior.h"
+#include "MockQuackBehavior.h"
 #include "../lib/Duck/Dance/NoDanceBehavior.h"
 #include "../lib/Duck/Fly/FlyNoWay.h"
 
 #include <gtest/gtest.h>
 #include <memory>
+
 
 class DuckBehaviorTest : public testing::Test
 {

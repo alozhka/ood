@@ -35,11 +35,14 @@ public:
 
 	void Fly() const
 	{
-		std::cout << "Flight #" << m_flyBehavior->GetFlyCount() + 1 << std::endl;
+		if (!m_flyBehavior->IsFlyable())
+		{
+			return;
+		}
 
 		m_flyBehavior->Fly();
 
-		if (m_flyBehavior->GetFlyCount() % 2 == 0)
+		if (m_quackBehavior->IsQuackable() && m_flyBehavior->GetFlyCount() % 2 == 0)
 		{
 			Quack();
 		}

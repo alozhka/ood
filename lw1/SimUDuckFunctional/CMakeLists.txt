@@ -30,7 +30,7 @@ add_executable(SimUDuckFunctional main.cpp
 
 enable_testing()
 
-add_executable(FunctionalDuckBehaviorTests tests/FunctionalDuckBehaviorTests.cpp
+add_executable(FunctionalDuckBehaviorTests tests/DuckBehaviorTests.cpp
         lib/Duck/Duck.h
         lib/Duck/MallardDuck.h
         lib/Duck/RedheadDuck.h

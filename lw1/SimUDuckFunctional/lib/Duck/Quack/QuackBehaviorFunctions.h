@@ -1,25 +1,33 @@
 #pragma once
-
 #include <functional>
 #include <iostream>
 
-using QuackFunction = std::function<void()>;
-
-inline QuackFunction CreateQuack()
+struct QuackBehavior
 {
-	return []() -> void {
-		std::cout << "Quack" << std::endl;
+	std::function<void()> Quack;
+	std::function<bool()> IsQuackable;
+};
+
+inline QuackBehavior CreateMuteQuack()
+{
+	return {
+		[] {},
+		[] { return false; }
 	};
 }
 
-inline QuackFunction CreateSqueak()
+inline QuackBehavior CreateQuack()
 {
-	return [] {
-		std::cout << "Squeak" << std::endl;
+	return {
+		[] { std::cout << "Quack Quack!!!\n"; },
+		[] { return true; }
 	};
 }
 
-inline QuackFunction CreateMuteQuack()
+inline QuackBehavior CreateSqueak()
 {
-	return [] {};
+	return {
+		[] { std::cout << "Squeek!!!\n"; },
+		[] { return true; }
+	};
 }

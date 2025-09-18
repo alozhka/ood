@@ -6,7 +6,10 @@ class RedheadDuck : public Duck
 {
 public:
 	RedheadDuck()
-		: Duck(CreateFlyWithWings(), CreateQuack(), CreateMinuetDance())
+		: Duck(
+			  std::make_unique<FlyBehavior>(CreateFlyWithWings()),
+			  std::make_unique<QuackBehavior>(CreateQuack()),
+			  std::make_unique<DanceBehavior>(CreateMinuet()))
 	{
 	}
 

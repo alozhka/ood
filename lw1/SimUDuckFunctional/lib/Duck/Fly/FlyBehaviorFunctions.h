@@ -1,25 +1,31 @@
 #pragma once
-
 #include <functional>
-#include <iostream>
 
-using FlyCallback = std::function<void()>;
-using FlyFunction = std::function<void(const FlyCallback&)>;
-
-FlyFunction CreateFlyWithWings()
+struct FlyBehavior
 {
-	return [flightCount = 0](const std::function<void()>& onSpecialFlight) mutable {
-		++flightCount;
-		std::cout << "I'm flying with wings! Flight #" << flightCount << std::endl;
+	std::function<void()> Fly;
+	std::function<bool()> IsFlyable;
+	std::function<int()> GetFlyCount;
+};
 
-		if (flightCount % 2 == 0)
-		{
-			onSpecialFlight();
-		}
+inline FlyBehavior CreateFlyNoWay()
+{
+	return {
+		[] {},
+		[] { return false; },
+		[] { return 0; }
 	};
 }
 
-FlyFunction CreateFlyNoWay()
+inline FlyBehavior CreateFlyWithWings()
 {
-	return FlyFunction([](const FlyCallback& onSpecialFlight) {});
+	auto flyCount = std::make_shared<int>(0);
+
+	return {
+		[flyCount] {
+			std::cout << "Im flying with wings!! Flight #" << ++*flyCount << std::endl;
+		},
+		[] { return true; },
+		[flyCount] { return *flyCount; }
+	};
 }

@@ -1,12 +1,16 @@
 #pragma once
 
 #include "Duck.h"
+#include <iostream>
 
 class RubberDuck : public Duck
 {
 public:
 	RubberDuck()
-		: Duck(CreateFlyNoWay(), CreateSqueak(), CreateNoDance())
+		: Duck(
+			  std::make_unique<FlyBehavior>(CreateFlyNoWay()),
+			  std::make_unique<QuackBehavior>(CreateSqueak()),
+			  std::make_unique<DanceBehavior>(CreateNoDance()))
 	{
 	}
 

@@ -7,25 +7,27 @@
 #include <cassert>
 #include <functional>
 #include <iostream>
+#include <memory>
+
+struct FlyBehavior;
 
 class Duck
 {
 public:
-	Duck(FlyFunction flyBehavior,
-		QuackFunction quackBehavior,
-		DanceFunction danceBehavior)
-		: m_flyBehavior(std::move(flyBehavior))
-		, m_quackBehavior(std::move(quackBehavior))
+	Duck(std::unique_ptr<FlyBehavior>&& flyBehavior,
+		std::unique_ptr<QuackBehavior>&& quackBehavior,
+		std::unique_ptr<DanceBehavior>&& danceBehavior)
+		: m_quackBehavior(std::move(quackBehavior))
 		, m_danceBehavior(std::move(danceBehavior))
 	{
-		assert(m_flyBehavior);
 		assert(m_quackBehavior);
 		assert(m_danceBehavior);
+		SetFlyBehavior(std::move(flyBehavior));
 	}
 
 	void Quack() const
 	{
-		m_quackBehavior();
+		m_quackBehavior->Quack();
 	}
 
 	void Swim() const
@@ -35,28 +37,35 @@ public:
 
 	void Fly() const
 	{
-		auto callback = [this]() -> void {
-			m_quackBehavior();
-		};
-		m_flyBehavior(callback);
+		if (!m_flyBehavior->IsFlyable())
+		{
+			return;
+		}
+
+		m_flyBehavior->Fly();
+
+		if (m_quackBehavior->IsQuackable() && m_flyBehavior->GetFlyCount() % 2 == 0)
+		{
+			Quack();
+		}
 	}
 
 	void Dance() const
 	{
-		m_danceBehavior();
+		(*m_danceBehavior)();
 	}
 
-	void SetFlyBehavior(const FlyFunction& flyBehavior)
+	void SetFlyBehavior(std::unique_ptr<FlyBehavior>&& flyBehavior)
 	{
 		assert(flyBehavior);
-		m_flyBehavior = flyBehavior;
+		m_flyBehavior = std::move(flyBehavior);
 	}
 
 	virtual void Display() const = 0;
 	virtual ~Duck() = default;
 
 private:
-	FlyFunction m_flyBehavior;
-	QuackFunction m_quackBehavior;
-	DanceFunction m_danceBehavior;
+	std::unique_ptr<FlyBehavior> m_flyBehavior;
+	std::unique_ptr<QuackBehavior> m_quackBehavior;
+	std::unique_ptr<DanceBehavior> m_danceBehavior;
 };

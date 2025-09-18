@@ -1,26 +1,20 @@
 #pragma once
-
 #include <functional>
 #include <iostream>
 
-using DanceFunction = std::function<void()>;
+using DanceBehavior = std::function<void()>;
 
-inline DanceFunction CreateNoDance()
+inline DanceBehavior CreateNoDance()
 {
 	return [] {};
 }
 
-inline DanceFunction CreateWaltzDance()
+inline DanceBehavior CreateMinuet()
 {
-	return [] {
-		std::cout << "I'm dancing waltz" << std::endl;
-	};
+	return [] { std::cout << "I'm dancing minuet\n"; };
 }
 
-// Функция для создания поведения "танцует менуэт"
-inline DanceFunction CreateMinuetDance()
+static DanceBehavior CreateWaltz()
 {
-	return [] {
-		std::cout << "I'm dancing minuet" << std::endl;
-	};
+	return [] { std::cout << "I'm dancing waltz\n"; };
 }

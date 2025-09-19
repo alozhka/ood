@@ -1,5 +1,9 @@
-//
-// Created by Сергей Ложкин on 19.09.2025.
-//
 
 #include "../commands/ShapesFactory.h"
+std::unique_ptr<shapes::IShapeStrategy> ShapesFactory::CreateFromStream(const std::string& type, std::istream& params)
+{
+	if (type == "circle")
+	{
+		return std::make_unique<>()
+	}
+}

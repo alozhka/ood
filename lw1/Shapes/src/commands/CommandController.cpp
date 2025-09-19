@@ -46,5 +46,6 @@ void CommandController::ProcessAddShape(std::istream& input)
 		throw std::invalid_argument("Invalid arguments. Usage: AddShape <id> <цвет> <тип> <параметры>");
 	}
 
-	IShapeStrategy shape = ShapesFactory::CreateFromStream(type, input);
+	std::unique_ptr<shapes::IShapeStrategy> shape = ShapesFactory::CreateFromStream(type, input);
+
 }

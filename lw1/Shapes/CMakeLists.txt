@@ -30,6 +30,9 @@ add_executable(Shapes main.cpp
         src/shapes/Picture.h
         src/commands/ShapesFactory.cpp
         src/commands/ShapesFactory.h
-        src/shapes/IShapeStrategy.h)
+        src/shapes/strategy/IShapeStrategy.h
+        src/shapes/Shape.cpp
+        src/shapes/Shape.h
+        src/shapes/strategy/ShapesStrategies.h)
 
 target_link_libraries(Shapes SFML::Graphics)

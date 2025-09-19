@@ -1,10 +1,10 @@
 #pragma once
-#include "../shapes/IShapeStrategy.h"
+#include "../shapes/strategy/IShapeStrategy.h"
 
 #include <string>
 
 class ShapesFactory
 {
 public:
-	static IShapeStrategy CreateFromStream(const std::string& type, std::istream& params);
+	static std::unique_ptr<shapes::IShapeStrategy> CreateFromStream(const std::string& type, std::istream& params);
 };

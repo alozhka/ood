@@ -23,6 +23,13 @@ FetchContent_MakeAvailable(SFML)
 add_executable(Shapes main.cpp
         src/Draw/ICanvas.h
         src/Draw/SFMLCanvas.cpp
-        src/Draw/SFMLCanvas.h)
+        src/Draw/SFMLCanvas.h
+        src/commands/CommandController.cpp
+        src/commands/CommandController.h
+        src/shapes/Picture.cpp
+        src/shapes/Picture.h
+        src/commands/ShapesFactory.cpp
+        src/commands/ShapesFactory.h
+        src/shapes/IShapeStrategy.h)
 
 target_link_libraries(Shapes SFML::Graphics)

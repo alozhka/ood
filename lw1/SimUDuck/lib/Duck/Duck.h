@@ -42,7 +42,7 @@ public:
 
 		m_flyBehavior->Fly();
 
-		if (m_quackBehavior->IsQuackable() && m_flyBehavior->GetFlyCount() % 2 == 0)
+		if (m_quackBehavior->IsQuackable() && m_flyBehavior->GetFlightCount() % 2 == 0)
 		{
 			Quack();
 		}

@@ -7,12 +7,12 @@ class FlyNoWay final : public IFlyBehavior
 public:
 	void Fly() override {}
 
-	bool IsFlyable() override
+	bool IsFlyable() const override
 	{
 		return false;
 	}
 
-	int GetFlyCount() override
+	int GetFlightCount() const override
 	{
 		return 0;
 	}

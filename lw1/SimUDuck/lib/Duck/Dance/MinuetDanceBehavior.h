@@ -6,7 +6,7 @@
 class MinuetDanceBehavior : public IDanceBehavior
 {
 public:
-	void Dance() const override
+	void Dance() override
 	{
 		std::cout << "I'm dancing minuet" << std::endl;
 	}

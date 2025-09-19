@@ -11,7 +11,7 @@ public:
 	{
 	}
 
-	void Dance() const override
+	void Dance() override
 	{
 		++m_callCount;
 	}
@@ -22,5 +22,5 @@ public:
 	}
 
 private:
-	mutable int m_callCount;
+	int m_callCount;
 };

@@ -4,8 +4,8 @@ struct IFlyBehavior
 {
 	virtual void Fly() = 0;
 
-	virtual int GetFlyCount() = 0;
-	virtual bool IsFlyable() = 0;
+	virtual int GetFlightCount() const = 0;
+	virtual bool IsFlyable() const = 0;
 
 	virtual ~IFlyBehavior() = default;
 };

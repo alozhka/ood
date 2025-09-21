@@ -3,12 +3,12 @@
 
 #include <unordered_map>
 
-namespace Shapes
+namespace shapes
 {
 class Picture
 {
 public:
-	Picture() = default;
+	Picture();
 	Picture(const Picture& other);
 
 	void AddShape(std::unique_ptr<Shape> shape);

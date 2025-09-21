@@ -2,7 +2,7 @@
 
 #include <cassert>
 
-Shape::Shape(int id, gfx::Color color, std::unique_ptr<shapes::IShapeStrategy> strategy)
+Shape::Shape(std::string id, gfx::Color color, std::unique_ptr<shapes::IShapeStrategy> strategy)
 	: m_id(id)
 	, m_color(color)
 	, m_shapeStrategy(std::move(strategy))
@@ -20,7 +20,7 @@ void Shape::Move(double dx, double dy) const
 	m_shapeStrategy->Move(dx, dy);
 }
 
-int Shape::GetId() const
+std::string Shape::GetId() const
 {
 	return m_id;
 }

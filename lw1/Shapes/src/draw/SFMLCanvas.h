@@ -2,12 +2,14 @@
 #include "ICanvas.h"
 #include <SFML/Graphics.hpp>
 
-class SFMLCanvas : gfx::ICanvas
+namespace gfx
+{
+class SFMLCanvas : public ICanvas
 {
 public:
 	explicit SFMLCanvas(sf::RenderWindow& window);
 
-	void SetColor(gfx::Color c) override;
+	void SetColor(Color c) override;
 	void MoveTo(double x, double y) override;
 	void LineTo(double x, double y) override;
 	void DrawEclipse(double cx, double cy, double rx, double ry) override;
@@ -19,3 +21,5 @@ private:
 	double m_currentX, m_currentY;
 	sf::Font m_font;
 };
+
+} // namespace gfx

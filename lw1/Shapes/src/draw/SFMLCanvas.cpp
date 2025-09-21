@@ -1,6 +1,6 @@
 #include "SFMLCanvas.h"
 
-SFMLCanvas::SFMLCanvas(sf::RenderWindow& window)
+gfx::SFMLCanvas::SFMLCanvas(sf::RenderWindow& window)
 	: m_window(window)
 	, m_currentColor(sf::Color::Black)
 	, m_currentX(0)
@@ -21,18 +21,18 @@ SFMLCanvas::SFMLCanvas(sf::RenderWindow& window)
 	}
 }
 
-void SFMLCanvas::SetColor(gfx::Color c)
+void gfx::SFMLCanvas::SetColor(gfx::Color c)
 {
 	m_currentColor = sf::Color(c.R, c.G, c.B);
 }
 
-void SFMLCanvas::MoveTo(double x, double y)
+void gfx::SFMLCanvas::MoveTo(double x, double y)
 {
 	m_currentX = x;
 	m_currentY = y;
 }
 
-void SFMLCanvas::LineTo(double x, double y)
+void gfx::SFMLCanvas::LineTo(double x, double y)
 {
 	sf::Vertex line[2] = {
 		sf::Vertex(sf::Vector2f(static_cast<float>(m_currentX), static_cast<float>(m_currentY)), m_currentColor),
@@ -45,7 +45,7 @@ void SFMLCanvas::LineTo(double x, double y)
 	m_currentY = y;
 }
 
-void SFMLCanvas::DrawEclipse(double cx, double cy, double rx, double ry)
+void gfx::SFMLCanvas::DrawEclipse(double cx, double cy, double rx, double ry)
 {
 	sf::CircleShape ellipse(static_cast<float>(rx));
 	ellipse.setScale(sf::Vector2f(1.0f, static_cast<float>(ry / rx)));
@@ -56,7 +56,7 @@ void SFMLCanvas::DrawEclipse(double cx, double cy, double rx, double ry)
 	m_window.draw(ellipse);
 }
 
-void SFMLCanvas::DrawText(double left, double top, double fontSize, const std::string& text)
+void gfx::SFMLCanvas::DrawText(double left, double top, double fontSize, const std::string& text)
 {
 	sf::Text sfText(m_font, text, static_cast<unsigned int>(fontSize));
 	sfText.setFillColor(m_currentColor);

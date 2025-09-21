@@ -24,8 +24,8 @@ add_executable(Shapes main.cpp
         src/Draw/ICanvas.h
         src/Draw/SFMLCanvas.cpp
         src/Draw/SFMLCanvas.h
-        src/commands/CommandController.cpp
-        src/commands/CommandController.h
+        src/commands/ShapesController.cpp
+        src/commands/ShapesController.h
         src/shapes/Picture.cpp
         src/shapes/Picture.h
         src/commands/ShapesFactory.cpp

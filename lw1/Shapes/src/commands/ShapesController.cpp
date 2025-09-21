@@ -1,18 +1,19 @@
-#include "CommandController.h"
+#include "ShapesController.h"
 
 #include "ShapesFactory.h"
 
 #include <sstream>
 
-CommandController::CommandController(gfx::ICanvas& canvas, std::istream& input, std::ostream& output)
-	: m_canvas(canvas)
+ShapesController::ShapesController(shapes::Picture& picture, gfx::ICanvas& canvas, std::istream& input, std::ostream& output)
+	: m_actions{ { "AddShape", std::bind_front(&ShapesController::ProcessAddShape, this) } }
+	, m_picture(picture)
+	, m_canvas(canvas)
 	, m_input(input)
 	, m_output(output)
-	, m_actions{ { "AddShape", std::bind_front(&CommandController::ProcessAddShape, this) } }
 {
 }
 
-void CommandController::ProcessCommand()
+void ShapesController::ProcessCommand()
 {
 	std::string command;
 	std::getline(m_input, command);
@@ -38,7 +39,7 @@ void CommandController::ProcessCommand()
 	}
 }
 
-void CommandController::ProcessAddShape(std::istream& input)
+void ShapesController::ProcessAddShape(std::istream& input)
 {
 	std::string id, color, type;
 	if (!(input >> id >> color >> type))
@@ -46,6 +47,7 @@ void CommandController::ProcessAddShape(std::istream& input)
 		throw std::invalid_argument("Invalid arguments. Usage: AddShape <id> <цвет> <тип> <параметры>");
 	}
 
-	std::unique_ptr<shapes::IShapeStrategy> shape = ShapesFactory::CreateFromStream(type, input);
-
+	std::unique_ptr<shapes::IShapeStrategy> strategy = ShapesFactory::CreateFromStream(type, input);
+	auto shape = std::make_unique<Shape>(id, gfx::Color::FromHex(color), std::move(strategy));
+	m_picture.AddShape(std::move(shape));
 }

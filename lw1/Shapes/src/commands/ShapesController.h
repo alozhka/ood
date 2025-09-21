@@ -8,10 +8,14 @@
 #include <functional>
 #include <map>
 
-class CommandController
+class ShapesController
 {
 public:
-	CommandController(/*shapes::Picture& picture, */ gfx::ICanvas& canvas, std::istream& input, std::ostream& output);
+	ShapesController(
+		shapes::Picture& picture,
+		gfx::ICanvas& canvas,
+		std::istream& input,
+		std::ostream& output);
 	void ProcessCommand();
 
 private:
@@ -19,7 +23,7 @@ private:
 	void ProcessMoveShape(std::istream& input);
 	void ProcessDeleteShape(std::istream& input);
 	void ProcessMovePicture(std::istream& input);
-	void ProcessList();
+	void ProcessList() const;
 	void ProcessChangeColor(std::istream& input);
 	void ProcessChangeShape(std::istream& input);
 	void ProcessDrawShape(std::istream& input);
@@ -30,6 +34,7 @@ private:
 	using ActionMap = std::map<std::string, std::function<void(std::istream&)>>;
 
 	ActionMap m_actions;
+	shapes::Picture& m_picture;
 	gfx::ICanvas& m_canvas;
 	std::istream& m_input;
 	std::ostream& m_output;

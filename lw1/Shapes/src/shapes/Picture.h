@@ -8,7 +8,7 @@ namespace shapes
 class Picture
 {
 public:
-	Picture();
+	Picture() = default;
 	Picture(const Picture& other);
 
 	void AddShape(std::unique_ptr<Shape> shape);
@@ -19,6 +19,6 @@ public:
 	void MovePicture(double x, double y);
 
 private:
-	std::unordered_map<std::string, std::unique_ptr<Shape>> m_shapes;
+	std::unordered_map<std::string, std::unique_ptr<Shape>> m_shapes{};
 };
 } // namespace Shapes

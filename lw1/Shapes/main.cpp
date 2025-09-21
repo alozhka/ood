@@ -11,7 +11,7 @@ int main()
 	shapes::Picture picture;
 	gfx::SFMLCanvas canvas(window);
 	ShapesController controller(picture, canvas, std::cin, std::cout);
-	window.clear(sf::Color::White);
+	window.clear(sf::Color::Black);
 
 	while (window.isOpen())
 	{
@@ -24,7 +24,12 @@ int main()
 			}
 		}
 
-		controller.ProcessCommand();
+		if (std::cin.rdbuf()->in_avail() > 0)
+		{
+			controller.ProcessCommand();
+		}
+
+		window.display();
 	}
 
 	return 0;

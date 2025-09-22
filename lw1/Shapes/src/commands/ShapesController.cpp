@@ -5,7 +5,10 @@
 #include <sstream>
 
 ShapesController::ShapesController(shapes::Picture& picture, gfx::ICanvas& canvas, std::istream& input, std::ostream& output)
-	: m_actions{ { "AddShape", std::bind_front(&ShapesController::ProcessAddShape, this) } }
+	: m_actions{
+		{ "AddShape", std::bind_front(&ShapesController::ProcessAddShape, this) },
+		{ "DrawPicture", std::bind_front(&ShapesController::ProcessDrawPicture, this) }
+	}
 	, m_picture(picture)
 	, m_canvas(canvas)
 	, m_input(input)
@@ -23,7 +26,7 @@ void ShapesController::ProcessCommand()
 	iss >> action;
 
 	const auto it = m_actions.find(action);
-	if (it != m_actions.end())
+	if (it == m_actions.end())
 	{
 		m_output << "Invalid command\n";
 		return;
@@ -50,4 +53,9 @@ void ShapesController::ProcessAddShape(std::istream& input)
 	std::unique_ptr<shapes::IShapeStrategy> strategy = ShapesFactory::CreateFromStream(type, input);
 	auto shape = std::make_unique<Shape>(id, gfx::Color::FromHex(color), std::move(strategy));
 	m_picture.AddShape(std::move(shape));
+}
+
+void ShapesController::ProcessDrawPicture(std::istream& input)
+{
+	m_picture.Draw(m_canvas);
 }

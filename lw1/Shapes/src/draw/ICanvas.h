@@ -27,7 +27,7 @@ struct Color
 			hexStr = hexStr.substr(1);
 		}
 
-		if (!std::regex_match(hex, Regexes::COLOR_REGEX))
+		if (!std::regex_match(hexStr, Regexes::COLOR_REGEX))
 		{
 			throw std::invalid_argument("Invalid color format.");
 		}

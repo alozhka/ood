@@ -24,13 +24,12 @@ int main()
 			}
 		}
 
-		if (std::cin.rdbuf()->in_avail() > 0)
-		{
-			controller.ProcessCommand();
-		}
+		controller.ProcessCommand();
 
 		window.display();
+
+		sf::sleep(sf::milliseconds(15));
 	}
 
-	return 0;
+	return EXIT_SUCCESS;
 }

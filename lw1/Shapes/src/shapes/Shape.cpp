@@ -2,12 +2,11 @@
 
 #include <cassert>
 
-Shape::Shape(std::string id, gfx::Color color, std::unique_ptr<shapes::IShapeStrategy> strategy)
+Shape::Shape(const std::string& id, gfx::Color color, std::unique_ptr<shapes::IShapeStrategy> strategy)
 	: m_id(id)
 	, m_color(color)
 	, m_shapeStrategy(std::move(strategy))
 {
-	assert(strategy);
 }
 
 void Shape::Draw(gfx::ICanvas& canvas) const

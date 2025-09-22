@@ -5,7 +5,7 @@
 class Shape
 {
 public:
-	Shape(std::string id, gfx::Color color, std::unique_ptr<shapes::IShapeStrategy> strategy);
+	Shape(const std::string& id, gfx::Color color, std::unique_ptr<shapes::IShapeStrategy> strategy);
 
 	void Draw(gfx::ICanvas& canvas) const;
 	void Move(double dx, double dy) const;

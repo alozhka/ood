@@ -20,14 +20,12 @@ int main()
 			if (event.has_value() && event->is<sf::Event::Closed>())
 			{
 				window.close();
-				return EXIT_SUCCESS;
+				break;
 			}
 		}
-
 		controller.ProcessCommand();
-
+		window.clear(sf::Color::Black);
 		window.display();
-
 		sf::sleep(sf::milliseconds(15));
 	}
 

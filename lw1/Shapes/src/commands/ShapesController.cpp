@@ -14,12 +14,21 @@ ShapesController::ShapesController(shapes::Picture& picture, gfx::ICanvas& canva
 	, m_input(input)
 	, m_output(output)
 {
+	StartInputThread();
 }
 
 void ShapesController::ProcessCommand()
 {
 	std::string command;
-	std::getline(m_input, command);
+	{
+		std::lock_guard lock(m_queueMutex);
+		if (m_commandQueue.empty())
+		{
+			return;
+		}
+		command = m_commandQueue.front();
+		m_commandQueue.pop();
+	}
 
 	std::istringstream iss(command);
 	std::string action;
@@ -42,6 +51,25 @@ void ShapesController::ProcessCommand()
 	}
 }
 
+void ShapesController::StartInputThread()
+{
+	m_inputThread = std::thread(&ShapesController::InputThreadFunction, this);
+}
+
+void ShapesController::StopInputThread()
+{
+	if (m_inputThread.joinable())
+	{
+		m_threadStopped = true;
+		m_inputThread.join();
+	}
+}
+
+ShapesController::~ShapesController()
+{
+	StopInputThread();
+}
+
 void ShapesController::ProcessAddShape(std::istream& input)
 {
 	std::string id, color, type;
@@ -55,7 +83,18 @@ void ShapesController::ProcessAddShape(std::istream& input)
 	m_picture.AddShape(std::move(shape));
 }
 
-void ShapesController::ProcessDrawPicture(std::istream& input)
+void ShapesController::ProcessDrawPicture(std::istream&)
 {
 	m_picture.Draw(m_canvas);
+}
+
+void ShapesController::InputThreadFunction()
+{
+	std::string line;
+	while (!m_threadStopped && std::getline(m_input, line))
+	{
+		std::lock_guard lock(m_queueMutex);
+		m_commandQueue.emplace(line);
+		return;
+	}
 }

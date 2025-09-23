@@ -52,7 +52,7 @@ void gfx::SFMLCanvas::DrawEclipse(double cx, double cy, double rx, double ry)
 	ellipse.setPosition(sf::Vector2f(static_cast<float>(cx - rx), static_cast<float>(cy - ry)));
 	ellipse.setOutlineColor(m_currentColor);
 	ellipse.setOutlineThickness(1);
-	ellipse.setFillColor(sf::Color::Transparent);
+	ellipse.setFillColor(m_currentColor);
 	m_window.draw(ellipse);
 }
 

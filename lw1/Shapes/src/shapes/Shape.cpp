@@ -9,12 +9,12 @@ Shape::Shape(const std::string& id, gfx::Color color, std::unique_ptr<shapes::IS
 {
 }
 
-void Shape::Draw(gfx::ICanvas& canvas) const
+void Shape::Draw(gfx::ICanvas& canvas)
 {
 	m_shapeStrategy->Draw(canvas);
 }
 
-void Shape::Move(double dx, double dy) const
+void Shape::Move(double dx, double dy)
 {
 	m_shapeStrategy->Move(dx, dy);
 }

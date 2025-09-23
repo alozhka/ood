@@ -12,10 +12,27 @@ void shapes::Picture::AddShape(std::unique_ptr<Shape>&& shape)
 	m_shapes[shape->GetId()] = std::move(shape);
 }
 
-void shapes::Picture::Draw(gfx::ICanvas& canvas)
+void shapes::Picture::DrawShape(const std::string& id, gfx::ICanvas& canvas)
+{
+	Shape* shape = GetShape(id);
+	shape->Draw(canvas);
+}
+
+void shapes::Picture::DrawPicture(gfx::ICanvas& canvas)
 {
 	for (const auto& shape : m_shapes | std::views::values)
 	{
 		shape->Draw(canvas);
 	}
+}
+
+Shape* shapes::Picture::GetShape(const std::string& id) const
+{
+	const auto it = m_shapes.find(id);
+	if (it == m_shapes.end())
+	{
+		throw std::runtime_error("Cannot find shape with ID=" + id);
+	}
+
+	return it->second.get();
 }

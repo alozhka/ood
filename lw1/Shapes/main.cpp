@@ -7,7 +7,9 @@
 
 int main()
 {
-	sf::RenderWindow window(sf::VideoMode(sf::Vector2u(800, 600)), "Shapes");
+	sf::ContextSettings settings;
+	settings.antiAliasingLevel = 8;
+	sf::RenderWindow window(sf::VideoMode(sf::Vector2u(800, 600)), "Shapes", sf::Style::Default, sf::State::Windowed, settings);
 	shapes::Picture picture;
 	gfx::SFMLCanvas canvas(window);
 	ShapesController controller(picture, canvas, std::cin, std::cout);
@@ -24,9 +26,8 @@ int main()
 			}
 		}
 		controller.ProcessCommand();
-		window.clear(sf::Color::Black);
 		window.display();
-		sf::sleep(sf::milliseconds(15));
+		sf::sleep(sf::milliseconds(50));
 	}
 
 	return EXIT_SUCCESS;

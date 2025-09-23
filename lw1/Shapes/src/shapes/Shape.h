@@ -7,8 +7,8 @@ class Shape
 public:
 	Shape(const std::string& id, gfx::Color color, std::unique_ptr<shapes::IShapeStrategy> strategy);
 
-	void Draw(gfx::ICanvas& canvas) const;
-	void Move(double dx, double dy) const;
+	void Draw(gfx::ICanvas& canvas);
+	void Move(double dx, double dy);
 
 	std::string GetId() const;
 

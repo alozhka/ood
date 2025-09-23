@@ -12,15 +12,17 @@ public:
 	Picture(const Picture& other);
 
 	void AddShape(std::unique_ptr<Shape>&& shape);
-	void RemoveShape(int id);
-	std::weak_ptr<Shape> GetShape(int id) const;
+	void RemoveShape(const std::string& id);
 
 	void MoveShape(int id, double x, double y);
 	void MovePicture(double x, double y);
 
-	void Draw(gfx::ICanvas& canvas);
+	void DrawShape(const std::string& id, gfx::ICanvas& canvas);
+	void DrawPicture(gfx::ICanvas& canvas);
 
 private:
+	Shape* GetShape(const std::string& id) const;
+
 	std::unordered_map<std::string, std::unique_ptr<Shape>> m_shapes{};
 };
 } // namespace shapes

@@ -7,6 +7,7 @@
 ShapesController::ShapesController(shapes::Picture& picture, gfx::ICanvas& canvas, std::istream& input, std::ostream& output)
 	: m_actions{
 		{ "AddShape", std::bind_front(&ShapesController::ProcessAddShape, this) },
+		{ "DrawShape", std::bind_front(&ShapesController::ProcessDrawShape, this) },
 		{ "DrawPicture", std::bind_front(&ShapesController::ProcessDrawPicture, this) }
 	}
 	, m_picture(picture)
@@ -83,18 +84,35 @@ void ShapesController::ProcessAddShape(std::istream& input)
 	m_picture.AddShape(std::move(shape));
 }
 
+void ShapesController::ProcessDrawShape(std::istream& input)
+{
+	std::string id;
+	if (!(input >> id))
+	{
+		throw std::invalid_argument("Invalid arguments. Usage: DrawShape <id>");
+	}
+
+	m_picture.DrawShape(id, m_canvas);
+}
+
 void ShapesController::ProcessDrawPicture(std::istream&)
 {
-	m_picture.Draw(m_canvas);
+	m_picture.DrawPicture(m_canvas);
 }
 
 void ShapesController::InputThreadFunction()
 {
 	std::string line;
-	while (!m_threadStopped && std::getline(m_input, line))
+	while (!m_threadStopped)
 	{
-		std::lock_guard lock(m_queueMutex);
-		m_commandQueue.emplace(line);
-		return;
+		if (std::getline(m_input, line))
+		{
+			std::lock_guard lock(m_queueMutex);
+			m_commandQueue.emplace(line);
+		}
+		else
+		{
+			break;
+		}
 	}
 }

@@ -2,6 +2,7 @@
 #include "Shape.h"
 
 #include <unordered_map>
+#include <vector>
 
 namespace shapes
 {
@@ -19,6 +20,8 @@ public:
 
 	void DrawShape(const std::string& id, gfx::ICanvas& canvas);
 	void DrawPicture(gfx::ICanvas& canvas);
+
+	std::vector<Shape*> ListShapes() const;
 
 private:
 	Shape* GetShape(const std::string& id) const;

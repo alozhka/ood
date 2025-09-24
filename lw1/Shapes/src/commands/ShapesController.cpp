@@ -8,7 +8,8 @@ ShapesController::ShapesController(shapes::Picture& picture, gfx::ICanvas& canva
 	: m_actions{
 		{ "AddShape", std::bind_front(&ShapesController::ProcessAddShape, this) },
 		{ "DrawShape", std::bind_front(&ShapesController::ProcessDrawShape, this) },
-		{ "DrawPicture", std::bind_front(&ShapesController::ProcessDrawPicture, this) }
+		{ "DrawPicture", std::bind_front(&ShapesController::ProcessDrawPicture, this) },
+		{ "List", std::bind_front(&ShapesController::ProcessList, this) }
 	}
 	, m_picture(picture)
 	, m_canvas(canvas)
@@ -82,6 +83,16 @@ void ShapesController::ProcessAddShape(std::istream& input)
 	std::unique_ptr<shapes::IShapeStrategy> strategy = ShapesFactory::CreateFromStream(type, input);
 	auto shape = std::make_unique<Shape>(id, gfx::Color::FromHex(color), std::move(strategy));
 	m_picture.AddShape(std::move(shape));
+}
+
+void ShapesController::ProcessList(std::istream&) const
+{
+	std::vector<Shape*> shapes = m_picture.ListShapes();
+	uint i = 1;
+	for (const auto& shape : shapes)
+	{
+		m_output << i++ << " " << shape->GetDescription();
+	}
 }
 
 void ShapesController::ProcessDrawShape(std::istream& input)

@@ -10,7 +10,7 @@ gfx::SFMLCanvas::SFMLCanvas(sf::RenderWindow& window)
 #ifdef _WIN32
 	bool fontLoaded = m_font.openFromFile(R"(C:\Windows\Fonts\arial.ttf)");
 #elif defined(__APPLE__)
-	bool fontLoaded = m_font.openFromFile("/System/Library/Fonts/Arial.ttf");
+	bool fontLoaded = m_font.openFromFile("/System/Library/Fonts/Geneva.ttf");
 #else
 	bool fontLoaded = m_font.openFromFile("/usr/share/fonts/TTF/arial.ttf");
 #endif
@@ -21,9 +21,9 @@ gfx::SFMLCanvas::SFMLCanvas(sf::RenderWindow& window)
 	}
 }
 
-void gfx::SFMLCanvas::SetColor(gfx::Color c)
+void gfx::SFMLCanvas::SetColor(Color c)
 {
-	m_currentColor = sf::Color(c.R, c.G, c.B);
+	m_currentColor = sf::Color(c.m_color);
 }
 
 void gfx::SFMLCanvas::MoveTo(double x, double y)

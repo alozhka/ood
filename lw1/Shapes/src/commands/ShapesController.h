@@ -29,7 +29,7 @@ private:
 	void ProcessMoveShape(std::istream& input);
 	void ProcessDeleteShape(std::istream& input);
 	void ProcessMovePicture(std::istream& input);
-	void ProcessList() const;
+	void ProcessList(std::istream& input) const;
 	void ProcessChangeColor(std::istream& input);
 	void ProcessChangeShape(std::istream& input);
 	void ProcessDrawShape(std::istream& input);

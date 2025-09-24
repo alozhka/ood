@@ -26,6 +26,18 @@ void shapes::Picture::DrawPicture(gfx::ICanvas& canvas)
 	}
 }
 
+std::vector<Shape*> shapes::Picture::ListShapes() const
+{
+	std::vector<Shape*> data;
+
+	for (const auto& shape : m_shapes | std::views::values)
+	{
+		data.push_back(shape.get());
+	}
+
+	return data;
+}
+
 Shape* shapes::Picture::GetShape(const std::string& id) const
 {
 	const auto it = m_shapes.find(id);

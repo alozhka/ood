@@ -11,6 +11,7 @@ public:
 	void Move(double dx, double dy);
 
 	std::string GetId() const;
+	std::string GetDescription() const;
 
 private:
 	std::string m_id;

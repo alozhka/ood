@@ -1,6 +1,8 @@
 #pragma once
 
+#include <iomanip>
 #include <regex>
+#include <sstream>
 #include <string>
 
 namespace Regexes
@@ -12,10 +14,8 @@ namespace gfx
 {
 struct Color
 {
-	Color(uint8_t red, uint8_t green, uint8_t blue)
-		: R(red)
-		, G(green)
-		, B(blue)
+	explicit Color(uint32_t color)
+		: m_color(color)
 	{
 	}
 
@@ -33,14 +33,18 @@ struct Color
 		}
 
 		uint32_t value = std::stoul(hexStr, nullptr, 16);
-		return {
-			static_cast<uint8_t>((value >> 16) & 0xFF),
-			static_cast<uint8_t>((value >> 8) & 0xFF),
-			static_cast<uint8_t>(value & 0xFF)
-		};
+		return Color(value);
 	}
 
-	uint8_t R, G, B;
+	std::string ToString() const
+	{
+		std::ostringstream oss;
+		oss << "#" << std::hex << std::setw(6) << std::setfill('0') << m_color;
+
+		return oss.str();
+	}
+
+	uint32_t m_color;
 };
 
 class ICanvas

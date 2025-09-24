@@ -23,3 +23,11 @@ std::string Shape::GetId() const
 {
 	return m_id;
 }
+
+std::string Shape::GetDescription() const
+{
+	return m_shapeStrategy->GetType()
+		+ " " + m_id
+		+ " " + m_color.ToString()
+		+ " " + m_shapeStrategy->GetDescription();
+}

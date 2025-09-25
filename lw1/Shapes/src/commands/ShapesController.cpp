@@ -9,7 +9,9 @@ ShapesController::ShapesController(shapes::Picture& picture, gfx::ICanvas& canva
 		{ "AddShape", std::bind_front(&ShapesController::ProcessAddShape, this) },
 		{ "MoveShape", std::bind_front(&ShapesController::ProcessMoveShape, this) },
 		{ "DrawShape", std::bind_front(&ShapesController::ProcessDrawShape, this) },
-		{"DeleteShape", std::bind_front(&ShapesController::ProcessDeleteShape, this)},
+		{ "ChangeShape", std::bind_front(&ShapesController::ProcessChangeShape, this) },
+		{ "DeleteShape", std::bind_front(&ShapesController::ProcessDeleteShape, this) },
+		{ "ChangeColor", std::bind_front(&ShapesController::ProcessChangeColor, this) },
 		{ "MovePicture", std::bind_front(&ShapesController::ProcessMovePicture, this) },
 		{ "DrawPicture", std::bind_front(&ShapesController::ProcessDrawPicture, this) },
 		{ "List", std::bind_front(&ShapesController::ProcessList, this) }
@@ -21,7 +23,6 @@ ShapesController::ShapesController(shapes::Picture& picture, gfx::ICanvas& canva
 {
 	StartInputThread();
 }
-
 void ShapesController::ProcessCommand()
 {
 	std::string command;

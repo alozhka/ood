@@ -23,7 +23,7 @@ protected:
 TEST_F(ShapeTests, ShapeCanBeConstructedFromStream)
 {
 	std::string id = "sh1";
-	gfx::Color color = gfx::Color::FromHex("eeefff");
+	gfx::Color color = gfx::Color::FromHexStr("eeefff");
 	Shape shape = CreateShape(id, color, "circle", "200 250 45.55");
 
 	EXPECT_EQ(id, shape.GetId());
@@ -34,7 +34,7 @@ TEST_F(ShapeTests, ShapeCanBeConstructedFromStream)
 TEST_F(ShapeTests, ShapeCanBeMoved)
 {
 	std::string id = "sh1";
-	gfx::Color color = gfx::Color::FromHex("eeefff");
+	gfx::Color color = gfx::Color::FromHexStr("eeefff");
 	Shape shape = CreateShape(id, color, "circle", "200 250 45.55");
 
 	EXPECT_EQ(id, shape.GetId());
@@ -49,8 +49,8 @@ TEST_F(ShapeTests, ShapeCanBeMoved)
 TEST_F(ShapeTests, ShapeCanChangeColor)
 {
 	std::string id = "sh1";
-	gfx::Color color = gfx::Color::FromHex("eeefff");
-	gfx::Color newColor = gfx::Color::FromHex("333aaa");
+	gfx::Color color = gfx::Color::FromHexStr("eeefff");
+	gfx::Color newColor = gfx::Color::FromHexStr("333aaa");
 	Shape shape = CreateShape(id, color, "circle", "200 250 45.55");
 
 	EXPECT_EQ(id, shape.GetId());
@@ -67,7 +67,7 @@ TEST_F(ShapeTests, ShapeCanChangeStrategy)
 {
 	std::unique_ptr<shapes::IShapeStrategy> newStrategy = CreateStrategy("rectangle", "150 100 20 30");
 	std::string id = "sh1";
-	gfx::Color color = gfx::Color::FromHex("eeefff");
+	gfx::Color color = gfx::Color::FromHexStr("eeefff");
 	Shape shape = CreateShape(id, color, "circle", "200 250 45.55");
 
 	EXPECT_EQ(id, shape.GetId());
@@ -98,7 +98,7 @@ protected:
 TEST_F(PictureTests, PictureCanAddShape)
 {
 	shapes::Picture picture;
-	auto shape = CreateShape("shape1", gfx::Color::FromHex("ffffff"), "circle", "100 150 25");
+	auto shape = CreateShape("shape1", gfx::Color::FromHexStr("ffffff"), "circle", "100 150 25");
 
 	EXPECT_NO_THROW(picture.AddShape(std::move(shape)));
 
@@ -110,8 +110,8 @@ TEST_F(PictureTests, PictureCanAddShape)
 TEST_F(PictureTests, PictureCannotAddShapeWithDuplicateId)
 {
 	shapes::Picture picture;
-	auto shape1 = CreateShape("shape1", gfx::Color::FromHex("ffffff"), "circle", "100 150 25");
-	auto shape2 = CreateShape("shape1", gfx::Color::FromHex("000000"), "rectangle", "50 75 20 30");
+	auto shape1 = CreateShape("shape1", gfx::Color::FromHexStr("ffffff"), "circle", "100 150 25");
+	auto shape2 = CreateShape("shape1", gfx::Color::FromHexStr("000000"), "rectangle", "50 75 20 30");
 
 	picture.AddShape(std::move(shape1));
 
@@ -124,7 +124,7 @@ TEST_F(PictureTests, PictureCannotAddShapeWithDuplicateId)
 TEST_F(PictureTests, PictureCanRemoveShape)
 {
 	shapes::Picture picture;
-	auto shape = CreateShape("shape1", gfx::Color::FromHex("ffffff"), "circle", "100 150 25");
+	auto shape = CreateShape("shape1", gfx::Color::FromHexStr("ffffff"), "circle", "100 150 25");
 
 	picture.AddShape(std::move(shape));
 	EXPECT_EQ(1, picture.ListShapes().size());
@@ -143,7 +143,7 @@ TEST_F(PictureTests, PictureCannotRemoveNonExistentShape)
 TEST_F(PictureTests, PictureCanMoveShape)
 {
 	shapes::Picture picture;
-	auto shape = CreateShape("shape1", gfx::Color::FromHex("ffffff"), "circle", "100 150 25");
+	auto shape = CreateShape("shape1", gfx::Color::FromHexStr("ffffff"), "circle", "100 150 25");
 
 	picture.AddShape(std::move(shape));
 
@@ -164,8 +164,8 @@ TEST_F(PictureTests, PictureCannotMoveNonExistentShape)
 TEST_F(PictureTests, PictureCanMovePicture)
 {
 	shapes::Picture picture;
-	auto shape1 = CreateShape("shape1", gfx::Color::FromHex("ffffff"), "circle", "100 150 25");
-	auto shape2 = CreateShape("shape2", gfx::Color::FromHex("000000"), "rectangle", "200 250 30 40");
+	auto shape1 = CreateShape("shape1", gfx::Color::FromHexStr("ffffff"), "circle", "100 150 25");
+	auto shape2 = CreateShape("shape2", gfx::Color::FromHexStr("000000"), "rectangle", "200 250 30 40");
 
 	picture.AddShape(std::move(shape1));
 	picture.AddShape(std::move(shape2));
@@ -184,9 +184,9 @@ TEST_F(PictureTests, PictureCanMovePicture)
 TEST_F(PictureTests, ListShapesReturnsThemInOrderOfAddition)
 {
 	shapes::Picture picture;
-	auto shape1 = CreateShape("shape1", gfx::Color::FromHex("ffffff"), "circle", "100 150 25");
-	auto shape2 = CreateShape("shape2", gfx::Color::FromHex("000000"), "rectangle", "200 250 30 40");
-	auto shape3 = CreateShape("shape3", gfx::Color::FromHex("aaaaaa"), "line", "0 0 100 100");
+	auto shape1 = CreateShape("shape1", gfx::Color::FromHexStr("ffffff"), "circle", "100 150 25");
+	auto shape2 = CreateShape("shape2", gfx::Color::FromHexStr("000000"), "rectangle", "200 250 30 40");
+	auto shape3 = CreateShape("shape3", gfx::Color::FromHexStr("aaaaaa"), "line", "0 0 100 100");
 
 	picture.AddShape(std::move(shape1));
 	picture.AddShape(std::move(shape3));
@@ -202,13 +202,13 @@ TEST_F(PictureTests, ListShapesReturnsThemInOrderOfAddition)
 TEST_F(PictureTests, PictureCanDrawShape)
 {
 	shapes::Picture picture;
-	auto shape = CreateShape("shape1", gfx::Color::FromHex("ffffff"), "circle", "100 150 25");
+	auto shape = CreateShape("shape1", gfx::Color::FromHexStr("ffffff"), "circle", "100 150 25");
 	picture.AddShape(std::move(shape));
 
 	gfx::MockCanvas canvas;
 	EXPECT_NO_THROW(picture.DrawShape("shape1", canvas));
 
-	EXPECT_GT(0, canvas.GetCallCount());
+	EXPECT_GT(canvas.GetCallCount(), 0);
 }
 
 TEST_F(PictureTests, CannotDrawNonExistentShape)
@@ -222,13 +222,57 @@ TEST_F(PictureTests, CannotDrawNonExistentShape)
 TEST_F(PictureTests, CanDrawPicture)
 {
 	shapes::Picture picture;
-	auto shape1 = CreateShape("shape1", gfx::Color::FromHex("ffffff"), "circle", "100 150 25");
-	auto shape2 = CreateShape("shape2", gfx::Color::FromHex("000000"), "rectangle", "200 250 30 40");
+	auto shape1 = CreateShape("shape1", gfx::Color::FromHexStr("ffffff"), "circle", "100 150 25");
+	auto shape2 = CreateShape("shape2", gfx::Color::FromHexStr("000000"), "rectangle", "200 250 30 40");
 	picture.AddShape(std::move(shape1));
 	picture.AddShape(std::move(shape2));
 	gfx::MockCanvas canvas;
 
 	EXPECT_NO_THROW(picture.DrawPicture(canvas));
 
-	EXPECT_GT(0, canvas.GetCallCount());
+	EXPECT_GT(canvas.GetCallCount(), 0);
+}
+
+TEST_F(PictureTests, PictureCanChangeShapeColor)
+{
+	shapes::Picture picture;
+	auto shape = CreateShape("shape1", gfx::Color::FromHexStr("ffffff"), "circle", "100 150 25");
+	picture.AddShape(std::move(shape));
+
+	EXPECT_EQ("circle shape1 #ffffff 100 150 25", picture.ListShapes()[0]->GetDescription());
+
+	gfx::Color newColor = gfx::Color::FromHexStr("333aaa");
+	picture.ChangeShapeColor("shape1", newColor);
+
+	EXPECT_EQ("circle shape1 #333aaa 100 150 25", picture.ListShapes()[0]->GetDescription());
+}
+
+TEST_F(PictureTests, PictureCanChangeShapeStrategy)
+{
+	shapes::Picture picture;
+	auto shape = CreateShape("shape1", gfx::Color::FromHexStr("ffffff"), "circle", "100 150 25");
+	picture.AddShape(std::move(shape));
+
+	EXPECT_EQ("circle shape1 #ffffff 100 150 25", picture.ListShapes()[0]->GetDescription());
+
+	auto newStrategy = CreateStrategy("rectangle", "150 100 20 30");
+	picture.ChangeShapeStrategy("shape1", std::move(newStrategy));
+
+	EXPECT_EQ("rectangle shape1 #ffffff 150 100 20 30", picture.ListShapes()[0]->GetDescription());
+}
+
+TEST_F(PictureTests, PictureCannotChangeColorOfNonExistentShape)
+{
+	shapes::Picture picture;
+	gfx::Color newColor = gfx::Color::FromHexStr("333aaa");
+
+	EXPECT_THROW(picture.ChangeShapeColor("nonexistent", newColor), std::runtime_error);
+}
+
+TEST_F(PictureTests, PictureCannotChangeStrategyOfNonExistentShape)
+{
+	shapes::Picture picture;
+	auto newStrategy = CreateStrategy("rectangle", "150 100 20 30");
+
+	EXPECT_THROW(picture.ChangeShapeStrategy("nonexistent", std::move(newStrategy)), std::runtime_error);
 }

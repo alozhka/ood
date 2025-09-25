@@ -23,7 +23,10 @@ void shapes::Picture::RemoveShape(const std::string& id)
 		throw std::runtime_error("Cannot find shape with ID=" + id);
 	}
 	m_shapes.erase(it);
-	std::ranges::remove_if(m_shapesOrder, [id](const std::string& shapeId) { return shapeId == id; });
+	const auto position_it = std::ranges::find_if(
+		m_shapesOrder,
+		[id](const std::string& shapeId) { return shapeId == id; });
+	m_shapesOrder.erase(position_it);
 }
 
 void shapes::Picture::MoveShape(const std::string& id, double x, double y)
@@ -52,6 +55,18 @@ void shapes::Picture::DrawPicture(gfx::ICanvas& canvas)
 	{
 		shape->Draw(canvas);
 	}
+}
+
+void shapes::Picture::ChangeShapeColor(const std::string& id, gfx::Color color)
+{
+	Shape* shape = GetShape(id);
+	shape->SetColor(color);
+}
+
+void shapes::Picture::ChangeShapeStrategy(const std::string& id, std::unique_ptr<IShapeStrategy>&& strategy)
+{
+	Shape* shape = GetShape(id);
+	shape->SetStrategy(std::move(strategy));
 }
 
 std::vector<Shape*> shapes::Picture::ListShapes() const

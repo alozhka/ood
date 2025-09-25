@@ -19,7 +19,7 @@ struct Color
 	{
 	}
 
-	static Color FromHex(const std::string& hex)
+	static Color FromHexStr(const std::string& hex)
 	{
 		std::string hexStr = hex;
 		if (hexStr[0] == '#')

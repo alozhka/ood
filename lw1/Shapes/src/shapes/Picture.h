@@ -20,6 +20,9 @@ public:
 	void DrawShape(const std::string& id, gfx::ICanvas& canvas);
 	void DrawPicture(gfx::ICanvas& canvas);
 
+	void ChangeShapeColor(const std::string& id, gfx::Color color);
+	void ChangeShapeStrategy(const std::string& id, std::unique_ptr<IShapeStrategy>&& strategy);
+
 	std::vector<Shape*> ListShapes() const;
 
 private:

@@ -7,7 +7,10 @@
 ShapesController::ShapesController(shapes::Picture& picture, gfx::ICanvas& canvas, std::istream& input, std::ostream& output)
 	: m_actions{
 		{ "AddShape", std::bind_front(&ShapesController::ProcessAddShape, this) },
+		{ "MoveShape", std::bind_front(&ShapesController::ProcessMoveShape, this) },
 		{ "DrawShape", std::bind_front(&ShapesController::ProcessDrawShape, this) },
+		{"DeleteShape", std::bind_front(&ShapesController::ProcessDeleteShape, this)},
+		{ "MovePicture", std::bind_front(&ShapesController::ProcessMovePicture, this) },
 		{ "DrawPicture", std::bind_front(&ShapesController::ProcessDrawPicture, this) },
 		{ "List", std::bind_front(&ShapesController::ProcessList, this) }
 	}
@@ -81,8 +84,42 @@ void ShapesController::ProcessAddShape(std::istream& input)
 	}
 
 	std::unique_ptr<shapes::IShapeStrategy> strategy = ShapesFactory::CreateFromStream(type, input);
-	auto shape = std::make_unique<Shape>(id, gfx::Color::FromHex(color), std::move(strategy));
+	auto shape = std::make_unique<Shape>(id, gfx::Color::FromHexStr(color), std::move(strategy));
 	m_picture.AddShape(std::move(shape));
+}
+
+void ShapesController::ProcessMoveShape(std::istream& input)
+{
+	std::string id;
+	double x, y;
+	if (!(input >> id >> x >> y))
+	{
+		throw std::runtime_error("Invalid arguments. Usage: MoveShape <id> <dx> <dy>");
+	}
+
+	m_picture.MoveShape(id, x, y);
+}
+
+void ShapesController::ProcessDeleteShape(std::istream& input)
+{
+	std::string id;
+	if (!(input >> id))
+	{
+		throw std::runtime_error("Invalid arguments. Usage: DeleteShape <id>");
+	}
+
+	m_picture.RemoveShape(id);
+}
+
+void ShapesController::ProcessMovePicture(std::istream& input)
+{
+	double x, y;
+	if (!(input >> x >> y))
+	{
+		throw std::runtime_error("Invalid arguments. Usage: MoveShape <dx> <dy>");
+	}
+
+	m_picture.MovePicture(x, y);
 }
 
 void ShapesController::ProcessList(std::istream&) const
@@ -93,6 +130,29 @@ void ShapesController::ProcessList(std::istream&) const
 	{
 		m_output << i++ << " " << shape->GetDescription() << std::endl;
 	}
+}
+
+void ShapesController::ProcessChangeColor(std::istream& input)
+{
+	std::string id, color;
+	if (!(input >> id >> color))
+	{
+		throw std::runtime_error("Invalid arguments. Usage: ChangeColor <id> <color>");
+	}
+
+	m_picture.ChangeShapeColor(id, gfx::Color::FromHexStr(color));
+}
+
+void ShapesController::ProcessChangeShape(std::istream& input)
+{
+	std::string id, type;
+	if (!(input >> id >> type))
+	{
+		throw std::runtime_error("Invalid arguments. Usage: ChangeShape <id> <type> <params>");
+	}
+
+	auto strategy = ShapesFactory::CreateFromStream(type, input);
+	m_picture.ChangeShapeStrategy(id, std::move(strategy));
 }
 
 void ShapesController::ProcessDrawShape(std::istream& input)

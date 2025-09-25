@@ -1,5 +1,6 @@
 #include "Picture.h"
 
+#include <algorithm>
 #include <ranges>
 
 void shapes::Picture::AddShape(std::unique_ptr<Shape>&& shape)
@@ -12,6 +13,31 @@ void shapes::Picture::AddShape(std::unique_ptr<Shape>&& shape)
 	std::string shapeId = shape->GetId();
 	m_shapes.insert({ shapeId, std::move(shape) });
 	m_shapesOrder.push_back(shapeId);
+}
+
+void shapes::Picture::RemoveShape(const std::string& id)
+{
+	const auto it = m_shapes.find(id);
+	if (it == m_shapes.end())
+	{
+		throw std::runtime_error("Cannot find shape with ID=" + id);
+	}
+	m_shapes.erase(it);
+	std::ranges::remove_if(m_shapesOrder, [id](const std::string& shapeId) { return shapeId == id; });
+}
+
+void shapes::Picture::MoveShape(const std::string& id, double x, double y)
+{
+	Shape* shape = GetShape(id);
+	shape->Move(x, y);
+}
+
+void shapes::Picture::MovePicture(double x, double y)
+{
+	for (const auto& shape : m_shapes | std::views::values)
+	{
+		shape->Move(x, y);
+	}
 }
 
 void shapes::Picture::DrawShape(const std::string& id, gfx::ICanvas& canvas)

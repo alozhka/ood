@@ -14,7 +14,7 @@ public:
 	void AddShape(std::unique_ptr<Shape>&& shape);
 	void RemoveShape(const std::string& id);
 
-	void MoveShape(int id, double x, double y);
+	void MoveShape(const std::string& id, double x, double y);
 	void MovePicture(double x, double y);
 
 	void DrawShape(const std::string& id, gfx::ICanvas& canvas);

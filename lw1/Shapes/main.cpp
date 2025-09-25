@@ -8,7 +8,7 @@
 int main()
 {
 	sf::ContextSettings settings;
-	settings.antiAliasingLevel = 8;
+	settings.antiAliasingLevel = 16;
 	sf::RenderWindow window(sf::VideoMode(sf::Vector2u(800, 600)), "Shapes", sf::Style::Default, sf::State::Windowed, settings);
 	shapes::Picture picture;
 	gfx::SFMLCanvas canvas(window);

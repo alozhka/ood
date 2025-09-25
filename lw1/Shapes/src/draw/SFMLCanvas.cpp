@@ -23,7 +23,7 @@ gfx::SFMLCanvas::SFMLCanvas(sf::RenderWindow& window)
 
 void gfx::SFMLCanvas::SetColor(Color c)
 {
-	m_currentColor = sf::Color(c.m_color);
+	m_currentColor = c.ToSfColor();
 }
 
 void gfx::SFMLCanvas::MoveTo(double x, double y)

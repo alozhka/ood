@@ -1,5 +1,7 @@
 #pragma once
 
+#include "SFML/Graphics/Color.hpp"
+
 #include <iomanip>
 #include <regex>
 #include <sstream>
@@ -47,6 +49,11 @@ struct Color
 		oss << "#" << std::hex << std::setw(6) << std::setfill('0') << m_color;
 
 		return oss.str();
+	}
+
+	sf::Color ToSfColor() const
+	{
+		return sf::Color(m_color << 8 | 0xFF);
 	}
 
 	uint32_t m_color;

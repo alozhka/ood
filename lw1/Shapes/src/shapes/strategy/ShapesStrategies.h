@@ -152,6 +152,8 @@ public:
 	{
 		m_p1.x += dx;
 		m_p1.y += dy;
+		m_p2.x += dx;
+		m_p2.y += dy;
 	}
 
 	std::string GetType() const override

@@ -23,10 +23,14 @@ void shapes::Picture::RemoveShape(const std::string& id)
 		throw std::runtime_error("Cannot find shape with ID=" + id);
 	}
 	m_shapes.erase(it);
+
 	const auto position_it = std::ranges::find_if(
 		m_shapesOrder,
 		[id](const std::string& shapeId) { return shapeId == id; });
-	m_shapesOrder.erase(position_it);
+	if (position_it != m_shapesOrder.end())
+	{
+		m_shapesOrder.erase(position_it);
+	}
 }
 
 void shapes::Picture::MoveShape(const std::string& id, double x, double y)

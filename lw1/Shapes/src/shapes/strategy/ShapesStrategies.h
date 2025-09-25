@@ -56,9 +56,9 @@ public:
 	{
 		canvas.MoveTo(m_leftTop.x, m_leftTop.y);
 		canvas.LineTo(m_leftTop.x + m_width, m_leftTop.y);
-		canvas.MoveTo(m_leftTop.x + m_width, m_leftTop.y + m_height);
+		canvas.LineTo(m_leftTop.x + m_width, m_leftTop.y + m_height);
 		canvas.LineTo(m_leftTop.x, m_leftTop.y + m_height);
-		canvas.MoveTo(m_leftTop.x, m_leftTop.y);
+		canvas.LineTo(m_leftTop.x, m_leftTop.y);
 	}
 
 	void Move(double dx, double dy) override
@@ -100,7 +100,8 @@ public:
 	{
 		canvas.MoveTo(m_p1.x, m_p1.y);
 		canvas.LineTo(m_p2.x, m_p2.y);
-		canvas.MoveTo(m_p3.x, m_p3.y);
+		canvas.LineTo(m_p3.x, m_p3.y);
+		canvas.LineTo(m_p1.x, m_p1.y);
 	}
 
 	void Move(double dx, double dy) override

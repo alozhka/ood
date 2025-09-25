@@ -10,7 +10,6 @@ class Picture
 {
 public:
 	Picture() = default;
-	Picture(const Picture& other);
 
 	void AddShape(std::unique_ptr<Shape>&& shape);
 	void RemoveShape(const std::string& id);
@@ -27,5 +26,6 @@ private:
 	Shape* GetShape(const std::string& id) const;
 
 	std::unordered_map<std::string, std::unique_ptr<Shape>> m_shapes{};
+	std::vector<std::string> m_shapesOrder{};
 };
 } // namespace shapes

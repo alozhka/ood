@@ -91,7 +91,7 @@ void ShapesController::ProcessList(std::istream&) const
 	uint i = 1;
 	for (const auto& shape : shapes)
 	{
-		m_output << i++ << " " << shape->GetDescription();
+		m_output << i++ << " " << shape->GetDescription() << std::endl;
 	}
 }
 

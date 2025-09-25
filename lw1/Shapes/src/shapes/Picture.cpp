@@ -9,7 +9,9 @@ void shapes::Picture::AddShape(std::unique_ptr<Shape>&& shape)
 		throw std::runtime_error("Cannot create shape with same ID");
 	}
 
-	m_shapes[shape->GetId()] = std::move(shape);
+	std::string shapeId = shape->GetId();
+	m_shapes.insert({ shapeId, std::move(shape) });
+	m_shapesOrder.push_back(shapeId);
 }
 
 void shapes::Picture::DrawShape(const std::string& id, gfx::ICanvas& canvas)
@@ -29,10 +31,11 @@ void shapes::Picture::DrawPicture(gfx::ICanvas& canvas)
 std::vector<Shape*> shapes::Picture::ListShapes() const
 {
 	std::vector<Shape*> data;
+	data.reserve(m_shapes.size());
 
-	for (const auto& shape : m_shapes | std::views::values)
+	for (const std::string& m_shapeId : m_shapesOrder)
 	{
-		data.push_back(shape.get());
+		data.push_back(m_shapes.find(m_shapeId)->second.get());
 	}
 
 	return data;

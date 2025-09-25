@@ -122,4 +122,42 @@ public:
 private:
 	Point m_p1, m_p2, m_p3;
 };
+
+class TextStrategy final : public IShapeStrategy
+{
+public:
+	TextStrategy(double left, double top, double size, const std::string& text)
+		: m_p(left, top)
+		, m_size(size)
+		, m_text(text)
+	{
+	}
+
+	void Draw(gfx::ICanvas& canvas) const override
+	{
+		canvas.DrawText(m_p.x, m_p.y, m_size, m_text);
+	}
+
+	void Move(double dx, double dy) override
+	{
+		m_p.x += dx;
+		m_p.y += dy;
+	}
+
+	std::string GetType() const override
+	{
+		return "text";
+	}
+
+	std::string GetDescription() const override
+	{
+		return std::to_string(m_p.x) + " " + std::to_string(m_p.y) + " "
+			+ std::to_string(m_size) + " " + m_text;
+	}
+
+private:
+	Point m_p;
+	double m_size;
+	std::string m_text;
+};
 } // namespace shapes

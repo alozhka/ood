@@ -1,7 +1,5 @@
 #include "Shape.h"
 
-#include <cassert>
-
 Shape::Shape(const std::string& id, gfx::Color color, std::unique_ptr<shapes::IShapeStrategy> strategy)
 	: m_id(id)
 	, m_color(color)

@@ -34,5 +34,16 @@ std::unique_ptr<shapes::IShapeStrategy> ShapesFactory::CreateFromStream(const st
 		}
 	}
 
+	if (type == "text")
+	{
+		double left, top, size;
+		std::string text;
+		if (!(params >> left >> top >> size) || !std::getline(params, text))
+		{
+			throw std::runtime_error("Invalid text parameters");
+		}
+		return std::make_unique<shapes::TextStrategy>(left, top, size, text);
+	}
+
 	throw std::invalid_argument("Unknown shape type");
 }

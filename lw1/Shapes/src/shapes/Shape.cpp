@@ -25,6 +25,10 @@ void Shape::SetStrategy(std::unique_ptr<shapes::IShapeStrategy>&& strategy)
 	assert(strategy);
 	m_shapeStrategy = std::move(strategy);
 }
+void Shape::SetColor(gfx::Color color)
+{
+	m_color = color;
+}
 
 std::string Shape::GetId() const
 {

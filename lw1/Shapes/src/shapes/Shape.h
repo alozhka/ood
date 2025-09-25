@@ -10,6 +10,7 @@ public:
 	void Draw(gfx::ICanvas& canvas);
 	void Move(double dx, double dy);
 	void SetStrategy(std::unique_ptr<shapes::IShapeStrategy>&& strategy);
+	void SetColor(gfx::Color color);
 
 	std::string GetId() const;
 	gfx::Color GetColor() const;

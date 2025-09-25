@@ -31,7 +31,10 @@ public:
 
 	std::string GetDescription() const override
 	{
-		return std::to_string(m_p.x) + " " + std::to_string(m_p.y) + " " + std::to_string(m_radius);
+		std::ostringstream oss;
+		oss << std::setprecision(15) << std::defaultfloat
+			<< m_p.x << " " << m_p.y << " " << m_radius;
+		return oss.str();
 	}
 
 private:
@@ -71,8 +74,11 @@ public:
 
 	std::string GetDescription() const override
 	{
-		return std::to_string(m_leftTop.x) + " " + std::to_string(m_leftTop.y) + " "
-			+ std::to_string(m_width) + " " + std::to_string(m_height);
+		std::ostringstream oss;
+		oss << std::setprecision(15) << std::defaultfloat
+			<< std::to_string(m_leftTop.x) << " " << std::to_string(m_leftTop.y) << " "
+			<< std::to_string(m_width) << " " << std::to_string(m_height);
+		return oss.str();
 	}
 
 private:
@@ -114,9 +120,12 @@ public:
 
 	std::string GetDescription() const override
 	{
-		return std::to_string(m_p1.x) + " " + std::to_string(m_p1.y) + " "
-			+ std::to_string(m_p2.x) + " " + std::to_string(m_p2.y) + " "
-			+ std::to_string(m_p3.x) + " " + std::to_string(m_p3.y);
+		std::ostringstream oss;
+		oss << std::setprecision(15) << std::defaultfloat
+			<< std::to_string(m_p1.x) << " " << std::to_string(m_p1.y) << " "
+			<< std::to_string(m_p2.x) << " " << std::to_string(m_p2.y) << " "
+			<< std::to_string(m_p3.x) << " " << std::to_string(m_p3.y);
+		return oss.str();
 	}
 
 private:
@@ -151,8 +160,11 @@ public:
 
 	std::string GetDescription() const override
 	{
-		return std::to_string(m_p1.x) + " " + std::to_string(m_p1.y) + " "
-			+ std::to_string(m_p2.x) + " " + std::to_string(m_p2.y);
+		std::ostringstream oss;
+		oss << std::setprecision(15) << std::defaultfloat
+			<< std::to_string(m_p1.x) << " " << std::to_string(m_p1.y) << " "
+			<< std::to_string(m_p2.x) << " " << std::to_string(m_p2.y);
+		return oss.str();
 	}
 
 private:
@@ -187,8 +199,11 @@ public:
 
 	std::string GetDescription() const override
 	{
-		return std::to_string(m_p.x) + " " + std::to_string(m_p.y) + " "
-			+ std::to_string(m_size) + " " + m_text;
+		std::ostringstream oss;
+		oss << std::setprecision(15) << std::defaultfloat
+			<< std::to_string(m_p.x) << " " << std::to_string(m_p.y) << " "
+			<<std::to_string(m_size) << " " << m_text;
+		return oss.str();
 	}
 
 private:

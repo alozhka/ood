@@ -5,12 +5,14 @@
 class Shape
 {
 public:
-	Shape(const std::string& id, gfx::Color color, std::unique_ptr<shapes::IShapeStrategy> strategy);
+	Shape(const std::string& id, gfx::Color color, std::unique_ptr<shapes::IShapeStrategy>&& strategy);
 
 	void Draw(gfx::ICanvas& canvas);
 	void Move(double dx, double dy);
+	void SetStrategy(std::unique_ptr<shapes::IShapeStrategy>&& strategy);
 
 	std::string GetId() const;
+	gfx::Color GetColor() const;
 	std::string GetDescription() const;
 
 private:

@@ -1,10 +1,12 @@
 #include "Shape.h"
 
-Shape::Shape(const std::string& id, gfx::Color color, std::unique_ptr<shapes::IShapeStrategy> strategy)
+#include <cassert>
+
+Shape::Shape(const std::string& id, gfx::Color color, std::unique_ptr<shapes::IShapeStrategy>&& strategy)
 	: m_id(id)
 	, m_color(color)
-	, m_shapeStrategy(std::move(strategy))
 {
+	SetStrategy(std::move(strategy));
 }
 
 void Shape::Draw(gfx::ICanvas& canvas)
@@ -18,9 +20,20 @@ void Shape::Move(double dx, double dy)
 	m_shapeStrategy->Move(dx, dy);
 }
 
+void Shape::SetStrategy(std::unique_ptr<shapes::IShapeStrategy>&& strategy)
+{
+	assert(strategy);
+	m_shapeStrategy = std::move(strategy);
+}
+
 std::string Shape::GetId() const
 {
 	return m_id;
+}
+
+gfx::Color Shape::GetColor() const
+{
+	return m_color;
 }
 
 std::string Shape::GetDescription() const

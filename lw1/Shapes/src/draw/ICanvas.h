@@ -36,6 +36,11 @@ struct Color
 		return Color(value);
 	}
 
+	bool operator==(const Color& other) const
+	{
+		return m_color == other.m_color;
+	}
+
 	std::string ToString() const
 	{
 		std::ostringstream oss;

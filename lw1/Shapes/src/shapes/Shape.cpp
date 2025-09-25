@@ -11,6 +11,7 @@ Shape::Shape(const std::string& id, gfx::Color color, std::unique_ptr<shapes::IS
 
 void Shape::Draw(gfx::ICanvas& canvas)
 {
+	canvas.SetColor(m_color);
 	m_shapeStrategy->Draw(canvas);
 }
 

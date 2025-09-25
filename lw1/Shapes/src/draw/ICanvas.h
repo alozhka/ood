@@ -1,7 +1,5 @@
 #pragma once
 
-#include "SFML/Graphics/Color.hpp"
-
 #include <iomanip>
 #include <regex>
 #include <sstream>
@@ -51,9 +49,9 @@ struct Color
 		return oss.str();
 	}
 
-	sf::Color ToSfColor() const
+	Color WithOpacity() const
 	{
-		return sf::Color(m_color << 8 | 0xFF);
+		return Color(m_color << 8 | 0xFF);
 	}
 
 	uint32_t m_color;

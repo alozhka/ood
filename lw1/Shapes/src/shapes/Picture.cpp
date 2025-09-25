@@ -73,6 +73,19 @@ void shapes::Picture::ChangeShapeStrategy(const std::string& id, std::unique_ptr
 	shape->SetStrategy(std::move(strategy));
 }
 
+void shapes::Picture::CloneShape(const std::string& id, const std::string& newId)
+{
+	Shape* shape = GetShape(id);
+	if (m_shapes.contains(newId))
+	{
+		throw std::runtime_error("Shape with ID=" + newId + " already exists.");
+	}
+	auto clonedShape = shape->Clone(newId);
+
+	m_shapes.insert({ newId, std::move(clonedShape) });
+	m_shapesOrder.push_back(newId);
+}
+
 std::vector<Shape*> shapes::Picture::ListShapes() const
 {
 	std::vector<Shape*> data;

@@ -34,8 +34,7 @@ private:
 	void ProcessChangeShape(std::istream& input);
 	void ProcessDrawShape(std::istream& input);
 	void ProcessDrawPicture(std::istream& input);
-	// TODO:
-	// void ProcessCloneShape(const std::vector<std::string>& tokens);
+	void ProcessCloneShape(std::istream& input);
 
 	void InputThreadFunction();
 

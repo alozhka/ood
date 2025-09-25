@@ -47,3 +47,9 @@ std::string Shape::GetDescription() const
 		+ " " + m_color.ToString()
 		+ " " + m_shapeStrategy->GetDescription();
 }
+
+std::unique_ptr<Shape> Shape::Clone(const std::string& newId) const
+{
+	auto clonedStrategy = m_shapeStrategy->Clone();
+	return std::make_unique<Shape>(newId, m_color, std::move(clonedStrategy));
+}

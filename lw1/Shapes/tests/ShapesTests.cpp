@@ -79,6 +79,27 @@ TEST_F(ShapeTests, ShapeCanChangeStrategy)
 	EXPECT_EQ("rectangle sh1 #eeefff 150 100 20 30", shape.GetDescription());
 }
 
+TEST_F(ShapeTests, ShapeCanBeCloned)
+{
+	std::string originalId = "original";
+	std::string clonedId = "cloned";
+	gfx::Color color = gfx::Color::FromHexStr("eeefff");
+	Shape originalShape = CreateShape(originalId, color, "circle", "200 250 45.55");
+
+	EXPECT_EQ("circle original #eeefff 200 250 45.55", originalShape.GetDescription());
+
+	auto clonedShape = originalShape.Clone(clonedId);
+
+	EXPECT_EQ("circle cloned #eeefff 200 250 45.55", clonedShape->GetDescription());
+	EXPECT_EQ("circle original #eeefff 200 250 45.55", originalShape.GetDescription());
+
+	originalShape.Move(100, 100);
+	originalShape.SetColor(gfx::Color::FromHexStr("333aaa"));
+
+	EXPECT_EQ("circle original #333aaa 300 350 45.55", originalShape.GetDescription());
+	EXPECT_EQ("circle cloned #eeefff 200 250 45.55", clonedShape->GetDescription());
+}
+
 class PictureTests : public testing::Test
 {
 protected:
@@ -275,4 +296,46 @@ TEST_F(PictureTests, PictureCannotChangeStrategyOfNonExistentShape)
 	auto newStrategy = CreateStrategy("rectangle", "150 100 20 30");
 
 	EXPECT_THROW(picture.ChangeShapeStrategy("nonexistent", std::move(newStrategy)), std::runtime_error);
+}
+
+TEST_F(PictureTests, PictureCanCloneShape)
+{
+	shapes::Picture picture;
+	auto originalShape = CreateShape("original", gfx::Color::FromHexStr("ffffff"), "circle", "100 150 25");
+	picture.AddShape(std::move(originalShape));
+
+	EXPECT_NO_THROW(picture.CloneShape("original", "cloned"));
+
+	std::vector<Shape*> shapesList = picture.ListShapes();
+	EXPECT_EQ(2, shapesList.size());
+	EXPECT_EQ("circle original #ffffff 100 150 25", shapesList[0]->GetDescription());
+	EXPECT_EQ("circle cloned #ffffff 100 150 25", shapesList[1]->GetDescription());
+
+	picture.MoveShape("original", 50, 75);
+	picture.ChangeShapeColor("original", gfx::Color::FromHexStr("333aaa"));
+
+	shapesList = picture.ListShapes();
+	EXPECT_EQ("circle original #333aaa 150 225 25", shapesList[0]->GetDescription());
+	EXPECT_EQ("circle cloned #ffffff 100 150 25", shapesList[1]->GetDescription());
+}
+
+TEST_F(PictureTests, PictureCannotCloneNonExistentShape)
+{
+	shapes::Picture picture;
+
+	EXPECT_THROW(picture.CloneShape("nonexistent", "cloned"), std::runtime_error);
+}
+
+TEST_F(PictureTests, PictureCannotCloneShapeWithDuplicateId)
+{
+	shapes::Picture picture;
+	auto shape1 = CreateShape("original", gfx::Color::FromHexStr("ffffff"), "circle", "100 150 25");
+	auto shape2 = CreateShape("existing", gfx::Color::FromHexStr("000000"), "rectangle", "50 75 20 30");
+	picture.AddShape(std::move(shape1));
+	picture.AddShape(std::move(shape2));
+
+	EXPECT_THROW(picture.CloneShape("original", "existing"), std::runtime_error);
+
+	std::vector<Shape*> shapesList = picture.ListShapes();
+	EXPECT_EQ(2, shapesList.size());
 }

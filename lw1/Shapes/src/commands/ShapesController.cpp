@@ -14,7 +14,8 @@ ShapesController::ShapesController(shapes::Picture& picture, gfx::ICanvas& canva
 		{ "ChangeColor", std::bind_front(&ShapesController::ProcessChangeColor, this) },
 		{ "MovePicture", std::bind_front(&ShapesController::ProcessMovePicture, this) },
 		{ "DrawPicture", std::bind_front(&ShapesController::ProcessDrawPicture, this) },
-		{ "List", std::bind_front(&ShapesController::ProcessList, this) }
+		{ "List", std::bind_front(&ShapesController::ProcessList, this) },
+		{ "CloneShape", std::bind_front(&ShapesController::ProcessCloneShape, this) }
 	}
 	, m_picture(picture)
 	, m_canvas(canvas)
@@ -170,6 +171,17 @@ void ShapesController::ProcessDrawShape(std::istream& input)
 void ShapesController::ProcessDrawPicture(std::istream&)
 {
 	m_picture.DrawPicture(m_canvas);
+}
+
+void ShapesController::ProcessCloneShape(std::istream& input)
+{
+	std::string id, newId;
+	if (!(input >> id >> newId))
+	{
+		throw std::runtime_error("Invalid arguments. Usage: CloneShape <id> <new-id>");
+	}
+
+	m_picture.CloneShape(id, newId);
 }
 
 void ShapesController::InputThreadFunction()

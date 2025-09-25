@@ -23,6 +23,8 @@ public:
 	void ChangeShapeColor(const std::string& id, gfx::Color color);
 	void ChangeShapeStrategy(const std::string& id, std::unique_ptr<IShapeStrategy>&& strategy);
 
+	void CloneShape(const std::string& id, const std::string& newId);
+
 	std::vector<Shape*> ListShapes() const;
 
 private:

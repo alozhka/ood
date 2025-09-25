@@ -1,6 +1,9 @@
 #pragma once
 #include "../Point.h"
 #include "IShapeStrategy.h"
+#include <memory>
+#include <iomanip>
+#include <sstream>
 
 namespace shapes
 {
@@ -35,6 +38,11 @@ public:
 		oss << std::setprecision(15) << std::defaultfloat
 			<< m_p.x << " " << m_p.y << " " << m_radius;
 		return oss.str();
+	}
+
+	std::unique_ptr<IShapeStrategy> Clone() const override
+	{
+		return std::make_unique<CircleStrategy>(m_p.x, m_p.y, m_radius);
 	}
 
 private:
@@ -79,6 +87,11 @@ public:
 			<< m_leftTop.x << " " << m_leftTop.y << " "
 			<< m_width << " " << m_height;
 		return oss.str();
+	}
+
+	std::unique_ptr<IShapeStrategy> Clone() const override
+	{
+		return std::make_unique<RectangleStrategy>(m_leftTop.x, m_leftTop.y, m_width, m_height);
 	}
 
 private:
@@ -129,6 +142,11 @@ public:
 		return oss.str();
 	}
 
+	std::unique_ptr<IShapeStrategy> Clone() const override
+	{
+		return std::make_unique<TriangleStrategy>(m_p1.x, m_p1.y, m_p2.x, m_p2.y, m_p3.x, m_p3.y);
+	}
+
 private:
 	Point m_p1, m_p2, m_p3;
 };
@@ -170,6 +188,11 @@ public:
 		return oss.str();
 	}
 
+	std::unique_ptr<IShapeStrategy> Clone() const override
+	{
+		return std::make_unique<LineStrategy>(m_p1.x, m_p1.y, m_p2.x, m_p2.y);
+	}
+
 private:
 	Point m_p1, m_p2;
 };
@@ -207,6 +230,11 @@ public:
 			<< m_p.x << " " << m_p.y << " "
 			<< m_size << " " << m_text;
 		return oss.str();
+	}
+
+	std::unique_ptr<IShapeStrategy> Clone() const override
+	{
+		return std::make_unique<TextStrategy>(m_p.x, m_p.y, m_size, m_text);
 	}
 
 private:

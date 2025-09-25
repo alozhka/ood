@@ -1,6 +1,7 @@
 #pragma once
 #include "../draw/ICanvas.h"
 #include "strategy/IShapeStrategy.h"
+#include <memory>
 
 class Shape
 {
@@ -15,6 +16,7 @@ public:
 	std::string GetId() const;
 	gfx::Color GetColor() const;
 	std::string GetDescription() const;
+	std::unique_ptr<Shape> Clone(const std::string& newId) const;
 
 private:
 	std::string m_id;

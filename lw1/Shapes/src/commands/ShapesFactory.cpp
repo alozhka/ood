@@ -34,6 +34,16 @@ std::unique_ptr<shapes::IShapeStrategy> ShapesFactory::CreateFromStream(const st
 		}
 	}
 
+	if (type == "line")
+	{
+		double x1, y1, x2, y2;
+		if (!(params >> x1 >> y1 >> x2 >> y2))
+		{
+			throw std::runtime_error("Invalid line parameters");
+		}
+		return std::make_unique<shapes::LineStrategy>(x1, y1, x2, y2);
+	}
+
 	if (type == "text")
 	{
 		double left, top, size;

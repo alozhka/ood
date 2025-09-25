@@ -88,7 +88,7 @@ void ShapesController::ProcessAddShape(std::istream& input)
 void ShapesController::ProcessList(std::istream&) const
 {
 	std::vector<Shape*> shapes = m_picture.ListShapes();
-	uint i = 1;
+	unsigned int i = 1;
 	for (const auto& shape : shapes)
 	{
 		m_output << i++ << " " << shape->GetDescription() << std::endl;

@@ -123,6 +123,42 @@ private:
 	Point m_p1, m_p2, m_p3;
 };
 
+class LineStrategy final : public IShapeStrategy
+{
+public:
+	LineStrategy(double x1, double y1, double x2, double y2)
+		: m_p1(x1, y1)
+		, m_p2(x2, y2)
+	{
+	}
+
+	void Draw(gfx::ICanvas& canvas) const override
+	{
+		canvas.MoveTo(m_p1.x, m_p1.y);
+		canvas.LineTo(m_p2.x, m_p2.y);
+	}
+
+	void Move(double dx, double dy) override
+	{
+		m_p1.x += dx;
+		m_p1.y += dy;
+	}
+
+	std::string GetType() const override
+	{
+		return "line";
+	}
+
+	std::string GetDescription() const override
+	{
+		return std::to_string(m_p1.x) + " " + std::to_string(m_p1.y) + " "
+			+ std::to_string(m_p2.x) + " " + std::to_string(m_p2.y);
+	}
+
+private:
+	Point m_p1, m_p2;
+};
+
 class TextStrategy final : public IShapeStrategy
 {
 public:

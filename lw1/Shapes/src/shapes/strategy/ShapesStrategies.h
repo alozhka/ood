@@ -76,8 +76,8 @@ public:
 	{
 		std::ostringstream oss;
 		oss << std::setprecision(15) << std::defaultfloat
-			<< std::to_string(m_leftTop.x) << " " << std::to_string(m_leftTop.y) << " "
-			<< std::to_string(m_width) << " " << std::to_string(m_height);
+			<< m_leftTop.x << " " << m_leftTop.y << " "
+			<< m_width << " " << m_height;
 		return oss.str();
 	}
 
@@ -122,9 +122,9 @@ public:
 	{
 		std::ostringstream oss;
 		oss << std::setprecision(15) << std::defaultfloat
-			<< std::to_string(m_p1.x) << " " << std::to_string(m_p1.y) << " "
-			<< std::to_string(m_p2.x) << " " << std::to_string(m_p2.y) << " "
-			<< std::to_string(m_p3.x) << " " << std::to_string(m_p3.y);
+			<< m_p1.x << " " << m_p1.y << " "
+			<< m_p2.x << " " << m_p2.y << " "
+			<< m_p3.x << " " << m_p3.y;
 		return oss.str();
 	}
 
@@ -162,8 +162,8 @@ public:
 	{
 		std::ostringstream oss;
 		oss << std::setprecision(15) << std::defaultfloat
-			<< std::to_string(m_p1.x) << " " << std::to_string(m_p1.y) << " "
-			<< std::to_string(m_p2.x) << " " << std::to_string(m_p2.y);
+			<< m_p1.x << " " << m_p1.y << " "
+			<< m_p2.x << " " << m_p2.y;
 		return oss.str();
 	}
 
@@ -201,8 +201,8 @@ public:
 	{
 		std::ostringstream oss;
 		oss << std::setprecision(15) << std::defaultfloat
-			<< std::to_string(m_p.x) << " " << std::to_string(m_p.y) << " "
-			<<std::to_string(m_size) << " " << m_text;
+			<< m_p.x << " " << m_p.y << " "
+			<< m_size << " " << m_text;
 		return oss.str();
 	}
 

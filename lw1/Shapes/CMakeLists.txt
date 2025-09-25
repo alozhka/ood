@@ -49,7 +49,10 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
-add_executable(ShapesTests tests/ShapesTests.cpp src/shapes/Shape.cpp src/commands/ShapesFactory.cpp)
+add_executable(ShapesTests tests/ShapesTests.cpp
+        src/shapes/Shape.cpp
+        src/commands/ShapesFactory.cpp
+        src/shapes/Picture.cpp)
 
 target_link_libraries(ShapesTests
         gtest_main

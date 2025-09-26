@@ -10,7 +10,7 @@ gfx::SFMLCanvas::SFMLCanvas(sf::RenderWindow& window)
 #ifdef _WIN32
 	bool fontLoaded = m_font.openFromFile(R"(C:\Windows\Fonts\arial.ttf)");
 #elif defined(__APPLE__)
-	bool fontLoaded = m_font.openFromFile("/System/Library/Fonts/Arial.ttf");
+	bool fontLoaded = m_font.openFromFile("/System/Library/Fonts/Geneva.ttf");
 #else
 	bool fontLoaded = m_font.openFromFile("/usr/share/fonts/TTF/arial.ttf");
 #endif
@@ -21,9 +21,9 @@ gfx::SFMLCanvas::SFMLCanvas(sf::RenderWindow& window)
 	}
 }
 
-void gfx::SFMLCanvas::SetColor(gfx::Color c)
+void gfx::SFMLCanvas::SetColor(Color c)
 {
-	m_currentColor = sf::Color(c.R, c.G, c.B);
+	m_currentColor = sf::Color(c.WithOpacity().m_color);
 }
 
 void gfx::SFMLCanvas::MoveTo(double x, double y)
@@ -52,7 +52,7 @@ void gfx::SFMLCanvas::DrawEclipse(double cx, double cy, double rx, double ry)
 	ellipse.setPosition(sf::Vector2f(static_cast<float>(cx - rx), static_cast<float>(cy - ry)));
 	ellipse.setOutlineColor(m_currentColor);
 	ellipse.setOutlineThickness(1);
-	ellipse.setFillColor(sf::Color::Transparent);
+	ellipse.setFillColor(m_currentColor);
 	m_window.draw(ellipse);
 }
 
@@ -62,4 +62,9 @@ void gfx::SFMLCanvas::DrawText(double left, double top, double fontSize, const s
 	sfText.setFillColor(m_currentColor);
 	sfText.setPosition(sf::Vector2f(static_cast<float>(left), static_cast<float>(top)));
 	m_window.draw(sfText);
+}
+
+void gfx::SFMLCanvas::Display()
+{
+	m_window.display();
 }

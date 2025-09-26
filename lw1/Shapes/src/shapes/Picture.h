@@ -2,6 +2,7 @@
 #include "Shape.h"
 
 #include <unordered_map>
+#include <vector>
 
 namespace shapes
 {
@@ -9,16 +10,27 @@ class Picture
 {
 public:
 	Picture() = default;
-	Picture(const Picture& other);
 
-	void AddShape(std::unique_ptr<Shape> shape);
-	void RemoveShape(int id);
-	std::weak_ptr<Shape> GetShape(int id) const;
+	void AddShape(std::unique_ptr<Shape>&& shape);
+	void RemoveShape(const std::string& id);
 
-	void MoveShape(int id, double x, double y);
+	void MoveShape(const std::string& id, double x, double y);
 	void MovePicture(double x, double y);
 
+	void DrawShape(const std::string& id, gfx::ICanvas& canvas);
+	void DrawPicture(gfx::ICanvas& canvas);
+
+	void ChangeShapeColor(const std::string& id, gfx::Color color);
+	void ChangeShapeStrategy(const std::string& id, std::unique_ptr<IShapeStrategy>&& strategy);
+
+	void CloneShape(const std::string& id, const std::string& newId);
+
+	std::vector<Shape*> ListShapes() const;
+
 private:
+	Shape* GetShape(const std::string& id) const;
+
 	std::unordered_map<std::string, std::unique_ptr<Shape>> m_shapes{};
+	std::vector<std::string> m_shapesOrder{};
 };
-} // namespace Shapes
+} // namespace shapes

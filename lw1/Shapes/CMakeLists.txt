@@ -33,6 +33,31 @@ add_executable(Shapes main.cpp
         src/shapes/strategy/IShapeStrategy.h
         src/shapes/Shape.cpp
         src/shapes/Shape.h
-        src/shapes/strategy/ShapesStrategies.h)
+        src/shapes/strategy/ShapesStrategies.h
+        src/shapes/Point.h)
 
 target_link_libraries(Shapes SFML::Graphics)
+
+FetchContent_Declare(
+        googletest
+        GIT_REPOSITORY https://github.com/google/googletest.git
+        GIT_TAG v1.14.0
+)
+# For Windows: Prevent overriding the parent project's compiler/linker settings
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
+
+enable_testing()
+
+add_executable(ShapesTests tests/ShapesTests.cpp
+        src/shapes/Shape.cpp
+        src/commands/ShapesFactory.cpp
+        src/shapes/Picture.cpp)
+
+target_link_libraries(ShapesTests
+        gtest_main
+        gtest
+)
+
+include(GoogleTest)
+gtest_discover_tests(ShapesTests)

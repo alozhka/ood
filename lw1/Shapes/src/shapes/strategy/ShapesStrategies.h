@@ -1,5 +1,9 @@
 #pragma once
+#include "../Point.h"
 #include "IShapeStrategy.h"
+#include <memory>
+#include <iomanip>
+#include <sstream>
 
 namespace shapes
 {
@@ -7,33 +11,50 @@ class CircleStrategy final : public IShapeStrategy
 {
 public:
 	CircleStrategy(double dx, double dy, double radius)
-		: m_dx(dx)
-		, m_dy(dy)
+		: m_p(dx, dy)
 		, m_radius(radius)
 	{
 	}
 
 	void Draw(gfx::ICanvas& canvas) const override
 	{
-		canvas.DrawEclipse(m_dx, m_dy, m_radius, m_radius);
+		canvas.DrawEclipse(m_p.x, m_p.y, m_radius, m_radius);
 	}
 
 	void Move(double dx, double dy) override
 	{
-		m_dx += m_dx;
-		m_dy += m_dy;
+		m_p.x += dx;
+		m_p.y += dy;
+	}
+
+	std::string GetType() const override
+	{
+		return "circle";
+	}
+
+	std::string GetDescription() const override
+	{
+		std::ostringstream oss;
+		oss << std::setprecision(15) << std::defaultfloat
+			<< m_p.x << " " << m_p.y << " " << m_radius;
+		return oss.str();
+	}
+
+	std::unique_ptr<IShapeStrategy> Clone() const override
+	{
+		return std::make_unique<CircleStrategy>(m_p.x, m_p.y, m_radius);
 	}
 
 private:
-	double m_dx, m_dy, m_radius;
+	Point m_p;
+	double m_radius;
 };
 
 class RectangleStrategy final : public IShapeStrategy
 {
 public:
 	RectangleStrategy(double left, double top, double width, double height)
-		: m_left(left)
-		, m_top(top)
+		: m_leftTop(left, top)
 		, m_width(width)
 		, m_height(height)
 	{
@@ -41,55 +62,184 @@ public:
 
 	void Draw(gfx::ICanvas& canvas) const override
 	{
-		canvas.MoveTo(m_left, m_top);
-		canvas.LineTo(m_left + m_width, m_top);
-		canvas.MoveTo(m_left + m_width, m_top + m_height);
-		canvas.LineTo(m_left, m_top + m_height);
-		canvas.MoveTo(m_left, m_top);
+		canvas.MoveTo(m_leftTop.x, m_leftTop.y);
+		canvas.LineTo(m_leftTop.x + m_width, m_leftTop.y);
+		canvas.LineTo(m_leftTop.x + m_width, m_leftTop.y + m_height);
+		canvas.LineTo(m_leftTop.x, m_leftTop.y + m_height);
+		canvas.LineTo(m_leftTop.x, m_leftTop.y);
 	}
 
 	void Move(double dx, double dy) override
 	{
-		m_left += dx;
-		m_top += dy;
+		m_leftTop.x += dx;
+		m_leftTop.y += dy;
+	}
+
+	std::string GetType() const override
+	{
+		return "rectangle";
+	}
+
+	std::string GetDescription() const override
+	{
+		std::ostringstream oss;
+		oss << std::setprecision(15) << std::defaultfloat
+			<< m_leftTop.x << " " << m_leftTop.y << " "
+			<< m_width << " " << m_height;
+		return oss.str();
+	}
+
+	std::unique_ptr<IShapeStrategy> Clone() const override
+	{
+		return std::make_unique<RectangleStrategy>(m_leftTop.x, m_leftTop.y, m_width, m_height);
 	}
 
 private:
-	double m_left, m_top, m_width, m_height;
+	Point m_leftTop;
+	double m_width, m_height;
 };
 
 class TriangleStrategy final : public IShapeStrategy
 {
 public:
 	TriangleStrategy(double x1, double y1, double x2, double y2, double x3, double y3)
-		: m_x1(x1)
-		, m_y1(y1)
-		, m_x2(x2)
-		, m_y2(y2)
-		, m_x3(x3)
-		, m_y3(y3)
+		: m_p1(x1, y1)
+		, m_p2(x2, y2)
+		, m_p3(x3, y3)
 	{
 	}
 
 	void Draw(gfx::ICanvas& canvas) const override
 	{
-		canvas.MoveTo(m_x1, m_y1);
-		canvas.LineTo(m_x2, m_y2);
-		canvas.MoveTo(m_x3, m_y3);
-		canvas.LineTo(m_x1, m_y1);
+		canvas.MoveTo(m_p1.x, m_p1.y);
+		canvas.LineTo(m_p2.x, m_p2.y);
+		canvas.LineTo(m_p3.x, m_p3.y);
+		canvas.LineTo(m_p1.x, m_p1.y);
 	}
 
 	void Move(double dx, double dy) override
 	{
-		m_x1 += dx;
-		m_y1 += dy;
-		m_x2 += dx;
-		m_y2 += dy;
-		m_x3 += dx;
-		m_y3 += dy;
+		m_p1.x += dx;
+		m_p1.y += dy;
+		m_p2.x += dx;
+		m_p2.y += dy;
+		m_p3.x += dx;
+		m_p3.y += dy;
+	}
+
+	std::string GetType() const override
+	{
+		return "triangle";
+	}
+
+	std::string GetDescription() const override
+	{
+		std::ostringstream oss;
+		oss << std::setprecision(15) << std::defaultfloat
+			<< m_p1.x << " " << m_p1.y << " "
+			<< m_p2.x << " " << m_p2.y << " "
+			<< m_p3.x << " " << m_p3.y;
+		return oss.str();
+	}
+
+	std::unique_ptr<IShapeStrategy> Clone() const override
+	{
+		return std::make_unique<TriangleStrategy>(m_p1.x, m_p1.y, m_p2.x, m_p2.y, m_p3.x, m_p3.y);
 	}
 
 private:
-	double m_x1, m_y1, m_x2, m_y2, m_x3, m_y3;
+	Point m_p1, m_p2, m_p3;
+};
+
+class LineStrategy final : public IShapeStrategy
+{
+public:
+	LineStrategy(double x1, double y1, double x2, double y2)
+		: m_p1(x1, y1)
+		, m_p2(x2, y2)
+	{
+	}
+
+	void Draw(gfx::ICanvas& canvas) const override
+	{
+		canvas.MoveTo(m_p1.x, m_p1.y);
+		canvas.LineTo(m_p2.x, m_p2.y);
+	}
+
+	void Move(double dx, double dy) override
+	{
+		m_p1.x += dx;
+		m_p1.y += dy;
+		m_p2.x += dx;
+		m_p2.y += dy;
+	}
+
+	std::string GetType() const override
+	{
+		return "line";
+	}
+
+	std::string GetDescription() const override
+	{
+		std::ostringstream oss;
+		oss << std::setprecision(15) << std::defaultfloat
+			<< m_p1.x << " " << m_p1.y << " "
+			<< m_p2.x << " " << m_p2.y;
+		return oss.str();
+	}
+
+	std::unique_ptr<IShapeStrategy> Clone() const override
+	{
+		return std::make_unique<LineStrategy>(m_p1.x, m_p1.y, m_p2.x, m_p2.y);
+	}
+
+private:
+	Point m_p1, m_p2;
+};
+
+class TextStrategy final : public IShapeStrategy
+{
+public:
+	TextStrategy(double left, double top, double size, const std::string& text)
+		: m_p(left, top)
+		, m_size(size)
+		, m_text(text)
+	{
+	}
+
+	void Draw(gfx::ICanvas& canvas) const override
+	{
+		canvas.DrawText(m_p.x, m_p.y, m_size, m_text);
+	}
+
+	void Move(double dx, double dy) override
+	{
+		m_p.x += dx;
+		m_p.y += dy;
+	}
+
+	std::string GetType() const override
+	{
+		return "text";
+	}
+
+	std::string GetDescription() const override
+	{
+		std::ostringstream oss;
+		oss << std::setprecision(15) << std::defaultfloat
+			<< m_p.x << " " << m_p.y << " "
+			<< m_size << " " << m_text;
+		return oss.str();
+	}
+
+	std::unique_ptr<IShapeStrategy> Clone() const override
+	{
+		return std::make_unique<TextStrategy>(m_p.x, m_p.y, m_size, m_text);
+	}
+
+private:
+	Point m_p;
+	double m_size;
+	std::string m_text;
 };
 } // namespace shapes

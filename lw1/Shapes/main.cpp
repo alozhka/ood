@@ -7,7 +7,9 @@
 
 int main()
 {
-	sf::RenderWindow window(sf::VideoMode(sf::Vector2u(800, 600)), "Shapes");
+	sf::ContextSettings settings;
+	settings.antiAliasingLevel = 16;
+	sf::RenderWindow window(sf::VideoMode(sf::Vector2u(800, 600), 1), "Shapes", sf::Style::Default, sf::State::Windowed, settings);
 	shapes::Picture picture;
 	gfx::SFMLCanvas canvas(window);
 	ShapesController controller(picture, canvas, std::cin, std::cout);
@@ -20,17 +22,12 @@ int main()
 			if (event.has_value() && event->is<sf::Event::Closed>())
 			{
 				window.close();
-				return EXIT_SUCCESS;
+				break;
 			}
 		}
-
-		if (std::cin.rdbuf()->in_avail() > 0)
-		{
-			controller.ProcessCommand();
-		}
-
-		window.display();
+		controller.ProcessCommand();
+		sf::sleep(sf::milliseconds(50));
 	}
 
-	return 0;
+	return EXIT_SUCCESS;
 }

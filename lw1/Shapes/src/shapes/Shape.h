@@ -1,16 +1,22 @@
 #pragma once
 #include "../draw/ICanvas.h"
 #include "strategy/IShapeStrategy.h"
+#include <memory>
 
 class Shape
 {
 public:
-	Shape(std::string id, gfx::Color color, std::unique_ptr<shapes::IShapeStrategy> strategy);
+	Shape(const std::string& id, gfx::Color color, std::unique_ptr<shapes::IShapeStrategy>&& strategy);
 
-	void Draw(gfx::ICanvas& canvas) const;
-	void Move(double dx, double dy) const;
+	void Draw(gfx::ICanvas& canvas);
+	void Move(double dx, double dy);
+	void SetStrategy(std::unique_ptr<shapes::IShapeStrategy>&& strategy);
+	void SetColor(gfx::Color color);
 
 	std::string GetId() const;
+	gfx::Color GetColor() const;
+	std::string GetDescription() const;
+	std::unique_ptr<Shape> Clone(const std::string& newId) const;
 
 private:
 	std::string m_id;

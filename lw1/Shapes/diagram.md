@@ -10,6 +10,7 @@ classDiagram
         +LineTo(double x, double y)*
         +DrawEclipse(double cx, double cy, double rx, double ry)*
         +DrawText(double left, double top, double fontSize, string text)*
+        +Display()*
     }
 
     class IShapeStrategy {
@@ -141,6 +142,7 @@ classDiagram
         +LineTo(double x, double y)
         +DrawEclipse(double cx, double cy, double rx, double ry)
         +DrawText(double left, double top, double fontSize, string text)
+        +Display()
     }
 
     %% Controller and Factory

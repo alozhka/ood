@@ -14,6 +14,7 @@ public:
 	void LineTo(double x, double y) override;
 	void DrawEclipse(double cx, double cy, double rx, double ry) override;
 	void DrawText(double left, double top, double fontSize, const std::string& text) override;
+	void Display() override;
 
 private:
 	sf::RenderWindow& m_window;

@@ -26,7 +26,6 @@ int main()
 			}
 		}
 		controller.ProcessCommand();
-		window.display();
 		sf::sleep(sf::milliseconds(50));
 	}
 

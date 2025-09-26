@@ -65,6 +65,7 @@ public:
 	virtual void LineTo(double x, double y) = 0;
 	virtual void DrawEclipse(double cx, double cy, double rx, double ry) = 0;
 	virtual void DrawText(double left, double top, double fontSize, const std::string& text) = 0;
+	virtual void Display() = 0;
 
 	virtual ~ICanvas() = default;
 };

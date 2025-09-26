@@ -33,6 +33,11 @@ public:
 		++m_counter;
 	}
 
+	void Display() override
+	{
+		++m_counter;
+	}
+
 	size_t GetCallCount() const
 	{
 		return m_counter;

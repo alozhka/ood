@@ -63,3 +63,8 @@ void gfx::SFMLCanvas::DrawText(double left, double top, double fontSize, const s
 	sfText.setPosition(sf::Vector2f(static_cast<float>(left), static_cast<float>(top)));
 	m_window.draw(sfText);
 }
+
+void gfx::SFMLCanvas::Display()
+{
+	m_window.display();
+}

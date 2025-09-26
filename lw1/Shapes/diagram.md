@@ -189,8 +189,8 @@ classDiagram
     Shape *-- IShapeStrategy : uses
     Shape *-- Color : has
     Picture *-- Shape : contains
-    ShapesController *-- Picture : manages
-    ShapesController *-- ICanvas : uses
+    ShapesController o-- Picture : manages
+    ShapesController o-- ICanvas : uses
     ShapesFactory ..> IShapeStrategy : creates
 
     CircleStrategy *-- Point : has

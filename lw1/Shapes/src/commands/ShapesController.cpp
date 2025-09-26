@@ -166,11 +166,13 @@ void ShapesController::ProcessDrawShape(std::istream& input)
 	}
 
 	m_picture.DrawShape(id, m_canvas);
+	m_canvas.Display();
 }
 
 void ShapesController::ProcessDrawPicture(std::istream&)
 {
 	m_picture.DrawPicture(m_canvas);
+	m_canvas.Display();
 }
 
 void ShapesController::ProcessCloneShape(std::istream& input)

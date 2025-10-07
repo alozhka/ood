@@ -21,7 +21,7 @@ private:
 struct StatsInfo
 {
 	explicit StatsInfo(const std::string& name)
-		: name(name)
+		: m_name(name)
 	{
 	}
 
@@ -41,17 +41,17 @@ struct StatsInfo
 
 	void Print(std::ostream& out) const
 	{
-		out << "Max " << name << " " << m_maxValue << std::endl;
-		out << "Min " << name << " " << m_minValue << std::endl;
-		out << "Average " << name << " " << (m_accValue / m_countAcc) << std::endl;
+		out << "Max " << m_name << " " << m_maxValue << std::endl;
+		out << "Min " << m_name << " " << m_minValue << std::endl;
+		out << "Average " << m_name << " " << (m_accValue / m_countAcc) << std::endl;
 		out << "----------------\n";
 	}
 
-	std::string name;
+	std::string m_name;
 	double m_minValue = std::numeric_limits<double>::infinity();
 	double m_maxValue = -std::numeric_limits<double>::infinity();
 	double m_accValue = 0;
-	double m_countAcc = 0;
+	uint m_countAcc = 0;
 };
 
 class StatsDisplay final : public IObserver<WeatherInfo>

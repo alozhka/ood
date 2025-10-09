@@ -2,9 +2,25 @@
 #include "../src/Observer.h"
 #include "../src/WeatherData.h"
 
-class BrokenDisplay final : public IObserver<WeatherData>
+class BrokenDisplay : public IObserver<WeatherInfo>
 {
-
 public:
-	void Update(const WeatherData& data) override;
+	explicit BrokenDisplay(WeatherData& weatherData, std::ostream& output)
+		: m_data(&weatherData)
+		, m_output(output)
+	{
+		m_data->RegisterObserver(*this);
+	}
+
+	void Update(const WeatherInfo& data) override
+	{
+		m_output << "temp: " << data.temperature
+				 << ", humidity: " << data.humidity
+				 << ", pressure: " << data.pressure << std::endl;
+		m_data->RemoveObserver(*this);
+	}
+
+private:
+	WeatherData* m_data;
+	std::ostream& m_output;
 };

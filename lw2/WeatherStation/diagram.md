@@ -51,7 +51,7 @@ classDiagram
         +GetPressure() double
         +MeasurementsChanged() void
         +SetMeasurements()
-        GetChangedData() WeatherInfo
+        #GetChangedData() WeatherInfo
     }
 
     IObservable o-- IObserver

@@ -45,7 +45,10 @@ public:
 	void NotifyObservers() override
 	{
 		T data = GetChangedData();
-		for (auto& observer : m_observers)
+		// NOTE: копирование предотвращает неопределённое поведение при удалении наблюдателя самим собой
+		std::set<ObserverType*> observersCopy(m_observers);
+
+		for (auto& observer : observersCopy)
 		{
 			observer->Update(data);
 		}

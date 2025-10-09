@@ -16,7 +16,9 @@ public:
 	{
 		m_output << "temp: " << data.temperature
 				 << ", humidity: " << data.humidity
-				 << ", pressure: " << data.pressure << std::endl;
+				 << ", pressure: " << data.pressure
+		<< ", wind speed: " << data.windSpeed
+		<< ", wind direction: " << data.windDirection << std::endl;
 		m_data.RemoveObserver(*this);
 	}
 

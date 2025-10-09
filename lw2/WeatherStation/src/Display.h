@@ -1,5 +1,6 @@
 #pragma once
 #include "Observer.h"
+#include "StatsInfo.h"
 #include "WeatherData.h"
 
 class Display : public IObserver<WeatherInfo>
@@ -46,42 +47,6 @@ private:
 	IObservable<WeatherInfo>& m_outdoorObserver;
 };
 
-struct StatsInfo
-{
-	explicit StatsInfo(const std::string& name)
-		: m_name(name)
-	{
-	}
-
-	void Update(double value)
-	{
-		if (m_minValue > value)
-		{
-			m_minValue = value;
-		}
-		if (m_maxValue < value)
-		{
-			m_maxValue = value;
-		}
-		m_accValue += value;
-		++m_countAcc;
-	}
-
-	void Print(std::ostream& out) const
-	{
-		out << "Max " << m_name << " " << m_maxValue << std::endl;
-		out << "Min " << m_name << " " << m_minValue << std::endl;
-		out << "Average " << m_name << " " << (m_accValue / m_countAcc) << std::endl;
-		out << "---------------------\n";
-	}
-
-	std::string m_name;
-	double m_minValue = std::numeric_limits<double>::infinity();
-	double m_maxValue = -std::numeric_limits<double>::infinity();
-	double m_accValue = 0;
-	uint m_countAcc = 0;
-};
-
 class StatsDisplay final : public IObserver<WeatherInfo>
 {
 public:
@@ -105,16 +70,16 @@ private:
 		m_temperatureInfo.Update(data.temperature);
 		m_humidityInfo.Update(data.humidity);
 		m_pressureInfo.Update(data.pressure);
+		m_windSpeedInfo.Update(data.windSpeed);
+		m_windDirectionInfo.Update(data.windDirection);
 
 		PrintSensorLocation(source);
 		m_temperatureInfo.Print(std::cout);
 		m_humidityInfo.Print(std::cout);
 		m_pressureInfo.Print(std::cout);
+		m_windSpeedInfo.Print(std::cout);
+		m_windDirectionInfo.Print(std::cout);
 	}
-
-	StatsInfo m_temperatureInfo{ "Temperature" };
-	StatsInfo m_humidityInfo{ "Humidity" };
-	StatsInfo m_pressureInfo{ "Pressure" };
 
 	void PrintSensorLocation(IObservable<WeatherInfo>& observer) const
 	{
@@ -131,4 +96,10 @@ private:
 	std::ostream& m_output;
 	IObservable<WeatherInfo>& m_indoorObserver;
 	IObservable<WeatherInfo>& m_outdoorObserver;
+
+	StatsInfo m_temperatureInfo{ "Temperature" };
+	StatsInfo m_humidityInfo{ "Humidity" };
+	StatsInfo m_pressureInfo{ "Pressure" };
+	StatsInfo m_windSpeedInfo{ "Wind speed" };
+	WindDirectionInfo m_windDirectionInfo;
 };

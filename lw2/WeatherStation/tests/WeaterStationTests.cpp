@@ -13,13 +13,13 @@ protected:
 
 TEST_F(WeatherStationTests, ObserverSafelyUnsubscibesItself)
 {
-	BrokenDisplay display{out, indoor};
+	BrokenDisplay display{ out, indoor };
 	indoor.RegisterObserver(display, 1);
 
-	indoor.SetMeasurements(1, 1, 1);
-	indoor.SetMeasurements(1, 1, 1);
+	indoor.SetMeasurements(1, 1, 1, 10, 30);
+	indoor.SetMeasurements(1, 1, 1, 10, 30);
 
-	EXPECT_EQ("temp: 1, humidity: 1, pressure: 1\n", out.str());
+	EXPECT_EQ("temp: 1, humidity: 1, pressure: 1, wind speed: 10, wind direction: 30\n", out.str());
 }
 
 TEST_F(WeatherStationTests, ObserversAreNotifiedByPriority)
@@ -36,7 +36,7 @@ TEST_F(WeatherStationTests, ObserversAreNotifiedByPriority)
 	indoor.RegisterObserver(display2, 10);
 	indoor.RegisterObserver(display4, 3);
 
-	indoor.SetMeasurements(1, 1, 1);
+	indoor.SetMeasurements(1, 1, 1, 10, 30);
 
 	ASSERT_EQ(4u, callOrder.size());
 	EXPECT_EQ(callOrder[0], 3);
@@ -55,7 +55,7 @@ TEST_F(WeatherStationTests, DuplicateRegistrationIsIgnored)
 	data.RegisterObserver(display, 5);
 	data.RegisterObserver(display, 10);
 
-	data.SetMeasurements(1, 1, 1);
+	data.SetMeasurements(1, 1, 1, 10, 30);
 
 	ASSERT_EQ(1u, callOrder.size());
 }

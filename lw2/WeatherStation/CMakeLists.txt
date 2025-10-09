@@ -7,7 +7,8 @@ add_executable(WeatherStation main.cpp
         src/WeatherData.h
         src/Observer.h
         src/Display.h
-        src/Observable.h)
+        src/Observable.h
+        src/StatsInfo.h)
 
 add_executable(WeatherStationTests tests/WeaterStationTests.cpp
         tests/BrokenDisplay.h

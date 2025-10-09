@@ -9,7 +9,8 @@ add_executable(WeatherStation main.cpp
         src/Display.h)
 
 add_executable(WeatherStationTests tests/WeaterStationTests.cpp
-        tests/BrokenDisplay.h)
+        tests/BrokenDisplay.h
+        tests/OrderTestDisplay.h)
 
 include(FetchContent)
 FetchContent_Declare(

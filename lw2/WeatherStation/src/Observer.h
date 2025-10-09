@@ -1,7 +1,6 @@
 #pragma once
 
-#include <functional>
-#include <set>
+#include <map>
 
 /*
 Шаблонный интерфейс IObserver. Его должен реализовывать класс,
@@ -26,7 +25,7 @@ class IObservable
 {
 public:
 	virtual ~IObservable() = default;
-	virtual void RegisterObserver(IObserver<T>& observer) = 0;
+	virtual void RegisterObserver(IObserver<T>& observer, int priority) = 0;
 	virtual void NotifyObservers() = 0;
 	virtual void RemoveObserver(IObserver<T>& observer) = 0;
 };
@@ -37,18 +36,26 @@ class Observable : public IObservable<T>
 public:
 	using ObserverType = IObserver<T>;
 
-	void RegisterObserver(ObserverType& observer) override
+	void RegisterObserver(ObserverType& observer, int priority) override
 	{
-		m_observers.insert(&observer);
+		auto it = m_observerPriorities.find(&observer);
+		if (it != m_observerPriorities.end())
+		{
+			return;
+		}
+
+		// NOTE: std::multimap сортирует по возрастанию ключа, а нужно по убыванию приоритета
+		m_observers.emplace(-priority, &observer);
+		m_observerPriorities.emplace(&observer, priority);
 	}
 
 	void NotifyObservers() override
 	{
 		T data = GetChangedData();
 		// NOTE: копирование предотвращает неопределённое поведение при удалении наблюдателя самим собой
-		std::set<ObserverType*> observersCopy(m_observers);
+		std::multimap<int, ObserverType*> observersCopy(m_observers);
 
-		for (auto& observer : observersCopy)
+		for (auto& [priority, observer] : observersCopy)
 		{
 			observer->Update(data);
 		}
@@ -56,7 +63,24 @@ public:
 
 	void RemoveObserver(ObserverType& observer) override
 	{
-		m_observers.erase(&observer);
+		auto it = m_observerPriorities.find(&observer);
+		if (it == m_observerPriorities.end())
+		{
+			return;
+		}
+
+		int priority = it->second;
+		m_observerPriorities.erase(it);
+
+		auto range = m_observers.equal_range(-priority);
+		for (auto iter = range.first; iter != range.second; ++iter)
+		{
+			if (iter->second == &observer)
+			{
+				m_observers.erase(iter);
+				break;
+			}
+		}
 	}
 
 protected:
@@ -65,5 +89,6 @@ protected:
 	virtual T GetChangedData() const = 0;
 
 private:
-	std::set<ObserverType*> m_observers;
+	std::multimap<int, ObserverType*> m_observers;
+	std::unordered_map<ObserverType*, int> m_observerPriorities;
 };

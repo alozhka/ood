@@ -3,25 +3,28 @@
 
 int main()
 {
-	WeatherData wd;
+	WeatherData indoorSensor;
+	WeatherData outdoorSensor;
 
-	Display display;
-	wd.RegisterObserver(display, 5);
+	Display display(std::cout, indoorSensor, outdoorSensor);
+	indoorSensor.RegisterObserver(display, 5);
+	outdoorSensor.RegisterObserver(display, 5);
 
-	StatsDisplay statsDisplay;
-	wd.RegisterObserver(statsDisplay, 10);
+	StatsDisplay statsDisplay(std::cout, indoorSensor, outdoorSensor);
+	indoorSensor.RegisterObserver(statsDisplay, 10);
+	outdoorSensor.RegisterObserver(statsDisplay, 10);
 
-	wd.SetMeasurements(3, 0.7, 760);
+	indoorSensor.SetMeasurements(3, 0.7, 760);
 	std::cout << std::endl;
 
-	wd.SetMeasurements(4, 0.8, 761);
+	outdoorSensor.SetMeasurements(4, 0.8, 761);
 	std::cout << std::endl;
 
-	wd.RegisterObserver(display, 5);
-	wd.RemoveObserver(statsDisplay);
+	indoorSensor.RegisterObserver(display, 5);
+	indoorSensor.RemoveObserver(statsDisplay);
 
-	wd.SetMeasurements(10, 0.8, 761);
+	indoorSensor.SetMeasurements(10, 0.8, 761);
 	std::cout << std::endl;
-	wd.SetMeasurements(-10, 0.8, 761);
+	outdoorSensor.SetMeasurements(-10, 0.8, 761);
 	return 0;
 }

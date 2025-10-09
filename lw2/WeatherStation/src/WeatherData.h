@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Observer.h"
+#include "Observable.h"
+
 #include <algorithm>
 #include <climits>
 #include <iostream>
@@ -13,7 +14,7 @@ struct WeatherInfo
 	double pressure = 0;
 };
 
-class WeatherData : public Observable<WeatherInfo>
+class WeatherData : public PriorityObservable<WeatherInfo>
 {
 public:
 	double GetTemperature() const

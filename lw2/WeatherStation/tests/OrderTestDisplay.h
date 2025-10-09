@@ -13,7 +13,7 @@ public:
 	{
 	}
 
-	void Update(const WeatherInfo& data) override
+	void Update(const WeatherInfo& data, IObservable<WeatherInfo>& source) override
 	{
 		m_callOrder.push_back(m_id);
 	}

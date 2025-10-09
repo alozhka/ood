@@ -6,23 +6,24 @@
 
 class WeatherStationTests : public testing::Test
 {
+protected:
+	std::ostringstream out{};
+	WeatherData indoor{}, outdoor{};
 };
 
-TEST(WeatherStationTests, ObserverSafelyUnsubscibesItself)
+TEST_F(WeatherStationTests, ObserverSafelyUnsubscibesItself)
 {
-	std::ostringstream out;
-	WeatherData data;
-	BrokenDisplay display(data, out);
+	BrokenDisplay display{out, indoor};
+	indoor.RegisterObserver(display, 1);
 
-	data.SetMeasurements(1, 1, 1);
-	data.SetMeasurements(1, 1, 1);
+	indoor.SetMeasurements(1, 1, 1);
+	indoor.SetMeasurements(1, 1, 1);
 
 	EXPECT_EQ("temp: 1, humidity: 1, pressure: 1\n", out.str());
 }
 
-TEST(WeatherStationTests, ObserversAreNotifiedByPriority)
+TEST_F(WeatherStationTests, ObserversAreNotifiedByPriority)
 {
-	WeatherData data;
 	std::vector<int> callOrder;
 
 	OrderTestDisplay display1(callOrder, 1);
@@ -30,12 +31,12 @@ TEST(WeatherStationTests, ObserversAreNotifiedByPriority)
 	OrderTestDisplay display3(callOrder, 3);
 	OrderTestDisplay display4(callOrder, 4);
 
-	data.RegisterObserver(display1, 5);
-	data.RegisterObserver(display3, 10);
-	data.RegisterObserver(display2, 10);
-	data.RegisterObserver(display4, 3);
+	indoor.RegisterObserver(display1, 5);
+	indoor.RegisterObserver(display3, 10);
+	indoor.RegisterObserver(display2, 10);
+	indoor.RegisterObserver(display4, 3);
 
-	data.SetMeasurements(1, 1, 1);
+	indoor.SetMeasurements(1, 1, 1);
 
 	ASSERT_EQ(4u, callOrder.size());
 	EXPECT_EQ(callOrder[0], 3);
@@ -44,7 +45,7 @@ TEST(WeatherStationTests, ObserversAreNotifiedByPriority)
 	EXPECT_EQ(callOrder[3], 4);
 }
 
-TEST(WeatherStationTests, DuplicateRegistrationIsIgnored)
+TEST_F(WeatherStationTests, DuplicateRegistrationIsIgnored)
 {
 	WeatherData data;
 	std::vector<int> callOrder;
@@ -59,10 +60,9 @@ TEST(WeatherStationTests, DuplicateRegistrationIsIgnored)
 	ASSERT_EQ(1u, callOrder.size());
 }
 
-TEST(WeatherStationTests, RemovingNonExistentObserverIsIgnored)
+TEST_F(WeatherStationTests, RemovingNonExistentObserverIsIgnored)
 {
-	WeatherData data;
-	Display display;
+	Display display(out, indoor, outdoor);
 
-	EXPECT_NO_THROW(data.RemoveObserver(display));
+	EXPECT_NO_THROW(indoor.RemoveObserver(display));
 }

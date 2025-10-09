@@ -6,7 +6,8 @@ set(CMAKE_CXX_STANDARD 20)
 add_executable(WeatherStation main.cpp
         src/WeatherData.h
         src/Observer.h
-        src/Display.h)
+        src/Display.h
+        src/Observable.h)
 
 add_executable(WeatherStationTests tests/WeaterStationTests.cpp
         tests/BrokenDisplay.h

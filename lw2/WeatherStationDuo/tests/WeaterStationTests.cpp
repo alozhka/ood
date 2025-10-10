@@ -17,8 +17,8 @@ TEST_F(WeatherStationTests, ObserverSafelyUnsubscibesItself)
 	BrokenDisplay display{ indoor };
 	indoor.RegisterObserver(display, 1);
 
-	indoor.SetMeasurements(1, 1, 1, 10, 30);
-	indoor.SetMeasurements(1, 1, 1, 10, 30);
+	indoor.SetMeasurements(1, 1, 1);
+	indoor.SetMeasurements(1, 1, 1);
 
 	EXPECT_EQ(1, display.GetCallCount());
 }
@@ -37,7 +37,7 @@ TEST_F(WeatherStationTests, ObserversAreNotifiedByPriority)
 	indoor.RegisterObserver(display2, 10);
 	indoor.RegisterObserver(display4, 3);
 
-	indoor.SetMeasurements(1, 1, 1, 10, 30);
+	indoor.SetMeasurements(1, 1, 1);
 
 	ASSERT_EQ(4u, callOrder.size());
 	EXPECT_EQ(callOrder[0], 3);
@@ -56,7 +56,7 @@ TEST_F(WeatherStationTests, DuplicateRegistrationIsIgnored)
 	data.RegisterObserver(display, 5);
 	data.RegisterObserver(display, 10);
 
-	data.SetMeasurements(1, 1, 1, 10, 30);
+	data.SetMeasurements(1, 1, 1);
 
 	ASSERT_EQ(1u, callOrder.size());
 }
@@ -74,7 +74,7 @@ TEST_F(WeatherStationTests, DisplayGetsDataFromBothSensors)
 {
 	MockDisplay display(indoor, outdoor);
 
-	indoor.SetMeasurements(1, 1, 1, 10, 30);
+	indoor.SetMeasurements(1, 1, 1);
 
 	EXPECT_EQ(1, display.GetCallCount());
 

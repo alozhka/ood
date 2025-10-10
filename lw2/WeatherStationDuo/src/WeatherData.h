@@ -43,13 +43,11 @@ public:
 		NotifyObservers();
 	}
 
-	void SetMeasurements(double temp, double humidity, double pressure, double windSpeed, double windDirection)
+	void SetMeasurements(double temp, double humidity, double pressure)
 	{
 		m_humidity = humidity;
 		m_temperature = temp;
 		m_pressure = pressure;
-		m_windSpeed = windSpeed;
-		m_windDirection = windDirection;
 
 		MeasurementsChanged();
 	}
@@ -68,8 +66,6 @@ private:
 	double m_temperature = 0.0;
 	double m_humidity = 0.0;
 	double m_pressure = 760.0;
-	double m_windSpeed = 0;
-	double m_windDirection = 0;
 };
 
 class OutWeatherData : public PriorityObservable<OutWeatherInfo>

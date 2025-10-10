@@ -10,7 +10,7 @@ int main()
 
 	StatsDisplay statsDisplay(std::cout, 5, indoorSensor, outdoorSensor);
 
-	indoorSensor.SetMeasurements(3, 0.7, 760, 3, 30);
+	indoorSensor.SetMeasurements(3, 0.7, 760);
 	std::cout << std::endl;
 
 	outdoorSensor.SetMeasurements(4, 0.8, 761, 15, 45);
@@ -19,7 +19,7 @@ int main()
 	indoorSensor.RegisterObserver(display, 5);
 	indoorSensor.RemoveObserver(statsDisplay);
 
-	indoorSensor.SetMeasurements(10, 0.8, 761, 10, 45);
+	indoorSensor.SetMeasurements(10, 0.8, 761);
 	std::cout << std::endl;
 	outdoorSensor.SetMeasurements(-10, 0.8, 761, 15, 45);
 	return 0;

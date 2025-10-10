@@ -13,7 +13,6 @@ class IObservable
 public:
 	virtual ~IObservable() = default;
 	virtual void RegisterObserver(IObserver<T>& observer, int priority) = 0;
-	virtual void NotifyObservers() = 0;
 	virtual void RemoveObserver(IObserver<T>& observer) = 0;
 };
 
@@ -34,18 +33,6 @@ public:
 		// NOTE: std::multimap сортирует по возрастанию ключа, а нужно по убыванию приоритета
 		m_observers.emplace(-priority, &observer);
 		m_observerPriorities.emplace(&observer, priority);
-	}
-
-	void NotifyObservers() override
-	{
-		T data = GetChangedData();
-		// NOTE: копирование предотвращает неопределённое поведение при удалении наблюдателя самим собой
-		std::multimap<int, ObserverType*> observersCopy(m_observers);
-
-		for (auto& [priority, observer] : observersCopy)
-		{
-			observer->Update(data);
-		}
 	}
 
 	void RemoveObserver(ObserverType& observer) override
@@ -74,6 +61,18 @@ protected:
 	// Классы-наследники должны перегрузить данный метод,
 	// в котором возвращать информацию об изменениях в объекте
 	virtual T GetChangedData() const = 0;
+
+	void NotifyObservers()
+	{
+		T data = GetChangedData();
+		// NOTE: копирование предотвращает неопределённое поведение при удалении наблюдателя самим собой
+		std::multimap<int, ObserverType*> observersCopy(m_observers);
+
+		for (auto& [priority, observer] : observersCopy)
+		{
+			observer->Update(data);
+		}
+	}
 
 private:
 	std::multimap<int, ObserverType*> m_observers;

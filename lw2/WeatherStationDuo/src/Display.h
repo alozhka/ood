@@ -13,17 +13,17 @@ public:
 		IObservable<WeatherInfo>& indoorObserver,
 		IObservable<OutWeatherInfo>& outdoorObserver)
 		: m_output(output)
-		, m_indoorObserver(indoorObserver)
-		, m_outdoorObserver(outdoorObserver)
+		, m_indoorObservable(indoorObserver)
+		, m_outdoorObservable(outdoorObserver)
 	{
-		m_indoorObserver.RegisterObserver(*this, priority);
-		m_outdoorObserver.RegisterObserver(*this, priority);
+		m_indoorObservable.RegisterObserver(*this, priority);
+		m_outdoorObservable.RegisterObserver(*this, priority);
 	}
 
 	~Display() override
 	{
-		m_indoorObserver.RemoveObserver(*this);
-		m_outdoorObserver.RemoveObserver(*this);
+		m_indoorObservable.RemoveObserver(*this);
+		m_outdoorObservable.RemoveObserver(*this);
 	}
 
 private:
@@ -52,8 +52,8 @@ private:
 	}
 
 	std::ostream& m_output;
-	IObservable<WeatherInfo>& m_indoorObserver;
-	IObservable<OutWeatherInfo>& m_outdoorObserver;
+	IObservable<WeatherInfo>& m_indoorObservable;
+	IObservable<OutWeatherInfo>& m_outdoorObservable;
 };
 
 class StatsDisplay final : public IObserver<WeatherInfo>
@@ -66,17 +66,17 @@ public:
 		IObservable<WeatherInfo>& indoorObserver,
 		IObservable<OutWeatherInfo>& outdoorObserver)
 		: m_output(output)
-		, m_indoorObserver(indoorObserver)
-		, m_outdoorObserver(outdoorObserver)
+		, m_indoorObservable(indoorObserver)
+		, m_outdoorObservable(outdoorObserver)
 	{
-		m_indoorObserver.RegisterObserver(*this, priority);
-		m_outdoorObserver.RegisterObserver(*this, priority);
+		m_indoorObservable.RegisterObserver(*this, priority);
+		m_outdoorObservable.RegisterObserver(*this, priority);
 	}
 
 	~StatsDisplay() override
 	{
-		m_indoorObserver.RemoveObserver(*this);
-		m_outdoorObserver.RemoveObserver(*this);
+		m_indoorObservable.RemoveObserver(*this);
+		m_outdoorObservable.RemoveObserver(*this);
 	}
 
 private:
@@ -115,8 +115,8 @@ private:
 	}
 
 	std::ostream& m_output;
-	IObservable<WeatherInfo>& m_indoorObserver;
-	IObservable<OutWeatherInfo>& m_outdoorObserver;
+	IObservable<WeatherInfo>& m_indoorObservable;
+	IObservable<OutWeatherInfo>& m_outdoorObservable;
 
 	StatsInfo m_temperatureInfo{ "Temperature" };
 	StatsInfo m_humidityInfo{ "Humidity" };

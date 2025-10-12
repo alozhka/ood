@@ -2,10 +2,6 @@
 
 #include "Observable.h"
 
-#include <iostream>
-#include <type_traits>
-#include <vector>
-
 struct WeatherInfo
 {
 	double temperature = 0;
@@ -23,18 +19,6 @@ enum class WeatherType
 	WindSpeed,
 	WindDirection
 };
-
-namespace std
-{
-template <>
-struct hash<WeatherInfo>
-{
-	size_t operator()(WeatherType weatherInfo) const noexcept
-	{
-		return std::hash<underlying_type_t<WeatherType>>{}(static_cast<underlying_type_t<WeatherType>>(weatherInfo));
-	}
-};
-} // namespace std
 
 class WeatherData : public PriorityObservable<WeatherInfo, WeatherType>
 {

@@ -1,6 +1,7 @@
 #pragma once
 #include "Observer.h"
 #include "WeatherData.h"
+#include <ostream>
 
 class Display final : public IObserver<WeatherInfo, WeatherType>
 {

@@ -23,13 +23,13 @@ class PriorityObservable : public IObservable<TData, TEvent>
 public:
 	using ObserverType = IObserver<TData, TEvent>;
 	using ObserverEventKey = std::pair<ObserverType*, TEvent>;
+	using ObserverMap = std::multimap<int, ObserverType*>;
+	using ObserverIterator = typename ObserverMap::iterator;
 
 	void RegisterObserver(ObserverType& observer, int priority, TEvent eventType) override
 	{
-		// Ключ для хранения подписки: комбинация наблюдателя и типа события
 		ObserverEventKey key = std::make_pair(&observer, eventType);
 
-		// Проверяем, не подписан ли уже наблюдатель на это событие
 		auto it = m_observerPriorities.find(key);
 		if (it != m_observerPriorities.end())
 		{
@@ -37,8 +37,24 @@ public:
 		}
 
 		// NOTE: std::multimap сортирует по возрастанию ключа, а нужно по убыванию приоритета
-		m_observers[eventType].emplace(-priority, &observer);
-		m_observerPriorities.emplace(key, priority);
+		auto observerIt = m_observers[eventType].emplace(-priority, &observer);
+
+		try
+		{
+			m_observerPriorities.emplace(key, observerIt);
+		}
+		catch (...)
+		{
+			// NOTE: Откатываем вставку в m_observers для обеспечения базовой гарантии
+			m_observers[eventType].erase(observerIt);
+
+			if (m_observers[eventType].empty())
+			{
+				m_observers.erase(eventType);
+			}
+
+			throw;
+		}
 	}
 
 	void NotifyObservers(TEvent eventType)
@@ -69,19 +85,13 @@ public:
 			return;
 		}
 
-		int priority = it->second;
+		// Извлекаем итератор на элемент в multimap
+		ObserverIterator observerIt = it->second;
 		m_observerPriorities.erase(it);
 
+		// Удаляем наблюдателя из multimap за O(1) используя итератор
 		auto& eventObservers = m_observers[eventType];
-		auto range = eventObservers.equal_range(-priority);
-		for (auto iter = range.first; iter != range.second; ++iter)
-		{
-			if (iter->second == &observer)
-			{
-				eventObservers.erase(iter);
-				break;
-			}
-		}
+		eventObservers.erase(observerIt);
 
 		// Если для данного типа события больше нет наблюдателей, удаляем сам ключ
 		if (eventObservers.empty())
@@ -97,8 +107,8 @@ protected:
 
 private:
 	// Хранилище наблюдателей: тип события -> (приоритет -> наблюдатель)
-	std::map<TEvent, std::multimap<int, ObserverType*>> m_observers;
+	std::map<TEvent, ObserverMap> m_observers;
 
-	// Хранилище приоритетов: (наблюдатель, тип события) -> приоритет
-	std::map<ObserverEventKey, int> m_observerPriorities;
+	// Хранилище итераторов: (наблюдатель, тип события) -> итератор на элемент в multimap
+	std::map<ObserverEventKey, ObserverIterator> m_observerPriorities;
 };

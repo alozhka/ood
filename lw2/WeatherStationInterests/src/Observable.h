@@ -106,9 +106,19 @@ protected:
 	virtual TData GetChangedData() const = 0;
 
 private:
+	struct ObserverEventKeyHash
+	{
+		std::size_t operator()(const ObserverEventKey& key) const
+		{
+			auto h1 = std::hash<ObserverType*>{}(key.first);
+			auto h2 = std::hash<TEvent>{}(key.second);
+			return h1 ^ (h2 << 1);
+		}
+	};
+
 	// Хранилище наблюдателей: тип события -> (приоритет -> наблюдатель)
-	std::map<TEvent, ObserverMap> m_observers;
+	std::unordered_map<TEvent, ObserverMap> m_observers;
 
 	// Хранилище итераторов: (наблюдатель, тип события) -> итератор на элемент в multimap
-	std::map<ObserverEventKey, ObserverIterator> m_observerPriorities;
+	std::unordered_map<ObserverEventKey, ObserverIterator, ObserverEventKeyHash> m_observerPriorities;
 };

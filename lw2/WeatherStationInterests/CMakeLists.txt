@@ -11,7 +11,7 @@ add_executable(WeatherStation main.cpp
         src/StatsInfo.h)
 
 add_executable(WeatherStationTests tests/WeaterStationTests.cpp
-        tests/MockDisplay.h)
+)
 
 include(FetchContent)
 FetchContent_Declare(

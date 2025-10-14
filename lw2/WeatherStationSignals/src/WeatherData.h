@@ -3,6 +3,10 @@
 #include <boost/signals2.hpp>
 #include <functional>
 
+using Connection = boost::signals2::connection;
+template <typename Signature>
+using Signal = boost::signals2::signal<Signature>;
+
 struct WeatherInfo
 {
 	double temperature = 0;
@@ -15,36 +19,36 @@ struct WeatherInfo
 class WeatherData
 {
 public:
-	using TemperatureSignal = boost::signals2::signal<void(const WeatherInfo&)>;
-	using HumiditySignal = boost::signals2::signal<void(const WeatherInfo&)>;
-	using PressureSignal = boost::signals2::signal<void(const WeatherInfo&)>;
-	using WindSpeedSignal = boost::signals2::signal<void(const WeatherInfo&)>;
-	using WindDirectionSignal = boost::signals2::signal<void(const WeatherInfo&)>;
+	using TemperatureSignal = Signal<void(const WeatherInfo&)>;
+	using HumiditySignal = Signal<void(const WeatherInfo&)>;
+	using PressureSignal = Signal<void(const WeatherInfo&)>;
+	using WindSpeedSignal = Signal<void(const WeatherInfo&)>;
+	using WindDirectionSignal = Signal<void(const WeatherInfo&)>;
 
 	// Методы для подписки на конкретные события
-	boost::signals2::connection DoOnTemperatureChanged(const TemperatureSignal::slot_type& subscriber, int priority = 0)
+	Connection DoOnTemperatureChanged(const TemperatureSignal::slot_type& subscriber, int priority = 0)
 	{
-		return m_temperatureSignal.connect(priority, subscriber);
+		return m_temperatureSignal.connect(-priority, subscriber);
 	}
 
-	boost::signals2::connection DoOnHumidityChanged(const HumiditySignal::slot_type& subscriber, int priority = 0)
+	Connection DoOnHumidityChanged(const HumiditySignal::slot_type& subscriber, int priority = 0)
 	{
-		return m_humiditySignal.connect(priority, subscriber);
+		return m_humiditySignal.connect(-priority, subscriber);
 	}
 
-	boost::signals2::connection DoOnPressureChanged(const PressureSignal::slot_type& subscriber, int priority = 0)
+	Connection DoOnPressureChanged(const PressureSignal::slot_type& subscriber, int priority = 0)
 	{
-		return m_pressureSignal.connect(priority, subscriber);
+		return m_pressureSignal.connect(-priority, subscriber);
 	}
 
-	boost::signals2::connection DoOnWindSpeedChanged(const WindSpeedSignal::slot_type& subscriber, int priority = 0)
+	Connection DoOnWindSpeedChanged(const WindSpeedSignal::slot_type& subscriber, int priority = 0)
 	{
-		return m_windSpeedSignal.connect(priority, subscriber);
+		return m_windSpeedSignal.connect(-priority, subscriber);
 	}
 
-	boost::signals2::connection DoOnWindDirectionChanged(const WindDirectionSignal::slot_type& subscriber, int priority = 0)
+	Connection DoOnWindDirectionChanged(const WindDirectionSignal::slot_type& subscriber, int priority = 0)
 	{
-		return m_windDirectionSignal.connect(priority, subscriber);
+		return m_windDirectionSignal.connect(-priority, subscriber);
 	}
 
 	// Геттеры

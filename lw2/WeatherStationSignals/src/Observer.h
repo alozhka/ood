@@ -1,8 +1,5 @@
 #pragma once
 
-template <typename TData, typename TEvent>
-class IObservable;
-
 /*
 Шаблонный интерфейс IObserver. Его должен реализовывать класс,
 желающий получать уведомления от соответствующего IObservable

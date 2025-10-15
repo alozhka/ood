@@ -1,0 +1,136 @@
+classDiagram
+    class IBeverage {
+        <<interface>>
+        +GetDescription() string
+        +GetCost() double
+    }
+
+    class Beverage {
+        -string m_description
+        +Beverage(description: string)
+        +GetDescription() string
+    }
+
+    class Coffee {
+        +Coffee(description: string)
+        +GetCost() double
+    }
+
+    class Cappuccino {
+        -bool m_isDouble
+        +Cappuccino(isDouble: bool)
+        +GetCost() double
+    }
+
+    class Latte {
+        -bool m_isDouble
+        +Latte(isDouble: bool)
+        +GetCost() double
+    }
+
+    class Tea {
+        +Tea()
+        +GetCost() double
+    }
+
+    class Milkshake {
+        -MilkshakeSize m_size
+        +Milkshake(size: MilkshakeSize)
+        +GetCost() double
+        -MilkshakeSizeToString(size: MilkshakeSize) string
+        -MilkshakeSizeToCost(size: MilkshakeSize) double
+    }
+
+    class MilkshakeSize {
+        <<enumeration>>
+        Small
+        Medium
+        Large
+    }
+
+    class CCondimentDecorator {
+        <<abstract>>
+        -IBeveragePtr m_beverage
+        #CCondimentDecorator(beverage: IBeveragePtr)
+        +GetDescription() string
+        +GetCost() double
+        +GetCondimentDescription()* string
+        +GetCondimentCost()* double
+    }
+
+    class CCinnamon {
+        +CCinnamon(beverage: IBeveragePtr)
+        #GetCondimentCost() double
+        #GetCondimentDescription() string
+    }
+
+    class CLemon {
+        -unsigned m_quantity
+        +CLemon(beverage: IBeveragePtr, quantity: unsigned)
+        #GetCondimentCost() double
+        #GetCondimentDescription() string
+    }
+
+    class CIceCubes {
+        -unsigned m_quantity
+        -IceCubeType m_type
+        +CIceCubes(beverage: IBeveragePtr, quantity: unsigned, type: IceCubeType)
+        #GetCondimentCost() double
+        #GetCondimentDescription() string
+    }
+
+    class IceCubeType {
+        <<enumeration>>
+        Dry
+        Water
+    }
+
+    class CSyrup {
+        -SyrupType m_syrupType
+        +CSyrup(beverage: IBeveragePtr, syrupType: SyrupType)
+        #GetCondimentCost() double
+        #GetCondimentDescription() string
+    }
+
+    class SyrupType {
+        <<enumeration>>
+        Chocolate
+        Maple
+    }
+
+    class CChocolateCrumbs {
+        -unsigned m_mass
+        +CChocolateCrumbs(beverage: IBeveragePtr, mass: unsigned)
+        #GetCondimentCost() double
+        #GetCondimentDescription() string
+    }
+
+    class CCoconutFlakes {
+        -unsigned m_mass
+        +CCoconutFlakes(beverage: IBeveragePtr, mass: unsigned)
+        #GetCondimentCost() double
+        #GetCondimentDescription() string
+    }
+
+%% Наследование напитков
+    IBeverage <|-- Beverage
+    Beverage <|-- Coffee
+    Beverage <|-- Tea
+    Beverage <|-- Milkshake
+    Coffee <|-- Cappuccino
+    Coffee <|-- Latte
+%% Декоратор реализует IBeverage
+    IBeverage <|-- CCondimentDecorator
+%% Конкретные декораторы наследуются от базового
+    CCondimentDecorator <|-- CCinnamon
+    CCondimentDecorator <|-- CLemon
+    CCondimentDecorator <|-- CIceCubes
+    CCondimentDecorator <|-- CSyrup
+    CCondimentDecorator <|-- CChocolateCrumbs
+    CCondimentDecorator <|-- CCoconutFlakes
+%% Декоратор содержит напиток
+    CCondimentDecorator o-- IBeverage
+%% Связи с перечислениями
+    Milkshake --> MilkshakeSize
+    CIceCubes --> IceCubeType
+    CSyrup --> SyrupType

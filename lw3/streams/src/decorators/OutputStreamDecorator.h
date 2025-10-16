@@ -1,5 +1,5 @@
 #pragma once
-#include "../streams/IOutputDataStream.h"
+#include "../output/IOutputDataStream.h"
 #include <memory>
 
 // Абстрактный базовый класс для декораторов выходного потока

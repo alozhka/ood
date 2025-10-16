@@ -22,12 +22,12 @@ add_executable(StreamsTests
         tests/StreamsTests.cpp
         src/parse/CommandLineParser.cpp
         src/parse/CommandLineParser.h
-        src/streams/IOutputDataStream.h
-        src/streams/MemoryOutputStream.h
-        src/streams/MemoryOutputStream.cpp
-        src/streams/IInputDataStream.h
-        src/streams/MemoryInputStream.h
-        src/streams/MemoryInputStream.cpp
+        src/output/IOutputDataStream.h
+        src/output/MemoryOutputStream.h
+        src/output/MemoryOutputStream.cpp
+        src/input/IInputDataStream.h
+        src/input/MemoryInputStream.h
+        src/input/MemoryInputStream.cpp
         src/decorators/OutputStreamDecorator.h
         src/decorators/InputStreamDecorator.h
         src/decorators/EncryptionTable.h

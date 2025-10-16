@@ -1,21 +1,21 @@
-#include "../src/parse/CommandLineParser.h"
-#include "../src/streams/MemoryOutputStream.h"
-#include "../src/streams/MemoryInputStream.h"
-#include "../src/decorators/EncryptionOutputStream.h"
 #include "../src/decorators/DecryptionInputStream.h"
+#include "../src/decorators/EncryptionOutputStream.h"
+#include "../src/input/MemoryInputStream.h"
+#include "../src/output/MemoryOutputStream.h"
+#include "../src/parse/CommandLineParser.h"
 #include "gtest/gtest.h"
-#include <string>
-#include <vector>
 #include <algorithm>
 #include <memory>
+#include <string>
+#include <vector>
 
-class StreamsTests : public ::testing::Test
+class ParsingTests : public ::testing::Test
 {
 };
 
-TEST_F(StreamsTests, ParseSimpleEncryptCommand)
+TEST_F(ParsingTests, ParseSimpleEncryptCommand)
 {
-	std::vector<const char*> argv = {"transform.exe", "--encrypt", "3", "input.dat", "output.dat"};
+	std::vector<const char*> argv = { "transform.exe", "--encrypt", "3", "input.dat", "output.dat" };
 	int argc = static_cast<int>(argv.size());
 
 	auto options = CommandLineParser::Parse(argc, const_cast<char**>(argv.data()));
@@ -28,9 +28,9 @@ TEST_F(StreamsTests, ParseSimpleEncryptCommand)
 	ASSERT_EQ(options.outputOperations[0].key, 3);
 }
 
-TEST_F(StreamsTests, ParseMultipleEncryptCommands)
+TEST_F(ParsingTests, ParseMultipleEncryptCommands)
 {
-	std::vector<const char*> argv = {"transform.exe", "--encrypt", "3", "--encrypt", "100500", "input.dat", "output.dat"};
+	std::vector<const char*> argv = { "transform.exe", "--encrypt", "3", "--encrypt", "100500", "input.dat", "output.dat" };
 	int argc = static_cast<int>(argv.size());
 
 	auto options = CommandLineParser::Parse(argc, const_cast<char**>(argv.data()));
@@ -44,9 +44,9 @@ TEST_F(StreamsTests, ParseMultipleEncryptCommands)
 	ASSERT_EQ(options.outputOperations[1].key, 100500);
 }
 
-TEST_F(StreamsTests, ParseEncryptAndCompressCommands)
+TEST_F(ParsingTests, ParseEncryptAndCompressCommands)
 {
-	std::vector<const char*> argv = {"transform.exe", "--encrypt", "3", "--encrypt", "100500", "--compress", "input.dat", "output.dat"};
+	std::vector<const char*> argv = { "transform.exe", "--encrypt", "3", "--encrypt", "100500", "--compress", "input.dat", "output.dat" };
 	int argc = static_cast<int>(argv.size());
 
 	auto options = CommandLineParser::Parse(argc, const_cast<char**>(argv.data()));
@@ -62,9 +62,9 @@ TEST_F(StreamsTests, ParseEncryptAndCompressCommands)
 	ASSERT_EQ(options.outputOperations[2].key, 0);
 }
 
-TEST_F(StreamsTests, ParseDecryptCommands)
+TEST_F(ParsingTests, ParseDecryptCommands)
 {
-	std::vector<const char*> argv = {"transform.exe", "--decompress", "--decrypt", "100500", "--decrypt", "3", "output.dat", "input.dat.restored"};
+	std::vector<const char*> argv = { "transform.exe", "--decompress", "--decrypt", "100500", "--decrypt", "3", "output.dat", "input.dat.restored" };
 	int argc = static_cast<int>(argv.size());
 
 	auto options = CommandLineParser::Parse(argc, const_cast<char**>(argv.data()));
@@ -79,33 +79,35 @@ TEST_F(StreamsTests, ParseDecryptCommands)
 	ASSERT_EQ(options.inputOperations[2].key, 3);
 }
 
-TEST_F(StreamsTests, ParseCommandsMissingArguments)
+TEST_F(ParsingTests, ParseCommandsMissingArguments)
 {
-	std::vector<const char*> argv = {"transform.exe", "--encrypt"};
+	std::vector<const char*> argv = { "transform.exe", "--encrypt" };
 	int argc = static_cast<int>(argv.size());
 
 	ASSERT_THROW(CommandLineParser::Parse(argc, const_cast<char**>(argv.data())), std::invalid_argument);
 }
 
-TEST_F(StreamsTests, ParseCommandsMissingFiles)
+TEST_F(ParsingTests, ParseCommandsMissingFiles)
 {
-	std::vector<const char*> argv = {"transform.exe", "--encrypt", "3"};
+	std::vector<const char*> argv = { "transform.exe", "--encrypt", "3" };
 	size_t argc = argv.size();
 
 	ASSERT_THROW(CommandLineParser::Parse(argc, const_cast<char**>(argv.data())), std::invalid_argument);
 }
 
-TEST_F(StreamsTests, ParseCommandsInvalidKey)
+TEST_F(ParsingTests, ParseCommandsInvalidKey)
 {
-	std::vector<const char*> argv = {"transform.exe", "--encrypt", "abc", "input.dat", "output.dat"};
+	std::vector<const char*> argv = { "transform.exe", "--encrypt", "abc", "input.dat", "output.dat" };
 	int argc = static_cast<int>(argv.size());
 
 	ASSERT_THROW(CommandLineParser::Parse(argc, const_cast<char**>(argv.data())), std::invalid_argument);
 }
 
-// ========== MemoryOutputStream Tests ==========
+class MemoryStreamTests : public testing::Test
+{
+};
 
-TEST_F(StreamsTests, OutputStreamWritesBytes)
+TEST_F(MemoryStreamTests, OutputStreamWritesBytes)
 {
 	MemoryOutputStream stream;
 	stream.WriteByte(1);
@@ -119,10 +121,10 @@ TEST_F(StreamsTests, OutputStreamWritesBytes)
 	ASSERT_EQ(data[2], 3);
 }
 
-TEST_F(StreamsTests, OutputStreamWritesBlock)
+TEST_F(MemoryStreamTests, OutputStreamWritesBlock)
 {
 	MemoryOutputStream stream;
-	uint8_t buffer[] = {10, 20, 30, 40, 50};
+	uint8_t buffer[] = { 10, 20, 30, 40, 50 };
 	stream.WriteBlock(buffer, 5);
 
 	const auto& data = stream.GetData();
@@ -130,7 +132,7 @@ TEST_F(StreamsTests, OutputStreamWritesBlock)
 	ASSERT_TRUE(std::ranges::equal(data, buffer));
 }
 
-TEST_F(StreamsTests, OutputStreamCanCloseStream)
+TEST_F(MemoryStreamTests, OutputStreamCanCloseStream)
 {
 	MemoryOutputStream stream;
 	stream.WriteByte(42);
@@ -141,10 +143,10 @@ TEST_F(StreamsTests, OutputStreamCanCloseStream)
 	ASSERT_EQ(data[0], 42);
 }
 
-TEST_F(StreamsTests, CannotWriteToClosedOutputStream)
+TEST_F(MemoryStreamTests, CannotWriteToClosedOutputStream)
 {
 	MemoryOutputStream stream;
-	uint8_t buffer[] = {1, 2, 3};
+	uint8_t buffer[] = { 1, 2, 3 };
 
 	stream.WriteByte(42);
 	stream.Close();
@@ -153,11 +155,9 @@ TEST_F(StreamsTests, CannotWriteToClosedOutputStream)
 	ASSERT_THROW(stream.WriteBlock(buffer, 3), std::logic_error);
 }
 
-// ========== MemoryInputStream Tests ==========
-
-TEST_F(StreamsTests, InputStreamReadsData)
+TEST_F(MemoryStreamTests, InputStreamReadsData)
 {
-	std::vector<uint8_t> data = {1, 2, 3, 4, 5, 6};
+	std::vector<uint8_t> data = { 1, 2, 3, 4, 5, 6 };
 	MemoryInputStream stream(data);
 
 	ASSERT_EQ(stream.ReadByte(), 1);
@@ -176,9 +176,9 @@ TEST_F(StreamsTests, InputStreamReadsData)
 	ASSERT_TRUE(stream.IsEOF());
 }
 
-TEST_F(StreamsTests, InputStreamReadsBeyondEnd)
+TEST_F(MemoryStreamTests, InputStreamReadsBeyondEnd)
 {
-	std::vector<uint8_t> data = {1, 2, 3};
+	std::vector<uint8_t> data = { 1, 2, 3 };
 	MemoryInputStream stream(data);
 
 	uint8_t buffer[10] = {};
@@ -191,7 +191,7 @@ TEST_F(StreamsTests, InputStreamReadsBeyondEnd)
 	ASSERT_TRUE(stream.IsEOF());
 }
 
-TEST_F(StreamsTests, InputStreamReadFromEmptyStream)
+TEST_F(MemoryStreamTests, InputStreamReadFromEmptyStream)
 {
 	std::vector<uint8_t> data = {};
 	MemoryInputStream stream(data);
@@ -200,16 +200,18 @@ TEST_F(StreamsTests, InputStreamReadFromEmptyStream)
 	ASSERT_THROW(stream.ReadByte(), std::ios_base::failure);
 }
 
-// ========== Encryption/Decryption Tests ==========
+class EncryptionTests : public testing::Test
+{
+};
 
-TEST_F(StreamsTests, CanEncryptData)
+TEST_F(EncryptionTests, CanEncryptData)
 {
 	auto memoryStream = std::make_unique<MemoryOutputStream>();
 	MemoryOutputStream* rawPtr = memoryStream.get();
 
 	EncryptionOutputStream encryptedStream(std::move(memoryStream), 12345);
 
-	std::vector<uint8_t> originalData = {1, 2, 3, 4, 5};
+	std::vector<uint8_t> originalData = { 1, 2, 3, 4, 5 };
 	encryptedStream.WriteBlock(originalData.data(), originalData.size());
 	encryptedStream.Close();
 
@@ -219,7 +221,7 @@ TEST_F(StreamsTests, CanEncryptData)
 	ASSERT_FALSE(std::ranges::equal(encryptedData, originalData));
 }
 
-TEST_F(StreamsTests, CanDecryptData)
+TEST_F(EncryptionTests, CanDecryptData)
 {
 	// Шифруем данные
 	auto memoryStreamOut = std::make_unique<MemoryOutputStream>();
@@ -227,7 +229,7 @@ TEST_F(StreamsTests, CanDecryptData)
 
 	EncryptionOutputStream encryptedStream(std::move(memoryStreamOut), 12345);
 
-	std::vector<uint8_t> originalData = {10, 20, 30, 40, 50};
+	std::vector<uint8_t> originalData = { 10, 20, 30, 40, 50 };
 	encryptedStream.WriteBlock(originalData.data(), originalData.size());
 	encryptedStream.Close();
 
@@ -244,14 +246,14 @@ TEST_F(StreamsTests, CanDecryptData)
 	ASSERT_TRUE(std::ranges::equal(decryptedData, originalData));
 }
 
-TEST_F(StreamsTests, EncryptionAndDecryptionTakesInitalData)
+TEST_F(EncryptionTests, EncryptionAndDecryptionTakesInitalData)
 {
 	// Записываем зашифрованные данные
 	auto memoryStreamOut = std::make_unique<MemoryOutputStream>();
 	MemoryOutputStream* rawPtrOut = memoryStreamOut.get();
 	EncryptionOutputStream encryptedStream(std::move(memoryStreamOut), 99999);
 	std::string initialString = "Hello, World!";
-	
+
 	encryptedStream.WriteBlock(initialString.data(), initialString.size());
 	encryptedStream.Close();
 
@@ -267,9 +269,9 @@ TEST_F(StreamsTests, EncryptionAndDecryptionTakesInitalData)
 	ASSERT_EQ(decryptedString, initialString);
 }
 
-TEST_F(StreamsTests, DifferentKeysProduceDifferentEncryption)
+TEST_F(EncryptionTests, DifferentKeysProduceDifferentEncryption)
 {
-	std::vector<uint8_t> originalData = {1, 2, 3, 4, 5};
+	std::vector<uint8_t> originalData = { 1, 2, 3, 4, 5 };
 
 	// Шифруем с ключом 1
 	auto memoryStream1 = std::make_unique<MemoryOutputStream>();
@@ -291,3 +293,7 @@ TEST_F(StreamsTests, DifferentKeysProduceDifferentEncryption)
 	// Разные ключи должны давать разные зашифрованные данные
 	ASSERT_FALSE(std::ranges::equal(encrypted1, encrypted2));
 }
+
+class CompressStreamsTests : public testing::Test
+{
+};

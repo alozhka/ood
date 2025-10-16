@@ -1,11 +1,6 @@
 #include "MemoryOutputStream.h"
-#include <stdexcept>
 #include <cstring>
-
-MemoryOutputStream::MemoryOutputStream()
-	: m_isClosed(false)
-{
-}
+#include <stdexcept>
 
 void MemoryOutputStream::WriteByte(uint8_t data)
 {

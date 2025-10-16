@@ -4,8 +4,19 @@ project(streams)
 set(CMAKE_CXX_STANDARD 20)
 
 add_executable(streams main.cpp
+        src/parse/CommandLineParser.cpp
+        src/parse/CommandLineParser.h
+        src/input/IInputDataStream.h
+        src/input/FileInputStream.h
+        src/input/decorators/InputStreamDecorator.h
+        src/input/decorators/DecompressInputStream.h
+        src/input/decorators/DecryptionInputStream.h
+        src/output/IOutputDataStream.h
+        src/output/FileOutputStream.h
+        src/output/decorators/OutputStreamDecorator.h
         src/output/decorators/CompressionOutputStream.h
-        src/input/decorators/DecompressInputStream.h)
+        src/output/decorators/EncryptionOutputStream.h
+        src/output/decorators/EncryptionTable.h)
 
 include(FetchContent)
 FetchContent_Declare(
@@ -34,7 +45,9 @@ add_executable(StreamsTests
         src/input/decorators/InputStreamDecorator.h
         src/output/decorators/EncryptionTable.h
         src/output/decorators/EncryptionOutputStream.h
-        src/input/decorators/DecryptionInputStream.h)
+        src/input/decorators/DecryptionInputStream.h
+        src/output/decorators/CompressionOutputStream.h
+        src/input/decorators/DecompressInputStream.h)
 
 target_link_libraries(StreamsTests
         gtest_main

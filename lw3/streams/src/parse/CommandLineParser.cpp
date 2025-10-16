@@ -32,7 +32,7 @@ uint32_t ParseKey(const std::string& keyStr)
 	}
 }
 
-void ParseOption(const std::string& option, int& index, int argc, char* argv[], CommandLineOptions& options)
+void ParseOption(const std::string& option, int& index, int argc, char* argv[], CommandLineArgs& options)
 {
 	if (option == "--encrypt")
 	{
@@ -72,7 +72,7 @@ void ParseOption(const std::string& option, int& index, int argc, char* argv[], 
 	}
 }
 
-void ParseOptions(CommandLineOptions& options, int& index, int argc, char* argv[])
+void ParseOptions(CommandLineArgs& options, int& index, int argc, char* argv[])
 {
 	while (index < argc)
 	{
@@ -91,14 +91,14 @@ void ParseOptions(CommandLineOptions& options, int& index, int argc, char* argv[
 }
 } // namespace
 
-CommandLineOptions CommandLineParser::Parse(int argc, char* argv[])
+CommandLineArgs CommandLineParser::Parse(int argc, char* argv[])
 {
 	if (argc < 3)
 	{
 		throw std::invalid_argument("Usage: transform [options] <input-file> <output-file>");
 	}
 
-	CommandLineOptions options;
+	CommandLineArgs options;
 	int i = 1;
 
 	ParseOptions(options, i, argc, argv);

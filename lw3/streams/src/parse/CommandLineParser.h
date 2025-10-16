@@ -17,7 +17,7 @@ struct Operation
 	uint32_t key = 0;
 };
 
-struct CommandLineOptions
+struct CommandLineArgs
 {
 	std::string inputFile;
 	std::string outputFile;
@@ -28,5 +28,5 @@ struct CommandLineOptions
 class CommandLineParser
 {
 public:
-	static CommandLineOptions Parse(int argc, char* argv[]);
+	static CommandLineArgs Parse(int argc, char* argv[]);
 };

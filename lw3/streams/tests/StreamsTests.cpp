@@ -1,8 +1,9 @@
 #include "../src/input/MemoryInputStream.h"
-#include "../src/input/decorators/CompressionOutputStream.h"
-#include "../src/input/decorators/EncryptionOutputStream.h"
+#include "../src/input/decorators/DecompressInputStream.h"
+#include "../src/input/decorators/DecryptionInputStream.h"
 #include "../src/output/MemoryOutputStream.h"
-#include "../src/output/decorators/DecryptionInputStream.h"
+#include "../src/output/decorators/CompressionOutputStream.h"
+#include "../src/output/decorators/EncryptionOutputStream.h"
 #include "../src/parse/CommandLineParser.h"
 #include "gtest/gtest.h"
 #include <algorithm>
@@ -298,22 +299,35 @@ class CompressStreamsTests : public testing::Test
 protected:
 	CompressStreamsTests()
 	{
-		memoryStream = std::make_unique<MemoryOutputStream>();
-		memoryStreamPrt = memoryStream.get();
+		outStream = std::make_unique<MemoryOutputStream>();
+		outStreamPtr = outStream.get();
 	}
 
-	std::unique_ptr<MemoryOutputStream> memoryStream;
-	MemoryOutputStream* memoryStreamPrt;
+	std::unique_ptr<MemoryOutputStream> outStream;
+	MemoryOutputStream* outStreamPtr;
 };
 
 TEST_F(CompressStreamsTests, CompressesStreamViaRLE)
 {
 	std::vector<char> originalData = { 'A', 'A', 'A', 'B', 'C', 'C' };
-	CompressionOutputStream compressionStream(std::move(memoryStream));
+	CompressionOutputStream compressionStream(std::move(outStream));
 
 	compressionStream.WriteBlock(originalData.data(), 6);
 	compressionStream.Close();
 
-	std::vector<uint8_t> actual = memoryStreamPrt->GetData();
+	std::vector<uint8_t> actual = outStreamPtr->GetData();
 	EXPECT_EQ(std::vector<uint8_t>({ '\x3', 'A', 'B', 'C', 'C' }), actual);
+}
+
+TEST_F(CompressStreamsTests, DecompressesStreamViaRLE)
+{
+	std::vector<uint8_t> originalData = { '\x3', 'A', 'B', 'C', 'C' };
+	auto inStream = std::make_unique<MemoryInputStream>(originalData);
+	DecompressInputStream decompress(std::move(inStream));
+
+	decompress.ReadBlock(originalData.data(), 6);
+	decompress.Close();
+
+	std::vector<uint8_t> actual = outStreamPtr->GetData();
+	EXPECT_EQ(std::vector<uint8_t>({ 'A', 'A', 'A', 'B', 'C', 'C' }), actual);
 }

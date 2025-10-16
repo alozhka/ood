@@ -3,7 +3,7 @@ project(streams)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(streams main.cpp
+add_executable(transform main.cpp
         src/parse/CommandLineParser.cpp
         src/parse/CommandLineParser.h
         src/input/IInputDataStream.h

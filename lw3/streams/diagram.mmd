@@ -1,0 +1,170 @@
+classDiagram
+    %% Input Streams
+    class IInputDataStream {
+        <<interface>>
+        +IsEOF() bool
+        +ReadByte() uint8_t
+        +ReadBlock(void* dstBuffer, streamsize size) streamsize
+        +Close() void
+    }
+
+    class MemoryInputStream {
+        -vector~uint8_t~ m_data
+        -size_t m_position
+        -bool m_isOpened
+        +MemoryInputStream(vector~uint8_t~ data)
+        +IsEOF() bool
+        +ReadByte() uint8_t
+        +ReadBlock(void* dstBuffer, streamsize size) streamsize
+        +Close() void
+        -EnsureIsNotEOF() void
+        -EnsureIsOpened() void
+    }
+
+    class FileInputStream {
+        -ifstream m_file
+        -bool m_isOpened
+        +FileInputStream(string fileName)
+        +IsEOF() bool
+        +ReadByte() uint8_t
+        +ReadBlock(void* dstBuffer, streamsize size) streamsize
+        +Close() void
+        -EnsureIsOpened() void
+    }
+
+    class InputStreamDecorator {
+        <<abstract>>
+        #unique_ptr~IInputDataStream~ m_stream
+        +InputStreamDecorator(unique_ptr~IInputDataStream~ stream)
+        +IsEOF() bool
+        +Close() void
+    }
+
+    class DecryptionInputStream {
+        -array~uint8_t, 256~ m_decryptionTable
+        +DecryptionInputStream(unique_ptr~IInputDataStream~ stream, uint32_t key)
+        +ReadByte() uint8_t
+        +ReadBlock(void* dstBuffer, streamsize size) streamsize
+    }
+
+    class DecompressInputStream {
+        -size_t m_byteCount
+        -uint8_t m_currentByte
+        +DecompressInputStream(unique_ptr~IInputDataStream~ stream)
+        +ReadByte() uint8_t
+        +ReadBlock(void* dstBuffer, streamsize size) streamsize
+        +IsEOF() bool
+        +Close() void
+    }
+
+    %% Output Streams
+    class IOutputDataStream {
+        <<interface>>
+        +WriteByte(uint8_t data) void
+        +WriteBlock(void* srcData, streamsize size) void
+        +Close() void
+    }
+
+    class MemoryOutputStream {
+        -vector~uint8_t~ m_data
+        -bool m_isClosed
+        +MemoryOutputStream()
+        +WriteByte(uint8_t data) void
+        +WriteBlock(void* srcData, streamsize size) void
+        +Close() void
+        +GetData() vector~uint8_t~
+        -EnsureStreamIsOpened() void
+    }
+
+    class FileOutputStream {
+        -ofstream m_file
+        -bool m_isClosed
+        +FileOutputStream(string fileName)
+        +WriteByte(uint8_t data) void
+        +WriteBlock(void* srcData, streamsize size) void
+        +Close() void
+        -EnsureStreamIsOpened() void
+    }
+
+    class OutputStreamDecorator {
+        <<abstract>>
+        #unique_ptr~IOutputDataStream~ m_stream
+        +OutputStreamDecorator(unique_ptr~IOutputDataStream~ stream)
+        +Close() void
+    }
+
+    class EncryptionOutputStream {
+        -array~uint8_t, 256~ m_encryptionTable
+        +EncryptionOutputStream(unique_ptr~IOutputDataStream~ stream, uint32_t key)
+        +WriteByte(uint8_t data) void
+        +WriteBlock(void* srcData, streamsize size) void
+    }
+
+    class CompressionOutputStream {
+        -size_t m_currentCount
+        -uint8_t m_currentByte
+        +CompressionOutputStream(unique_ptr~IOutputDataStream~ stream)
+        +WriteByte(uint8_t data) void
+        +WriteBlock(void* srcData, streamsize size) void
+        +Close() void
+        -WriteCompressByte() void
+    }
+
+    %% Encryption Utils
+    class EncryptionUtils {
+        <<namespace>>
+        +GenerateEncryptionTable(uint32_t key) array~uint8_t, 256~
+        +GenerateDecryptionTable(uint32_t key) array~uint8_t, 256~
+    }
+
+    %% Command Line Parser
+    class OperationType {
+        <<enumeration>>
+        ENCRYPT
+        DECRYPT
+        COMPRESS
+        DECOMPRESS
+    }
+
+    class Operation {
+        <<struct>>
+        +OperationType type
+        +uint32_t key
+    }
+
+    class CommandLineArgs {
+        <<struct>>
+        +string inputFile
+        +string outputFile
+        +vector~Operation~ inputOperations
+        +vector~Operation~ outputOperations
+    }
+
+    class CommandLineParser {
+        +Parse(int argc, char* argv[]) CommandLineArgs
+    }
+
+    %% Relationships - Input Streams
+    IInputDataStream <|.. MemoryInputStream : implements
+    IInputDataStream <|.. FileInputStream : implements
+    IInputDataStream <|.. InputStreamDecorator : implements
+    InputStreamDecorator <|-- DecryptionInputStream : extends
+    InputStreamDecorator <|-- DecompressInputStream : extends
+    InputStreamDecorator o-- IInputDataStream : wraps
+
+    %% Relationships - Output Streams
+    IOutputDataStream <|.. MemoryOutputStream : implements
+    IOutputDataStream <|.. FileOutputStream : implements
+    IOutputDataStream <|.. OutputStreamDecorator : implements
+    OutputStreamDecorator <|-- EncryptionOutputStream : extends
+    OutputStreamDecorator <|-- CompressionOutputStream : extends
+    OutputStreamDecorator o-- IOutputDataStream : wraps
+
+    %% Relationships - Encryption
+    DecryptionInputStream ..> EncryptionUtils : uses
+    EncryptionOutputStream ..> EncryptionUtils : uses
+
+    %% Relationships - Command Line
+    CommandLineArgs *-- Operation : contains
+    Operation *-- OperationType : uses
+    CommandLineParser ..> CommandLineArgs : creates

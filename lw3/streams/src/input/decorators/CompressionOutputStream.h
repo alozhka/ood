@@ -15,7 +15,7 @@ public:
 		{
 			m_currentByte = data;
 		}
-		else if (m_currentByte == data && m_currentCount != std::numeric_limits<uint8_t>::max())
+		if (m_currentByte == data && m_currentCount != std::numeric_limits<uint8_t>::max())
 		{
 			++m_currentCount;
 		}
@@ -46,11 +46,21 @@ public:
 private:
 	void WriteCompressByte()
 	{
-		if (m_currentCount > 0)
+		if (m_currentCount > 2)
 		{
 			m_stream->WriteByte(m_currentCount);
 			m_stream->WriteByte(m_currentByte);
 		}
+		if (m_currentCount == 2)
+		{
+			m_stream->WriteByte(m_currentByte);
+			m_stream->WriteByte(m_currentByte);
+		}
+		if (m_currentCount == 1)
+		{
+			m_stream->WriteByte(m_currentByte);
+		}
+
 		m_currentCount = 0;
 	}
 

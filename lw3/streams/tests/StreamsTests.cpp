@@ -279,14 +279,12 @@ TEST_F(EncryptionTests, DifferentKeysProduceDifferentEncryption)
 	MemoryOutputStream* rawPtr1 = memoryStream1.get();
 	EncryptionOutputStream encryptedStream1(std::move(memoryStream1), 1);
 	encryptedStream1.WriteBlock(originalData.data(), originalData.size());
-	encryptedStream1.Close();
 
 	// Шифруем с ключом 2
 	auto memoryStream2 = std::make_unique<MemoryOutputStream>();
 	MemoryOutputStream* rawPtr2 = memoryStream2.get();
 	EncryptionOutputStream encryptedStream2(std::move(memoryStream2), 2);
 	encryptedStream2.WriteBlock(originalData.data(), originalData.size());
-	encryptedStream2.Close();
 
 	const auto& encrypted1 = rawPtr1->GetData();
 	const auto& encrypted2 = rawPtr2->GetData();
@@ -312,4 +310,10 @@ TEST_F(CompressStreamsTests, CompressesStreamViaRLE)
 {
 	std::vector<char> originalData = { 'A', 'A', 'A', 'B', 'C', 'C' };
 	CompressionOutputStream compressionStream(std::move(memoryStream));
+
+	compressionStream.WriteBlock(originalData.data(), 6);
+	compressionStream.Close();
+
+	std::vector<uint8_t> actual = memoryStreamPrt->GetData();
+	EXPECT_EQ(std::vector<uint8_t>({ '\x3', 'A', 'B', 'C', 'C' }), actual);
 }

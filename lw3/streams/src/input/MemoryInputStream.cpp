@@ -9,6 +9,7 @@ MemoryInputStream::MemoryInputStream(const std::vector<uint8_t>& data)
 
 bool MemoryInputStream::IsEOF() const
 {
+	EnsureIsOpened();
 	return m_position >= m_data.size();
 }
 
@@ -20,6 +21,8 @@ uint8_t MemoryInputStream::ReadByte()
 
 std::streamsize MemoryInputStream::ReadBlock(void* dstBuffer, std::streamsize size)
 {
+	EnsureIsOpened();
+
 	if (size == 0)
 	{
 		return 0;
@@ -35,10 +38,23 @@ std::streamsize MemoryInputStream::ReadBlock(void* dstBuffer, std::streamsize si
 	return bytesToRead;
 }
 
+void MemoryInputStream::Close()
+{
+	m_isOpened = false;
+}
+
 void MemoryInputStream::EnsureIsNotEOF() const
 {
 	if (IsEOF())
 	{
 		throw std::ios_base::failure("Cannot read from stream: end of stream reached");
+	}
+}
+
+void MemoryInputStream::EnsureIsOpened() const
+{
+	if (!m_isOpened)
+	{
+		throw std::ios_base::failure("Cannot read closed stream");
 	}
 }

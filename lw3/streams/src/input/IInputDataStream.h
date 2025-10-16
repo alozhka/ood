@@ -18,5 +18,8 @@ public:
 	// Возвращает количество реально прочитанных байт. Выбрасывает исключение в случае ошибки
 	virtual std::streamsize ReadBlock(void* dstBuffer, std::streamsize size) = 0;
 
+	// Закрывает поток. Операции над ним после этого должны выбрасывать исключение logic_error
+	virtual void Close() = 0;
+
 	virtual ~IInputDataStream() = default;
 };

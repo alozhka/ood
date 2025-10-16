@@ -3,7 +3,8 @@ project(streams)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(streams main.cpp)
+add_executable(streams main.cpp
+        src/input/decorators/CompressionOutputStream.h)
 
 include(FetchContent)
 FetchContent_Declare(
@@ -31,7 +32,7 @@ add_executable(StreamsTests
         src/decorators/OutputStreamDecorator.h
         src/decorators/InputStreamDecorator.h
         src/decorators/EncryptionTable.h
-        src/decorators/EncryptionOutputStream.h
+        src/input/decorators/EncryptionOutputStream.h
         src/decorators/DecryptionInputStream.h)
 
 target_link_libraries(StreamsTests

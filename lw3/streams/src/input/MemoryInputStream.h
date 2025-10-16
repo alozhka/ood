@@ -10,10 +10,13 @@ public:
 	bool IsEOF() const override;
 	uint8_t ReadByte() override;
 	std::streamsize ReadBlock(void* dstBuffer, std::streamsize size) override;
+	void Close() override;
 
 private:
 	void EnsureIsNotEOF() const;
+	void EnsureIsOpened() const;
 
 	std::vector<uint8_t> m_data;
 	size_t m_position = 0;
+	bool m_isOpened = true;
 };

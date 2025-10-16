@@ -1,6 +1,7 @@
 #include "../src/decorators/DecryptionInputStream.h"
-#include "../src/decorators/EncryptionOutputStream.h"
 #include "../src/input/MemoryInputStream.h"
+#include "../src/input/decorators/CompressionOutputStream.h"
+#include "../src/input/decorators/EncryptionOutputStream.h"
 #include "../src/output/MemoryOutputStream.h"
 #include "../src/parse/CommandLineParser.h"
 #include "gtest/gtest.h"
@@ -296,4 +297,19 @@ TEST_F(EncryptionTests, DifferentKeysProduceDifferentEncryption)
 
 class CompressStreamsTests : public testing::Test
 {
+protected:
+	CompressStreamsTests()
+	{
+		memoryStream = std::make_unique<MemoryOutputStream>();
+		memoryStreamPrt = memoryStream.get();
+	}
+
+	std::unique_ptr<MemoryOutputStream> memoryStream;
+	MemoryOutputStream* memoryStreamPrt;
 };
+
+TEST_F(CompressStreamsTests, CompressesStreamViaRLE)
+{
+	std::vector<char> originalData = { 'A', 'A', 'A', 'B', 'C', 'C' };
+	CompressionOutputStream compressionStream(std::move(memoryStream));
+}

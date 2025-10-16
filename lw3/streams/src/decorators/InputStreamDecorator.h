@@ -16,6 +16,11 @@ public:
 		return m_stream->IsEOF();
 	}
 
+	void Close() override
+	{
+		return m_stream->Close();
+	}
+
 protected:
 	std::unique_ptr<IInputDataStream> m_stream;
 };

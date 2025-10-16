@@ -144,6 +144,49 @@ private:
 	SyrupType m_syrupType;
 };
 
+enum class LiquorType
+{
+	Nut,
+	Chocolate,
+};
+
+// Ликер
+class Liquor : public CondimentDecorator
+{
+public:
+	explicit Liquor(IBeveragePtr&& beverage, LiquorType type)
+		: CondimentDecorator(std::move(beverage))
+		, m_type(type)
+	{
+	}
+
+	std::string GetCondimentDescription() const override
+	{
+		return LiquorTypeToString(m_type) + " liquor";
+	}
+
+	double GetCondimentCost() const override
+	{
+		return 50;
+	}
+
+private:
+	static std::string LiquorTypeToString(LiquorType type)
+	{
+		switch (type)
+		{
+		case LiquorType::Nut:
+			return "Nut";
+		case LiquorType::Chocolate:
+			return "Chocolate";
+		default:
+			throw std::invalid_argument("Unknown liquor type");
+		}
+	}
+
+	LiquorType m_type;
+};
+
 // Шоколадная крошка
 class ChocolateCrumbs : public CondimentDecorator
 {
@@ -166,6 +209,61 @@ public:
 
 private:
 	unsigned m_mass;
+};
+
+// Шоколадные дольки
+class ChocolatePieces : public CondimentDecorator
+{
+public:
+	explicit ChocolatePieces(IBeveragePtr&& beverage, unsigned quantity)
+		: CondimentDecorator(std::move(beverage))
+		, m_quantity(quantity)
+	{
+		EnsureNotExceededMaxPiecesCount(quantity);
+	}
+
+	std::string GetCondimentDescription() const override
+	{
+		return "Chocolate pieces x " + std::to_string(m_quantity);
+	}
+
+	double GetCondimentCost() const override
+	{
+		return UnitPrice * m_quantity;
+	}
+
+private:
+	static void EnsureNotExceededMaxPiecesCount(unsigned quantity)
+	{
+		if (quantity > MAX_PIECES_COUNT)
+		{
+			throw std::invalid_argument("Max amount of chocolate pieces is " + std::to_string(MAX_PIECES_COUNT));
+		}
+	}
+
+	unsigned int m_quantity;
+	static constexpr unsigned MAX_PIECES_COUNT = 5;
+	static constexpr unsigned UnitPrice = 10;
+};
+
+// Сливки
+class Cream : public CondimentDecorator
+{
+public:
+	explicit Cream(IBeveragePtr&& beverage)
+		: CondimentDecorator(std::move(beverage))
+	{
+	}
+
+	std::string GetCondimentDescription() const override
+	{
+		return "Cream";
+	}
+
+	double GetCondimentCost() const override
+	{
+		return 25;
+	}
 };
 
 // Кокосовая стружка

@@ -71,11 +71,20 @@ private:
 	bool m_isDouble;
 };
 
+enum class TeaType
+{
+	Black,
+	Puer,
+	Red,
+	Green,
+};
+
 class Tea : public Beverage
 {
 public:
-	Tea()
-		: Beverage("Tea")
+	explicit Tea(TeaType type)
+		: Beverage(TeaTypeToString(type) + " tea")
+		, m_type(type)
 	{
 	}
 
@@ -83,6 +92,25 @@ public:
 	{
 		return 30;
 	}
+
+private:
+	static std::string TeaTypeToString(TeaType type)
+	{
+		switch (type)
+		{
+		case TeaType::Black:
+			return "Black";
+		case TeaType::Green:
+			return "Green";
+		case TeaType::Red:
+			return "Red";
+		case TeaType::Puer:
+			return "Puer";
+		default:
+			throw std::invalid_argument("Unknown tea type");
+		}
+	}
+	TeaType m_type;
 };
 
 enum class MilkshakeSize
@@ -103,7 +131,7 @@ public:
 
 	double GetCost() const override
 	{
-		return MilkshakeSizeToCost(m_size);
+		return GetMilkshakeSizeCost(m_size);
 	}
 
 private:
@@ -122,7 +150,7 @@ private:
 		}
 	}
 
-	static double MilkshakeSizeToCost(MilkshakeSize size)
+	static double GetMilkshakeSizeCost(MilkshakeSize size)
 	{
 		switch (size)
 		{

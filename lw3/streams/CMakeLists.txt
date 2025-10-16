@@ -29,11 +29,11 @@ add_executable(StreamsTests
         src/input/IInputDataStream.h
         src/input/MemoryInputStream.h
         src/input/MemoryInputStream.cpp
-        src/decorators/OutputStreamDecorator.h
-        src/decorators/InputStreamDecorator.h
-        src/decorators/EncryptionTable.h
+        src/output/decorators/OutputStreamDecorator.h
+        src/input/decorators/InputStreamDecorator.h
+        src/output/decorators/EncryptionTable.h
         src/input/decorators/EncryptionOutputStream.h
-        src/decorators/DecryptionInputStream.h)
+        src/output/decorators/DecryptionInputStream.h)
 
 target_link_libraries(StreamsTests
         gtest_main

@@ -1,8 +1,8 @@
-#include "../src/decorators/DecryptionInputStream.h"
 #include "../src/input/MemoryInputStream.h"
 #include "../src/input/decorators/CompressionOutputStream.h"
 #include "../src/input/decorators/EncryptionOutputStream.h"
 #include "../src/output/MemoryOutputStream.h"
+#include "../src/output/decorators/DecryptionInputStream.h"
 #include "../src/parse/CommandLineParser.h"
 #include "gtest/gtest.h"
 #include <algorithm>

@@ -1,6 +1,6 @@
 #pragma once
-#include "../../decorators/EncryptionTable.h"
-#include "../../decorators/OutputStreamDecorator.h"
+#include "../../output/decorators/EncryptionTable.h"
+#include "../../output/decorators/OutputStreamDecorator.h"
 #include <array>
 
 class EncryptionOutputStream : public OutputStreamDecorator

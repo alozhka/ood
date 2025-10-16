@@ -1,5 +1,5 @@
 #pragma once
-#include "../../decorators/OutputStreamDecorator.h"
+#include "../../output/decorators/OutputStreamDecorator.h"
 
 class CompressionOutputStream : public OutputStreamDecorator
 {

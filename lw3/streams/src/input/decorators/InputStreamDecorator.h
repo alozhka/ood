@@ -1,5 +1,5 @@
 #pragma once
-#include "../input/IInputDataStream.h"
+#include "../IInputDataStream.h"
 #include <memory>
 
 // Абстрактный базовый класс для декораторов входного потока

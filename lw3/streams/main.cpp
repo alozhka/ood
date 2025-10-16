@@ -7,6 +7,7 @@
 #include "src/parse/CommandLineParser.h"
 #include <iostream>
 #include <memory>
+#include <ranges>
 
 std::unique_ptr<IInputDataStream> CreateInputStream(const std::string& fileName, const std::vector<Operation>& operations)
 {
@@ -34,7 +35,7 @@ std::unique_ptr<IOutputDataStream> CreateOutputStream(const std::string& fileNam
 {
 	std::unique_ptr<IOutputDataStream> stream = std::make_unique<FileOutputStream>(fileName);
 
-	for (const auto& op : operations)
+	for (const auto& op : std::ranges::reverse_view(operations))
 	{
 		switch (op.type)
 		{
@@ -54,16 +55,9 @@ std::unique_ptr<IOutputDataStream> CreateOutputStream(const std::string& fileNam
 
 void TransformFile(IInputDataStream& input, IOutputDataStream& output)
 {
-	constexpr std::streamsize BUFFER_SIZE = 4096;
-	uint8_t buffer[BUFFER_SIZE];
-
 	while (!input.IsEOF())
 	{
-		std::streamsize bytesRead = input.ReadBlock(buffer, BUFFER_SIZE);
-		if (bytesRead > 0)
-		{
-			output.WriteBlock(buffer, bytesRead);
-		}
+		output.WriteByte(input.ReadByte());
 	}
 }
 

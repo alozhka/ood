@@ -11,7 +11,6 @@ public:
 	void WriteBlock(const void* srcData, std::streamsize size) override;
 	void Close() override;
 
-	// Метод для получения данных (для тестирования)
 	const std::vector<uint8_t>& GetData() const;
 
 private:

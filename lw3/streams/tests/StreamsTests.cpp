@@ -316,18 +316,18 @@ TEST_F(CompressStreamsTests, CompressesStreamViaRLE)
 	compressionStream.Close();
 
 	std::vector<uint8_t> actual = outStreamPtr->GetData();
-	EXPECT_EQ(std::vector<uint8_t>({ '\x3', 'A', 'B', 'C', 'C' }), actual);
+	EXPECT_EQ(std::vector<uint8_t>({ '\x3', 'A', '\x1', 'B', '\x2', 'C' }), actual);
 }
 
 TEST_F(CompressStreamsTests, DecompressesStreamViaRLE)
 {
-	std::vector<uint8_t> originalData = { '\x3', 'A', 'B', 'C', 'C' };
-	auto inStream = std::make_unique<MemoryInputStream>(originalData);
+	std::vector<uint8_t> compressedData = { '\x3', 'A', '\x1', 'B', '\x2', 'C' };
+	auto inStream = std::make_unique<MemoryInputStream>(compressedData);
 	DecompressInputStream decompress(std::move(inStream));
+	std::vector<uint8_t> decompressedData(6);
 
-	decompress.ReadBlock(originalData.data(), 6);
+	decompress.ReadBlock(decompressedData.data(), 6);
 	decompress.Close();
 
-	std::vector<uint8_t> actual = outStreamPtr->GetData();
-	EXPECT_EQ(std::vector<uint8_t>({ 'A', 'A', 'A', 'B', 'C', 'C' }), actual);
+	EXPECT_EQ(std::vector<uint8_t>({ 'A', 'A', 'A', 'B', 'C', 'C' }), decompressedData);
 }

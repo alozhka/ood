@@ -17,21 +17,21 @@ public:
 		m_currentColor = color;
 	}
 
-	void DrawLine(Point from, Point to) override
+	void DrawLine(double fromX, double fromY, double toX, double toY) override
 	{
-		std::string line = "<line x1=\"" + std::to_string(from.x) + "\" "
-			+ "y1=\"" + std::to_string(from.y) + "\" "
-			+ "x2=\"" + std::to_string(to.x) + "\" "
-			+ "y2=\"" + std::to_string(to.y) + "\" "
+		std::string line = "<line x1=\"" + std::to_string(fromX) + "\" "
+			+ "y1=\"" + std::to_string(fromX) + "\" "
+			+ "x2=\"" + std::to_string(toX) + "\" "
+			+ "y2=\"" + std::to_string(toY) + "\" "
 			+ "style=\"stroke:" + ColorToHexString(m_currentColor) + ";stroke=width:4\"/>";
 		m_output
 			<< line << std::endl;
 	}
 
-	void DrawEllipse(Point center, double rx, double ry) override
+	void DrawEllipse(double cx, double cy, double rx, double ry) override
 	{
-		std::string ellipse = "<ellipse cx=\"" + std::to_string(center.x) + "\" "
-			+ "cy=\"" + std::to_string(center.y) + "\" "
+		std::string ellipse = "<ellipse cx=\"" + std::to_string(cx) + "\" "
+			+ "cy=\"" + std::to_string(cx) + "\" "
 			+ "rx=\"" + std::to_string(rx) + "\" "
 			+ "ry=\"" + std::to_string(ry) + "\" "
 			+ "style=\"stroke:" + ColorToHexString(m_currentColor) + ";stroke-width:4;fill:none\"/>";

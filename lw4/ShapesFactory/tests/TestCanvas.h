@@ -10,11 +10,13 @@ public:
 	{
 		m_results.emplace_back("set color");
 	}
-	void DrawLine(Point from, Point to) override
+
+	void DrawLine(double fromX, double fromY, double toX, double toY) override
 	{
 		m_results.emplace_back("draw line");
 	}
-	void DrawEllipse(Point center, double rx, double ry) override
+
+	void DrawEllipse(double cx, double cy, double rx, double ry) override
 	{
 		m_results.emplace_back("draw ellipse");
 	}

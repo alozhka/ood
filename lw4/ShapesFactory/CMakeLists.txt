@@ -7,7 +7,12 @@ add_executable(ShapesFactory main.cpp
         src/canvas/ICanvas.h
         src/canvas/Color.h
         src/canvas/Point.h
-        src/canvas/SVGCanvas.h)
+        src/canvas/SVGCanvas.h
+        src/shapes/Shape.h
+        src/shapes/Triangle.h
+        src/shapes/Rectangle.h
+        src/shapes/Ellipse.h
+        src/shapes/RegularPolygon.h)
 
 # TESTS
 include(FetchContent)
@@ -24,7 +29,8 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 add_executable(ShapesFactoryTests
-        tests/TestCanvas.h)
+        tests/TestCanvas.h
+        tests/ShapesFactoryTests.cpp)
 
 target_link_libraries(ShapesFactoryTests
         gtest_main

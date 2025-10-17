@@ -6,6 +6,7 @@
 
 #include <iostream>
 
+//TODO: нарисовать нормальную картинку
 int main(int argc, char* argv[])
 {
 	if (argc < 2)

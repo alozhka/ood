@@ -20,10 +20,10 @@ public:
 	void DrawLine(double fromX, double fromY, double toX, double toY) override
 	{
 		std::string line = "<line x1=\"" + std::to_string(fromX) + "\" "
-			+ "y1=\"" + std::to_string(fromX) + "\" "
+			+ "y1=\"" + std::to_string(fromY) + "\" "
 			+ "x2=\"" + std::to_string(toX) + "\" "
 			+ "y2=\"" + std::to_string(toY) + "\" "
-			+ "style=\"stroke:" + ColorToHexString(m_currentColor) + ";stroke=width:4\"/>";
+			+ "style=\"stroke:" + ColorToHexString(m_currentColor) + ";stroke-width:4\"/>";
 		m_output
 			<< line << std::endl;
 	}
@@ -31,7 +31,7 @@ public:
 	void DrawEllipse(double cx, double cy, double rx, double ry) override
 	{
 		std::string ellipse = "<ellipse cx=\"" + std::to_string(cx) + "\" "
-			+ "cy=\"" + std::to_string(cx) + "\" "
+			+ "cy=\"" + std::to_string(cy) + "\" "
 			+ "rx=\"" + std::to_string(rx) + "\" "
 			+ "ry=\"" + std::to_string(ry) + "\" "
 			+ "style=\"stroke:" + ColorToHexString(m_currentColor) + ";stroke-width:4;fill:none\"/>";

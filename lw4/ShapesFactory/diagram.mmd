@@ -1,0 +1,158 @@
+classDiagram
+%% Enums and Structs
+    class Color {
+        <<enumeration>>
+        Green
+        Red
+        Blue
+        Yellow
+        Pink
+        Black
+    }
+
+    class Point {
+        <<struct>>
+        +double x
+        +double y
+        +operator==(Point) bool
+    }
+
+%% Canvas
+    class ICanvas {
+        <<interface>>
+        +SetColor(Color)* void
+        +DrawLine(double, double, double, double)* void
+        +DrawEllipse(double, double, double, double)* void
+    }
+
+    class SVGCanvas {
+        -Color m_currentColor
+        -ostringstream m_output
+        +SetColor(Color) void
+        +DrawLine(double, double, double, double) void
+        +DrawEllipse(double, double, double, double) void
+        +SaveToFile(string) void
+    }
+
+%% Shapes
+    class Shape {
+        <<abstract>>
+        -Color m_color
+        +Shape(Color)
+        +Draw(ICanvas)* void
+        +GetColor() Color
+    }
+
+    class Rectangle {
+        -Point m_leftTop
+        -double m_width
+        -double m_height
+        +Rectangle(Color, Point, double, double)
+        +Draw(ICanvas) void
+        +GetLeftTop() Point
+        +GetWidth() double
+        +GetHeight() double
+    }
+
+    class Triangle {
+        -Point m_p1
+        -Point m_p2
+        -Point m_p3
+        +Triangle(Color, Point, Point, Point)
+        +Draw(ICanvas) void
+        +GetVertex1() Point
+        +GetVertex2() Point
+        +GetVertex3() Point
+    }
+
+    class Ellipse {
+        -Point m_center
+        -double m_rx
+        -double m_ry
+        +Ellipse(Color, Point, double, double)
+        +Draw(ICanvas) void
+        +GetCenter() Point
+        +GetHorizontalRadius() double
+        +GetVerticalRadius() double
+    }
+
+    class RegularPolygon {
+        -Point m_center
+        -unsigned int m_vertexCount
+        -double m_radius
+        +RegularPolygon(Color, Point, unsigned int, double)
+        +Draw(ICanvas) void
+        +GetCenter() Point
+        +GetVertexCount() unsigned int
+        +GetRadius() double
+    }
+
+%% Factory
+    class IShapeFactory {
+        <<interface>>
+        +CreateShape(string)* unique_ptr~Shape~
+    }
+
+    class ShapeFactory {
+        +CreateShape(string) unique_ptr~Shape~
+        -ParseColor(string) Color
+        -CreateRectangle(istringstream) unique_ptr~Shape~
+        -CreateTriangle(istringstream) unique_ptr~Shape~
+        -CreateEllipse(istringstream) unique_ptr~Shape~
+        -CreateRegularPolygon(istringstream) unique_ptr~Shape~
+    }
+
+%% Picture
+    class PictureDraft {
+        -vector~unique_ptr~Shape~~ m_shapes
+        +AddShape(unique_ptr~Shape~) void
+        +GetShapesCount() size_t
+        +GetShape(size_t) Shape&
+        +begin() const_iterator
+        +end() const_iterator
+    }
+
+%% People
+    class IDesigner {
+        <<interface>>
+        +CreateDraft(istream)* PictureDraft
+    }
+
+    class Designer {
+        -IShapeFactory& m_factory
+        +Designer(IShapeFactory)
+        +CreateDraft(istream) PictureDraft
+    }
+
+    class Painter {
+        +DrawPicture(PictureDraft, ICanvas) void
+    }
+
+    class Client {
+        -IDesigner& m_designer
+        +Client(IDesigner)
+        +HandleCommand(istream, ICanvas, Painter) void
+    }
+
+%% Relationships
+    SVGCanvas ..|> ICanvas: implements
+    Shape o-- Color: has
+    Rectangle --|> Shape: extends
+    Triangle --|> Shape: extends
+    Ellipse --|> Shape: extends
+    RegularPolygon --|> Shape: extends
+    Shape ..> ICanvas: uses
+    ShapeFactory ..|> IShapeFactory: implements
+    ShapeFactory ..> Rectangle: creates
+    ShapeFactory ..> Triangle: creates
+    ShapeFactory ..> Ellipse: creates
+    ShapeFactory ..> RegularPolygon: creates
+    PictureDraft o-- Shape: contains 0..*
+    Designer ..|> IDesigner: implements
+    Designer o-- IShapeFactory: uses
+    Designer ..> PictureDraft: creates
+    Painter ..> PictureDraft: uses
+    Painter ..> ICanvas: uses
+    Client o-- IDesigner: uses
+    Client ..> Painter: uses
+    Client ..> ICanvas: uses

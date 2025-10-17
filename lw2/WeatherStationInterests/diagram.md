@@ -2,31 +2,30 @@
 
 ```mermaid
 classDiagram
-    class IObserver~T~ {
+    class IObserver~TData, TEvent~ {
         <<interface>>
-        +Update(data: T) void*
+        +Update(data: TData, eventType: TEvent) void*
     }
-    class IObservable~T~ {
+    class IObservable~TData, TEvent~ {
         <<interface>>
-        +RegisterObserver(observer: IObserver~T~) void*
-        +NotifyObservers() void*
-        +RemoveObserver(observer: IObserver~T~) void*
+        +RegisterObserver(observer: IObserver~TData, TEvent~) void*
+        +RemoveObserver(observer: IObserver~TData, TEvent~) void*
     }
-    class Observable~T~ {
-        -m_observers: set~Observer~T~~
-        +RegisterObserver(observer: IObserver~T~) void
+    class PriorityObservable~TData, TEvent~ {
+        -m_observers: set~Observer~TData, TEvent~~
+        +RegisterObserver(observer: IObserver~TData, TEvent~) void
         +NotifyObserver() void
-        +RemoveObserver(observer: IObserver~T~) void
-        #GetChangedData() T*
+        +RemoveObserver(observer: IObserver~TData, TEvent~) void
+        #GetChangedData() TData*
     }
     class StatsDisplay {
         -m_temperatureInfo: StatsInfo
         -m_humidityInfo: StatsInfo
         -m_pressureInfo: StatsInfo
-        -Update(data: WeatherData) void
+        -Update(data: WeatherData, eventType: WeatherType) void
     }
     class Display {
-        -Update(data: WeatherData) void
+        -Update(data: WeatherData, eventType: WeatherType) void
     }
     class StatsInfo {
         -m_name: string
@@ -53,13 +52,23 @@ classDiagram
         +SetMeasurements()
         #GetChangedData() WeatherInfo
     }
+    class WeatherType {
+        <<enumeration>>
+        Temperature,
+        Humidity,
+        Pressure,
+        WindSpeed,
+        WindDirection
+ }
 
-    IObservable o-- IObserver
+    PriorityObservable o-- IObserver
     IObserver <|-- Display
     IObserver <|-- StatsDisplay
-    IObservable <|-- Observable
+    IObservable <|-- PriorityObservable
     StatsDisplay *-- StatsInfo
     WeatherData *-- WeatherInfo
     StatsDisplay o-- WeatherData
-    Observable <|-- WeatherData
+    PriorityObservable <|-- WeatherData
+    StatsDisplay <.. WeatherType : uses
+    WeatherData <.. WeatherType : uses
 ```

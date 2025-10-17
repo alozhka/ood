@@ -16,6 +16,7 @@ public:
 			m_currentByte = data;
 			m_currentCount = 1;
 		}
+		// TODO: граничное условие на лимит uint8_t
 		else if (m_currentByte == data && m_currentCount < std::numeric_limits<uint8_t>::max())
 		{
 			++m_currentCount;
@@ -55,6 +56,6 @@ private:
 		m_currentCount = 0;
 	}
 
-	size_t m_currentCount = 0;
+	uint8_t m_currentCount = 0;
 	uint8_t m_currentByte = 0;
 };

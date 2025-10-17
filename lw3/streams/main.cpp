@@ -9,6 +9,8 @@
 #include <memory>
 #include <ranges>
 
+// TODO: Обосновать наличие базового класса декоратора
+
 std::unique_ptr<IInputDataStream> CreateInputStream(const std::string& fileName, const std::vector<Operation>& operations)
 {
 	std::unique_ptr<IInputDataStream> stream = std::make_unique<FileInputStream>(fileName);

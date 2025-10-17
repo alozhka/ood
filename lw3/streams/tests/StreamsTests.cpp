@@ -319,6 +319,23 @@ TEST_F(CompressStreamsTests, CompressesStreamViaRLE)
 	EXPECT_EQ(std::vector<uint8_t>({ '\x3', 'A', '\x1', 'B', '\x2', 'C' }), actual);
 }
 
+TEST_F(CompressStreamsTests, CompressOnlyToLengthOfByteSize)
+{
+	std::vector<char> originalData{};
+	originalData.reserve(255);
+	for (int i = 0; i < 255; ++i)
+	{
+		originalData.push_back('A');
+	}
+	CompressionOutputStream compressionStream(std::move(outStream));
+
+	compressionStream.WriteBlock(originalData.data(), 255);
+	compressionStream.Close();
+
+	std::vector<uint8_t> actual = outStreamPtr->GetData();
+	EXPECT_EQ(std::vector<uint8_t>({ 255, 'A' }), actual);
+}
+
 TEST_F(CompressStreamsTests, DecompressesStreamViaRLE)
 {
 	std::vector<uint8_t> compressedData = { '\x3', 'A', '\x1', 'B', '\x2', 'C' };

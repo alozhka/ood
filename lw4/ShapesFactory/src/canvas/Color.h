@@ -32,3 +32,24 @@ static std::string ColorToHexString(Color color)
 		throw std::invalid_argument("Unknown color");
 	}
 }
+
+static Color ParseColor(const std::string& colorStr)
+{
+	std::string lowerColor = colorStr;
+	std::ranges::transform(lowerColor, lowerColor.begin(), tolower);
+
+	if (lowerColor == "red")
+		return Color::Red;
+	if (lowerColor == "green")
+		return Color::Green;
+	if (lowerColor == "blue")
+		return Color::Blue;
+	if (lowerColor == "pink")
+		return Color::Pink;
+	if (lowerColor == "yellow")
+		return Color::Yellow;
+	if (lowerColor == "black")
+		return Color::Black;
+
+	throw std::invalid_argument("Unknown color: " + colorStr);
+}

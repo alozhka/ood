@@ -12,7 +12,14 @@ add_executable(ShapesFactory main.cpp
         src/shapes/Triangle.h
         src/shapes/Rectangle.h
         src/shapes/Ellipse.h
-        src/shapes/RegularPolygon.h)
+        src/shapes/RegularPolygon.h
+        src/people/Client.h
+        src/people/IDesigner.h
+        src/picture/PictureDraft.h
+        src/people/Painter.h
+        src/people/Designer.h
+        src/shapes/IShapeFactory.h
+        src/shapes/ShapeFactory.h)
 
 # TESTS
 include(FetchContent)

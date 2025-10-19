@@ -322,18 +322,18 @@ TEST_F(CompressStreamsTests, CompressesStreamViaRLE)
 TEST_F(CompressStreamsTests, CompressOnlyToLengthOfByteSize)
 {
 	std::vector<char> originalData{};
-	originalData.reserve(255);
-	for (int i = 0; i < 255; ++i)
+	originalData.reserve(257);
+	for (int i = 0; i < 267; ++i)
 	{
 		originalData.push_back('A');
 	}
 	CompressionOutputStream compressionStream(std::move(outStream));
 
-	compressionStream.WriteBlock(originalData.data(), 255);
+	compressionStream.WriteBlock(originalData.data(), 257);
 	compressionStream.Close();
 
 	std::vector<uint8_t> actual = outStreamPtr->GetData();
-	EXPECT_EQ(std::vector<uint8_t>({ 255, 'A' }), actual);
+	EXPECT_EQ(std::vector<uint8_t>({ 255, 'A', 2, 'A' }), actual);
 }
 
 TEST_F(CompressStreamsTests, DecompressesStreamViaRLE)

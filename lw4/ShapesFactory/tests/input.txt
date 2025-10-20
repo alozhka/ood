@@ -1,4 +1,15 @@
-ellipse pink 200 200 40 120
-rectangle yellow 10 10 500 300
-triangle green 20 40 70 100 35 125
-regularpolygon black 500 250 6 140
+ellipse Blue 250 280 150 70
+ellipse Pink 150 150 100 90
+triangle Pink 100 60 130 110 70 110
+triangle Pink 200 60 230 110 170 110
+ellipse Green 120 130 10 15
+ellipse Green 180 130 10 15
+triangle Black 150 160 155 170 145 170
+ellipse Black 150 175 20 10
+rectangle Black 135 330 15 40
+rectangle Black 165 330 15 40
+rectangle Black 315 330 15 40
+rectangle Black 345 330 15 40
+ellipse Black 400 240 50 15
+ellipse Black 150 90 60 20
+rectangle Black 130 50 40 40

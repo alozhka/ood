@@ -1,7 +1,10 @@
+#include "src/CommandController.h"
+
 #include <iostream>
 
 int main()
 {
-    std::cout << "Hello, World!" << std::endl;
-    return 0;
+	CommandController controller{ std::cin, std::cout };
+	controller.Run();
+	return 0;
 }

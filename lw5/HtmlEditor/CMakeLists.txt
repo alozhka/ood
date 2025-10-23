@@ -4,8 +4,9 @@ project(HtmlEditor)
 set(CMAKE_CXX_STANDARD 20)
 
 add_executable(HtmlEditor main.cpp
-        src/parse/CommandController.h
-        src/commands/Command.h)
+        src/Menu.h
+        src/CommandController.h
+)
 
 include(FetchContent)
 FetchContent_Declare(

@@ -1,23 +1,26 @@
-#include "../src/parse/CommandController.h"
+#include "../src/CommandController.h"
+#include "../src/Menu.h"
 #include "gtest/gtest.h"
 
-class CommandControllerTests : public testing::TestWithParam<std::string>, public testing::TestResult
+class CommandControllerTests : public testing::Test
 {
 protected:
-    CommandControllerTests() : input{GetParam()}, controller{input}
-    {
-    }
+	void SetupInput(const std::string& inputData)
+	{
+		input.str(inputData);
+		input.clear();
+	}
 
-    std::istringstream input;
-    CommandController controller;
+	std::istringstream input;
+	std::ostringstream output;
 };
 
-TEST_P(CommandControllerTests, CorrectlryParsesCommands)
+TEST_F(CommandControllerTests, PrintsHelp)
 {
-    controller.HandleCommand();
-}
+	SetupInput("Help\nExit");
+	CommandController controller(input, output);
 
-INSTANTIATE_TEST_SUITE_P(
-    CommandControllerTests,
-    CommandControllerTests_CorrectlryParsesCommands_Test,
-    testing::Values("Help"));
+	controller.Run();
+
+	EXPECT_EQ("Commands list:\n", output.str());
+}

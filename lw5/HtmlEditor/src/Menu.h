@@ -26,10 +26,7 @@ public:
 
 	void Run()
 	{
-		ShowInstructions();
-
 		std::string commandLine;
-
 		while (!m_exit && getline(m_input, commandLine))
 		{
 			try

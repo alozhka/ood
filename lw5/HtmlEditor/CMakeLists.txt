@@ -8,6 +8,8 @@ add_executable(HtmlEditor main.cpp
         src/CommandController.h
         src/Document/IDocument.h
         src/Document/Document.h
+        src/Document/History.h
+        src/Document/Command/ICommand.h
 )
 
 include(FetchContent)

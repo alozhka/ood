@@ -17,10 +17,12 @@ protected:
 
 TEST_F(CommandControllerTests, PrintsHelp)
 {
-	SetupInput("Help\nExit");
+	SetupInput("Exit\n");
 	CommandController controller(input, output);
 
 	controller.Run();
 
-	EXPECT_EQ("Commands list:\n", output.str());
+	EXPECT_EQ(
+		"Commands list:\n  Help: Shows the available commands and required args\n  Exit: Exits the program.\n",
+		output.str());
 }

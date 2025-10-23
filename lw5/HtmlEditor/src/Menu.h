@@ -30,7 +30,7 @@ public:
 
 		std::string commandLine;
 
-		while (!m_exit && m_output << "> " && getline(m_input, commandLine))
+		while (!m_exit && getline(m_input, commandLine))
 		{
 			try
 			{

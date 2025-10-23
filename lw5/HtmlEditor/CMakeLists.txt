@@ -6,6 +6,8 @@ set(CMAKE_CXX_STANDARD 20)
 add_executable(HtmlEditor main.cpp
         src/Menu.h
         src/CommandController.h
+        src/Document/IDocument.h
+        src/Document/Document.h
 )
 
 include(FetchContent)

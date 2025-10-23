@@ -10,11 +10,11 @@ public:
 		m_menu.AddItem(
 			"Help",
 			"Shows the available commands and required args",
-			std::bind_front(&CommandController::PrintHelp, this));
+			[this](std::istream&) { PrintHelp(); });
 		m_menu.AddItem(
 			"Exit",
-			"Usage: Exit. Exits the program.",
-			std::bind_front(&CommandController::Exit, this));
+			"Exits the program.",
+			[this](std::istream&) { Exit(); });
 	}
 
 	void Run()
@@ -23,12 +23,12 @@ public:
 	}
 
 private:
-	void PrintHelp(std::istream&)
+	void PrintHelp()
 	{
 		m_menu.ShowInstructions();
 	}
 
-	void Exit(std::istream&)
+	void Exit()
 	{
 		m_menu.Exit();
 	}

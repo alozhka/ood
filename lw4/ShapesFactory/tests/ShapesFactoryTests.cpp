@@ -175,13 +175,14 @@ TEST_F(PainterTests, DrawsPictureOnCanvas)
 
 	painter.DrawPicture(draft, canvas);
 
-	std::vector<std::string>& results = canvas.GetResults();
-	EXPECT_EQ("set color", results[0]);
-	EXPECT_EQ("draw line", results[1]);
-	EXPECT_EQ("draw line", results[2]);
-	EXPECT_EQ("draw line", results[3]);
-	EXPECT_EQ("set color", results[5]);
-	EXPECT_EQ("draw ellipse", results[6]);
+	std::vector<std::vector<std::string>>& results = canvas.GetResults();
+	EXPECT_EQ(std::vector<std::string>({ "set color", "#ff0000" }), results[0]);
+	EXPECT_EQ(std::vector<std::string>({ "draw line", "20.000000", "0.000000", "20.000000", "0.000000" }), results[1]);
+	EXPECT_EQ(std::vector<std::string>({ "draw line", "20.000000", "0.000000", "-10.000000", "17.320508" }), results[2]);
+	EXPECT_EQ(std::vector<std::string>({ "draw line", "-10.000000", "17.320508", "-10.000000", "-17.320508" }), results[3]);
+	EXPECT_EQ(std::vector<std::string>({ "draw line", "-10.000000", "-17.320508", "20.000000", "0.000000" }), results[4]);
+	EXPECT_EQ(std::vector<std::string>({ "set color", "#0000ff" }), results[5]);
+	EXPECT_EQ(std::vector<std::string>({ "draw ellipse", "5.000000", "5.000000", "3.000000", "4.000000" }), results[6]);
 }
 
 class ClientTests : public testing::Test
@@ -200,12 +201,12 @@ TEST_F(ClientTests, HandlesCompleteWorkflow)
 
 	client.HandleCommand(input, canvas, painter);
 
-	std::vector<std::string>& results = canvas.GetResults();
-	EXPECT_EQ("set color", results[0]);
-	EXPECT_EQ("draw line", results[1]);
-	EXPECT_EQ("draw line", results[2]);
-	EXPECT_EQ("draw line", results[3]);
-	EXPECT_EQ("draw line", results[4]);
-	EXPECT_EQ("set color", results[5]);
-	EXPECT_EQ("draw ellipse", results[6]);
+	std::vector<std::vector<std::string>>& results = canvas.GetResults();
+	EXPECT_EQ(std::vector<std::string>({ "set color", "#ff0000" }), results[0]);
+	EXPECT_EQ(std::vector<std::string>({ "draw line", "10.000000", "20.000000", "40.000000", "20.000000" }), results[1]);
+	EXPECT_EQ(std::vector<std::string>({ "draw line", "40.000000", "20.000000", "40.000000", "60.000000" }), results[2]);
+	EXPECT_EQ(std::vector<std::string>({ "draw line", "40.000000", "60.000000", "10.000000", "60.000000" }), results[3]);
+	EXPECT_EQ(std::vector<std::string>({ "draw line", "10.000000", "60.000000", "10.000000", "20.000000" }), results[4]);
+	EXPECT_EQ(std::vector<std::string>({ "set color", "#0000ff" }), results[5]);
+	EXPECT_EQ(std::vector<std::string>({ "draw ellipse", "5.000000", "5.000000", "2.000000", "3.000000" }), results[6]);
 }

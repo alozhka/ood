@@ -1,9 +1,8 @@
 #pragma once
 
 #include <boost/signals2.hpp>
-#include <functional>
 
-using Connection = boost::signals2::connection;
+using ScopedConnection = boost::signals2::connection;
 template <typename Signature>
 using Signal = boost::signals2::signal<Signature>;
 
@@ -26,27 +25,27 @@ public:
 	using WindDirectionSignal = Signal<void(const WeatherInfo&)>;
 
 	// Методы для подписки на конкретные события
-	Connection DoOnTemperatureChanged(const TemperatureSignal::slot_type& subscriber, int priority = 0)
+	[[nodiscard]] ScopedConnection DoOnTemperatureChanged(const TemperatureSignal::slot_type& subscriber, int priority = 0)
 	{
 		return m_temperatureSignal.connect(-priority, subscriber);
 	}
 
-	Connection DoOnHumidityChanged(const HumiditySignal::slot_type& subscriber, int priority = 0)
+	[[nodiscard]] ScopedConnection DoOnHumidityChanged(const HumiditySignal::slot_type& subscriber, int priority = 0)
 	{
 		return m_humiditySignal.connect(-priority, subscriber);
 	}
 
-	Connection DoOnPressureChanged(const PressureSignal::slot_type& subscriber, int priority = 0)
+	[[nodiscard]] ScopedConnection DoOnPressureChanged(const PressureSignal::slot_type& subscriber, int priority = 0)
 	{
 		return m_pressureSignal.connect(-priority, subscriber);
 	}
 
-	Connection DoOnWindSpeedChanged(const WindSpeedSignal::slot_type& subscriber, int priority = 0)
+	[[nodiscard]] ScopedConnection DoOnWindSpeedChanged(const WindSpeedSignal::slot_type& subscriber, int priority = 0)
 	{
 		return m_windSpeedSignal.connect(-priority, subscriber);
 	}
 
-	Connection DoOnWindDirectionChanged(const WindDirectionSignal::slot_type& subscriber, int priority = 0)
+	[[nodiscard]] ScopedConnection DoOnWindDirectionChanged(const WindDirectionSignal::slot_type& subscriber, int priority = 0)
 	{
 		return m_windDirectionSignal.connect(-priority, subscriber);
 	}

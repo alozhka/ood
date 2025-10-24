@@ -6,10 +6,15 @@
 
 class Display
 {
+	bool m_destroyed = false;
 public:
 	explicit Display(std::ostream& output)
 		: m_output(output)
 	{
+	}
+	~Display()
+	{
+		m_destroyed = true;
 	}
 
 	void OnTemperatureChanged(const WeatherInfo& data)

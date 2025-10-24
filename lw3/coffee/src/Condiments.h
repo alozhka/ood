@@ -3,6 +3,7 @@
 #include "IBeverage.h"
 
 // Базовый декоратор "Добавка к напитку". Также является напитком
+// TODO разобраться, какой ещё есть паттерн и какая от него польза
 class CondimentDecorator : public IBeverage
 {
 public:

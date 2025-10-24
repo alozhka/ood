@@ -120,5 +120,6 @@ private:
 	std::unordered_map<TEvent, ObserverMap> m_observers;
 
 	// Хранилище итераторов: (наблюдатель, тип события) -> итератор на элемент в multimap
+	// TODO: убрать итераторы с ссылок
 	std::unordered_map<ObserverEventKey, ObserverIterator, ObserverEventKeyHash> m_observerPriorities;
 };

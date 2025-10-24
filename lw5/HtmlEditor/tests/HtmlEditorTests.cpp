@@ -49,11 +49,14 @@ protected:
 	Document document;
 };
 
-TEST_F(DocumentTests, CannotInsertParagraphInInvalidPosition)
+TEST_F(CommandControllerTests, CannotInsertParagraphInInvalidPosition)
 {
-	document.InsertParagraph("First paragraph", std::nullopt);
+	SetupInput("InsertParagraph 5 First paragraph\n");
+	CommandController controller(input, output);
 
-	EXPECT_THROW(document.InsertParagraph("Invalid", 5), std::out_of_range);
+	controller.Run();
+
+	EXPECT_EQ("Invalid position for insertion\n", output.str());
 }
 
 TEST_F(CommandControllerTests, InsertsParagraphs)

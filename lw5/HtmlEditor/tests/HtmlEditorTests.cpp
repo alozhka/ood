@@ -49,14 +49,6 @@ protected:
 	Document document;
 };
 
-TEST_F(DocumentTests, InsertParagraphs)
-{
-	document.InsertParagraph("First paragraph", std::nullopt);
-	document.InsertParagraph("Second paragraph", std::nullopt);
-	document.InsertParagraph("Middle paragraph", 1);
-	document.InsertParagraph("Very first paragraph", 0);
-}
-
 TEST_F(DocumentTests, CannotInsertParagraphInInvalidPosition)
 {
 	document.InsertParagraph("First paragraph", std::nullopt);

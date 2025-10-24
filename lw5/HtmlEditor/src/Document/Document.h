@@ -1,15 +1,21 @@
 #pragma once
+#include "Command/InsertParagraphCommand.h"
+#include "DocumentItem.h"
 #include "History.h"
 #include "IDocument.h"
 
+#include <memory>
+#include <stdexcept>
 #include <string>
+#include <vector>
 
 class Document : public IDocument
 {
 public:
 	void InsertParagraph(const std::string& text, std::optional<size_t> position) override
 	{
-		// TODO: implement
+		auto command = std::make_unique<InsertParagraphCommand>(m_items, text, position);
+		m_history.AddAndExecute(std::move(command));
 	}
 
 	void ReplaceText(const std::string& newText, size_t position) override
@@ -29,7 +35,16 @@ public:
 
 	size_t GetItemsCount() const override
 	{
-		return 0;
+		return m_items.size();
+	}
+
+	std::shared_ptr<DocumentItem> GetItem(size_t index) const override
+	{
+		if (index >= m_items.size())
+		{
+			throw std::out_of_range("Invalid item index");
+		}
+		return m_items[index];
 	}
 
 	void DeleteItem(size_t index) override
@@ -74,5 +89,6 @@ public:
 
 private:
 	std::string m_title{};
-	History history{};
+	std::vector<std::shared_ptr<DocumentItem>> m_items;
+	History m_history{};
 };

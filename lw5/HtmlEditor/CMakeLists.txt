@@ -10,6 +10,9 @@ add_executable(HtmlEditor main.cpp
         src/Document/Document.h
         src/Document/History.h
         src/Document/Command/ICommand.h
+        src/Document/IParagraph.h
+        src/Document/Paragraph.h
+        src/Document/DocumentItem.h
 )
 
 include(FetchContent)

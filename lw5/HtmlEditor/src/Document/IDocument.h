@@ -25,8 +25,8 @@ public:
 	virtual size_t GetItemsCount() const = 0;
 
 	// Доступ к элементам изображения
-	// virtual ConstDocumentItem GetItem(size_t index)const = 0;
-	// virtual DocumentItem GetItem(size_t index) = 0;
+	virtual std::shared_ptr<DocumentItem> GetItem(size_t index) const = 0;
+
 	// Удаляет элемент из документа
 	virtual void DeleteItem(size_t index) = 0;
 

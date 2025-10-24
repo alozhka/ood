@@ -55,25 +55,30 @@ TEST_F(DocumentTests, InsertParagraphs)
 	document.InsertParagraph("Second paragraph", std::nullopt);
 	document.InsertParagraph("Middle paragraph", 1);
 	document.InsertParagraph("Very first paragraph", 0);
-
-	EXPECT_EQ(4, document.GetItemsCount());
 }
 
-TEST_F(DocumentTests, InsertParagraphWithInvalidPosition)
+TEST_F(DocumentTests, CannotInsertParagraphInInvalidPosition)
 {
 	document.InsertParagraph("First paragraph", std::nullopt);
 
-	// Попытка вставить в позицию 5, когда в документе только 1 элемент
 	EXPECT_THROW(document.InsertParagraph("Invalid", 5), std::out_of_range);
 }
 
-TEST_F(CommandControllerTests, InsertParagraphViaController)
+TEST_F(CommandControllerTests, InsertsParagraphs)
 {
-	SetupInput("InsertParagraph end First paragraph\nInsertParagraph end Second paragraph\nList\nExit\n");
+	SetupInput("InsertParagraph end First paragraph\n"
+			   "InsertParagraph end Second paragraph\n"
+			   "InsertParagraph 1 Middle paragraph\n"
+			   "InsertParagraph 0 Very first paragraph\n"
+			   "List\n");
 	CommandController controller(input, output);
 
 	controller.Run();
 
-	EXPECT_TRUE(output.str().find("1. Paragraph: First paragraph") != std::string::npos);
-	EXPECT_TRUE(output.str().find("2. Paragraph: Second paragraph") != std::string::npos);
+	EXPECT_EQ("Title: \n"
+			  "1. Paragraph: Very first paragraph\n"
+			  "2. Paragraph: First paragraph\n"
+			  "3. Paragraph: Middle paragraph\n"
+			  "4. Paragraph: Second paragraph\n",
+		output.str());
 }

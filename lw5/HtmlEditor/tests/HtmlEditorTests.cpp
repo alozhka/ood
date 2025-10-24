@@ -77,3 +77,28 @@ TEST_F(CommandControllerTests, InsertsParagraphs)
 			  "4. Paragraph: Second paragraph\n",
 		output.str());
 }
+
+TEST_F(CommandControllerTests, ReplacesParagraph)
+{
+	SetupInput("InsertParagraph end First paragraph\n"
+			   "InsertParagraph end Second paragraph\n"
+			   "List\n");
+	CommandController controller(input, output);
+
+	controller.Run();
+
+	EXPECT_EQ("Title: \n"
+			  "1. Paragraph: First paragraph\n"
+			  "2. Paragraph: Second paragraph\n",
+		output.str());
+
+	output.str("");
+	SetupInput("ReplaceText 2 New paragraph\nList\n");
+
+	controller.Run();
+
+	EXPECT_EQ("Title: \n"
+			  "1. Paragraph: First paragraph\n"
+			  "2. Paragraph: New paragraph\n",
+		output.str());
+}

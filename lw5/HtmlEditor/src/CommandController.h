@@ -4,6 +4,8 @@
 #include "Document/IDocument.h"
 #include "Menu.h"
 
+#include <filesystem>
+
 class CommandController
 {
 public:
@@ -36,6 +38,10 @@ public:
 			"InsertParagraph",
 			"Usage: InsertParagraph <position>|end <text>. Inserts a paragraph.",
 			std::bind_front(&CommandController::InsertParagraph, this));
+		m_menu.AddItem(
+			"ReplaceText",
+			"Usage: ReplaceText <position> <text>. Replaces a paragraph with specified text.",
+			std::bind_front(&CommandController::ReplateText, this));
 	}
 
 	void Run()
@@ -44,7 +50,7 @@ public:
 	}
 
 private:
-	void PrintHelp()
+	void PrintHelp() const
 	{
 		m_menu.ShowInstructions();
 	}
@@ -67,14 +73,7 @@ private:
 
 	void SetTitle(std::istream& input)
 	{
-		std::string begin, end;
-
-		if (input >> begin)
-		{
-			std::getline(input, end);
-		}
-		std::string title = begin + end;
-
+		std::string title = ReadText(input);
 		m_document->SetTitle(title);
 	}
 
@@ -102,18 +101,7 @@ private:
 		{
 			throw std::runtime_error("Position is not specified");
 		}
-
-		std::string begin, end;
-		if (input >> begin)
-		{
-			std::getline(input, end);
-		}
-		std::string text = begin + end;
-
-		if (text.empty())
-		{
-			throw std::runtime_error("Text is not specified");
-		}
+		std::string text = ReadText(input);
 
 		std::optional<size_t> position;
 		if (positionStr != "end")
@@ -129,6 +117,34 @@ private:
 		}
 
 		m_document->InsertParagraph(text, position);
+	}
+
+	void ReplateText(std::istream& input)
+	{
+		size_t position;
+
+		if (!(input >> position))
+		{
+			throw std::runtime_error("Position is not specified");
+		}
+		std::string text = ReadText(input);
+
+		m_document->ReplaceText(text, position);
+	}
+
+	static std::string ReadText(std::istream& input)
+	{
+		std::string begin, end;
+		if (input >> begin)
+		{
+			std::getline(input, end);
+		}
+		std::string text = begin + end;
+		if (text.empty())
+		{
+			throw std::runtime_error("Text is not specified");
+		}
+		return text;
 	}
 
 	std::unique_ptr<IDocument> m_document;

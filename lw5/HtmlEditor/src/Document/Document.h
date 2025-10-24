@@ -1,5 +1,6 @@
 #pragma once
 #include "Command/InsertParagraphCommand.h"
+#include "Command/RenameTextCommand.h"
 #include "DocumentItem.h"
 #include "History.h"
 #include "IDocument.h"
@@ -20,7 +21,8 @@ public:
 
 	void ReplaceText(const std::string& newText, size_t position) override
 	{
-		// TODO: implement
+		auto command = std::make_unique<RenameTextCommand>(m_items, newText, position);
+		m_history.AddAndExecute(std::move(command));
 	}
 
 	void InsertImage(const std::string& path, int width, int height, std::optional<size_t> position) override

@@ -29,7 +29,8 @@ TEST_F(CommandControllerTests, PrintsHelp)
 		"  Save: Usage: Save <path>. Saves the file.\n"
 		"  SetTitle: Usage: SetTitle <title>. Sets the document title.\n"
 		"  List: Shows the document title and items.\n"
-		"  InsertParagraph: Usage: InsertParagraph <position>|end <text>. Inserts a paragraph.\n",
+		"  InsertParagraph: Usage: InsertParagraph <position>|end <text>. Inserts a paragraph.\n"
+		"  ReplaceText: Usage: ReplaceText <position> <text>. Replaces a paragraph with specified text.\n",
 		output.str());
 }
 

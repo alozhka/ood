@@ -13,6 +13,7 @@ add_executable(HtmlEditor main.cpp
         src/Document/IParagraph.h
         src/Document/Paragraph.h
         src/Document/DocumentItem.h
+        src/Document/Command/RenameTextCommand.h
 )
 
 include(FetchContent)

@@ -9,18 +9,15 @@ class History
 public:
 	using ICommandPtr = std::unique_ptr<ICommand>;
 
-	void AddAndExecute(ICommandPtr command)
+	void AddAndExecute(ICommandPtr&& command)
 	{
-		// Удаляем все команды после текущей позиции (если была отмена)
 		if (m_currentCommandIndex < m_commands.size())
 		{
 			m_commands.erase(m_commands.begin() + m_currentCommandIndex, m_commands.end());
 		}
 
-		// Выполняем команду
 		command->Execute();
 
-		// Добавляем команду в историю
 		m_commands.push_back(std::move(command));
 		++m_currentCommandIndex;
 

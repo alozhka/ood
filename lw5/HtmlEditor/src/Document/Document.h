@@ -15,14 +15,28 @@ class Document : public IDocument
 public:
 	void InsertParagraph(const std::string& text, std::optional<size_t> position) override
 	{
-		auto command = std::make_unique<InsertParagraphCommand>(m_items, text, position);
-		m_history.AddAndExecute(std::move(command));
+		auto paragraph = std::make_shared<Paragraph>(text);
+		auto item = std::make_shared<DocumentItem>(paragraph);
+
+		size_t insertPos = position.value_or(m_items.size());
+
+		if (insertPos > m_items.size())
+		{
+			throw std::out_of_range("Invalid position for insertion");
+		}
+
+		m_items.insert(m_items.begin() + insertPos, item);
 	}
 
 	void ReplaceText(const std::string& newText, size_t position) override
 	{
-		auto command = std::make_unique<RenameTextCommand>(m_items, newText, position);
-		m_history.AddAndExecute(std::move(command));
+		if (position >= m_items.size())
+		{
+			throw std::runtime_error("Position out of range");
+		}
+
+		std::shared_ptr<IParagraph> paragraph = m_items[position]->GetParagraph();
+		paragraph->SetText(newText);
 	}
 
 	void InsertImage(const std::string& path, int width, int height, std::optional<size_t> position) override

@@ -1,21 +1,23 @@
 #pragma once
 #include "../DocumentItem.h"
+#include "../IDocument.h"
 #include "../Paragraph.h"
 #include "ICommand.h"
 
 #include <memory>
 #include <optional>
 #include <stdexcept>
+#include <utility>
 #include <vector>
 
 class InsertParagraphCommand : public ICommand
 {
 public:
 	InsertParagraphCommand(
-		std::vector<std::shared_ptr<DocumentItem>>& items,
+		std::shared_ptr<IDocument> document,
 		const std::string& text,
 		std::optional<size_t> position)
-		: m_items(items)
+		: m_document(std::move(document))
 		, m_text(text)
 		, m_position(position)
 	{
@@ -23,34 +25,18 @@ public:
 
 	void Execute() override
 	{
-		auto paragraph = std::make_shared<Paragraph>(m_text);
-		m_item = std::make_shared<DocumentItem>(paragraph);
-
-		size_t insertPos = m_position.value_or(m_items.size());
-
-		if (insertPos > m_items.size())
-		{
-			throw std::out_of_range("Invalid position for insertion");
-		}
-
-		m_actualPosition = insertPos;
-		m_items.insert(m_items.begin() + insertPos, m_item);
+		m_actualPosition = m_position.value_or(m_document->GetItemsCount());
+		m_document->InsertParagraph(m_text, m_position);
 	}
 
 	void Unexecute() override
 	{
-		if (m_actualPosition >= m_items.size())
-		{
-			throw std::logic_error("Cannot unexecute: invalid position");
-		}
-
-		m_items.erase(m_items.begin() + m_actualPosition);
+		m_document->DeleteItem(m_actualPosition);
 	}
 
 private:
-	std::vector<std::shared_ptr<DocumentItem>>& m_items;
+	std::shared_ptr<IDocument> m_document;
 	std::string m_text;
 	std::optional<size_t> m_position;
-	std::shared_ptr<DocumentItem> m_item;
 	size_t m_actualPosition = 0;
 };

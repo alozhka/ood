@@ -10,8 +10,7 @@ class CommandController
 {
 public:
 	explicit CommandController(std::istream& input, std::ostream& output)
-		: m_document{ std::make_unique<Document>() }
-		, m_menu{ input, output }
+		: m_menu{ input, output }
 		, m_output{ output }
 	{
 		m_menu.AddItem(
@@ -108,7 +107,16 @@ private:
 		{
 			try
 			{
-				position = std::stoull(positionStr);
+				size_t userPosition = std::stoull(positionStr);
+				if (userPosition == 0)
+				{
+					throw std::runtime_error("Position must be >= 1");
+				}
+				position = userPosition - 1; // Преобразуем из пользовательской нумерации (1-based) в внутреннюю (0-based)
+			}
+			catch (const std::runtime_error&)
+			{
+				throw;
 			}
 			catch (...)
 			{
@@ -116,20 +124,29 @@ private:
 			}
 		}
 
-		m_document->InsertParagraph(text, position);
+		auto command = std::make_unique<InsertParagraphCommand>(m_document, text, position);
+		m_history.AddAndExecute(std::move(command));
 	}
 
 	void ReplateText(std::istream& input)
 	{
-		size_t position;
+		size_t userPosition;
 
-		if (!(input >> position))
+		if (!(input >> userPosition))
 		{
 			throw std::runtime_error("Position is not specified");
 		}
+
+		if (userPosition == 0)
+		{
+			throw std::runtime_error("Position must be >= 1");
+		}
+
 		std::string text = ReadText(input);
 
-		m_document->ReplaceText(text, position);
+		size_t position = userPosition - 1; // Преобразуем из пользовательской нумерации (1-based) в внутреннюю (0-based)
+		auto command = std::make_unique<RenameTextCommand>(m_document, text, position);
+		m_history.AddAndExecute(std::move(command));
 	}
 
 	static std::string ReadText(std::istream& input)
@@ -147,7 +164,8 @@ private:
 		return text;
 	}
 
-	std::unique_ptr<IDocument> m_document;
+	std::shared_ptr<IDocument> m_document = std::make_shared<Document>();
+	History m_history{};
 	Menu m_menu;
 	std::ostream& m_output;
 };

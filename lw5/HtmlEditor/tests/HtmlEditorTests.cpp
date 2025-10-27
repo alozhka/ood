@@ -64,8 +64,8 @@ TEST_F(CommandControllerTests, InsertsParagraphs)
 {
 	SetupInput("InsertParagraph end First paragraph\n"
 			   "InsertParagraph end Second paragraph\n"
-			   "InsertParagraph 1 Middle paragraph\n"
-			   "InsertParagraph 0 Very first paragraph\n"
+			   "InsertParagraph 2 Middle paragraph\n"
+			   "InsertParagraph 1 Very first paragraph\n"
 			   "List\n");
 	CommandController controller(input, output);
 

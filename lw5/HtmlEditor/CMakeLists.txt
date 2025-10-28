@@ -14,6 +14,7 @@ add_executable(HtmlEditor main.cpp
         src/Document/Paragraph.h
         src/Document/DocumentItem.h
         src/Document/Command/RenameTextCommand.h
+        src/Document/Command/DeleteItemCommand.h
 )
 
 include(FetchContent)

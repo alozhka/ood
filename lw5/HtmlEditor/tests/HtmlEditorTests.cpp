@@ -30,7 +30,8 @@ TEST_F(CommandControllerTests, PrintsHelp)
 		"  SetTitle: Usage: SetTitle <title>. Sets the document title.\n"
 		"  List: Shows the document title and items.\n"
 		"  InsertParagraph: Usage: InsertParagraph <position>|end <text>. Inserts a paragraph.\n"
-		"  ReplaceText: Usage: ReplaceText <position> <text>. Replaces a paragraph with specified text.\n",
+		"  ReplaceText: Usage: ReplaceText <position> <text>. Replaces a paragraph with specified text.\n"
+		"  DeleteItem: Usage: DeleteItem <position>. Deletes the item at specified position.\n",
 		output.str());
 }
 
@@ -102,4 +103,43 @@ TEST_F(CommandControllerTests, ReplacesParagraph)
 			  "1. Paragraph: First paragraph\n"
 			  "2. Paragraph: New paragraph\n",
 		output.str());
+}
+
+TEST_F(CommandControllerTests, DeletesItem)
+{
+	SetupInput("InsertParagraph end First paragraph\n"
+			   "InsertParagraph end Second paragraph\n"
+			   "InsertParagraph end Third paragraph\n"
+			   "List\n");
+	CommandController controller(input, output);
+
+	controller.Run();
+
+	EXPECT_EQ("Title: \n"
+			  "1. Paragraph: First paragraph\n"
+			  "2. Paragraph: Second paragraph\n"
+			  "3. Paragraph: Third paragraph\n",
+		output.str());
+
+	output.str("");
+	SetupInput("DeleteItem 2\nList\n");
+
+	controller.Run();
+
+	EXPECT_EQ("Title: \n"
+			  "1. Paragraph: First paragraph\n"
+			  "2. Paragraph: Third paragraph\n",
+		output.str());
+}
+
+TEST_F(CommandControllerTests, CannotDeleteItemAtInvalidPosition)
+{
+	SetupInput("InsertParagraph end First paragraph\n"
+			   "InsertParagraph end Third paragraph\n"
+			   "DeleteItem 3\n");
+	CommandController controller(input, output);
+
+	controller.Run();
+
+	EXPECT_EQ("Invalid item index\n", output.str());
 }

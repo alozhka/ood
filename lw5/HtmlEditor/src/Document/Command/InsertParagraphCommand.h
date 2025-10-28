@@ -10,14 +10,14 @@
 #include <utility>
 #include <vector>
 
-class InsertParagraphCommand : public ICommand
+class InsertParagraphCommand final : public ICommand
 {
 public:
 	InsertParagraphCommand(
-		std::shared_ptr<IDocument> document,
+		std::shared_ptr<IDocument>& document,
 		const std::string& text,
 		std::optional<size_t> position)
-		: m_document(std::move(document))
+		: m_document(document)
 		, m_text(text)
 		, m_position(position)
 	{

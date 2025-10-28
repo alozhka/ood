@@ -3,7 +3,7 @@
 
 #include "ICommand.h"
 
-class RenameTextCommand : public ICommand
+class RenameTextCommand final : public ICommand
 {
 public:
 	RenameTextCommand(std::shared_ptr<IDocument> document, const std::string& newText, size_t position)

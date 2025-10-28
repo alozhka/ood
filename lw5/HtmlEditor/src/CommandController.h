@@ -1,4 +1,5 @@
 #pragma once
+#include "Document/Command/DeleteItemCommand.h"
 #include "Document/Document.h"
 #include "Document/DocumentItem.h"
 #include "Document/IDocument.h"
@@ -41,6 +42,10 @@ public:
 			"ReplaceText",
 			"Usage: ReplaceText <position> <text>. Replaces a paragraph with specified text.",
 			std::bind_front(&CommandController::ReplateText, this));
+		m_menu.AddItem(
+			"DeleteItem",
+			"Usage: DeleteItem <position>. Deletes the item at specified position.",
+			std::bind_front(&CommandController::DeleteItem, this));
 	}
 
 	void Run()
@@ -110,17 +115,17 @@ private:
 				size_t userPosition = std::stoull(positionStr);
 				if (userPosition == 0)
 				{
-					throw std::runtime_error("Position must be >= 1");
+					throw std::invalid_argument("Position must be >= 1");
 				}
 				position = userPosition - 1; // Преобразуем из пользовательской нумерации (1-based) в внутреннюю (0-based)
 			}
-			catch (const std::runtime_error&)
+			catch (const std::invalid_argument&)
 			{
 				throw;
 			}
 			catch (...)
 			{
-				throw std::runtime_error("Invalid position format");
+				throw std::invalid_argument("Invalid position format");
 			}
 		}
 
@@ -134,18 +139,31 @@ private:
 
 		if (!(input >> userPosition))
 		{
-			throw std::runtime_error("Position is not specified");
+			throw std::invalid_argument("Position is not specified");
 		}
 
 		if (userPosition == 0)
 		{
-			throw std::runtime_error("Position must be >= 1");
+			throw std::invalid_argument("Position must be >= 1");
 		}
 
 		std::string text = ReadText(input);
 
-		size_t position = userPosition - 1; // Преобразуем из пользовательской нумерации (1-based) в внутреннюю (0-based)
+		size_t position = userPosition - 1;
 		auto command = std::make_unique<RenameTextCommand>(m_document, text, position);
+		m_history.AddAndExecute(std::move(command));
+	}
+
+	void DeleteItem(std::istream& input)
+	{
+		size_t position;
+		if (!(input >> position))
+		{
+			throw std::invalid_argument("Position is not spesifiedß");
+		}
+
+		--position;
+		auto command = std::make_unique<DeleteItemCommand>(m_document, position);
 		m_history.AddAndExecute(std::move(command));
 	}
 

@@ -56,16 +56,14 @@ public:
 
 	std::shared_ptr<DocumentItem> GetItem(size_t index) const override
 	{
-		if (index >= m_items.size())
-		{
-			throw std::out_of_range("Invalid item index");
-		}
+		EnsureIndexInRange(index);
 		return m_items[index];
 	}
 
 	void DeleteItem(size_t index) override
 	{
-		// TODO: implement
+		EnsureIndexInRange(index);
+		m_items.erase(m_items.begin() + index);
 	}
 
 	std::string GetTitle() const override
@@ -104,6 +102,14 @@ public:
 	}
 
 private:
+	void EnsureIndexInRange(size_t index) const
+	{
+		if (index >= m_items.size())
+		{
+			throw std::out_of_range("Invalid item index");
+		}
+	}
+
 	std::string m_title{};
 	std::vector<std::shared_ptr<DocumentItem>> m_items;
 	History m_history{};

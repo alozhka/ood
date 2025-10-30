@@ -104,7 +104,7 @@ private:
 			}
 			else if (auto image = item->GetImage())
 			{
-				m_output << "Image: " << image->GetWidth() << " " << image->GetHeight() << " " << image->GetPath() << "\n";
+				m_output << "Image: " << image->GetWidth() << " " << image->GetHeight() << " " << image->GetPath() << std::endl;
 			}
 		}
 	}
@@ -118,27 +118,7 @@ private:
 		}
 		std::string text = ReadText(input);
 
-		std::optional<size_t> position;
-		if (positionStr != "end")
-		{
-			try
-			{
-				size_t userPosition = std::stoull(positionStr);
-				if (userPosition == 0)
-				{
-					throw std::invalid_argument("Position must be >= 1");
-				}
-				position = userPosition - 1; // Преобразуем из пользовательской нумерации (1-based) в внутреннюю (0-based)
-			}
-			catch (const std::invalid_argument&)
-			{
-				throw;
-			}
-			catch (...)
-			{
-				throw std::invalid_argument("Invalid position format");
-			}
-		}
+		std::optional<size_t> position = PositionStringToNumber(positionStr);
 
 		auto command = std::make_unique<InsertParagraphCommand>(m_document, text, position);
 		m_history.AddAndExecute(std::move(command));
@@ -188,8 +168,14 @@ private:
 		{
 			throw std::runtime_error("Not all arguments are specified");
 		}
+		std::optional<size_t> position = PositionStringToNumber(positionStr);
 
-		std::optional<size_t> position;
+		auto command = std::make_unique<InsertImageCommand>(m_document, path, width, height, position);
+		m_history.AddAndExecute(std::move(command));
+	}
+
+	static std::optional<size_t> PositionStringToNumber(const std::string& positionStr)
+	{
 		if (positionStr != "end")
 		{
 			try
@@ -199,7 +185,7 @@ private:
 				{
 					throw std::invalid_argument("Position must be >= 1");
 				}
-				position = userPosition - 1;
+				return userPosition - 1;
 			}
 			catch (const std::invalid_argument&)
 			{
@@ -210,11 +196,8 @@ private:
 				throw std::invalid_argument("Invalid position format");
 			}
 		}
-
-		auto command = std::make_unique<InsertImageCommand>(m_document, path, width, height, position);
-		m_history.AddAndExecute(std::move(command));
+		return std::nullopt;
 	}
-
 	static std::string ReadText(std::istream& input)
 	{
 		std::string begin, end;

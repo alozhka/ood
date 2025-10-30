@@ -21,18 +21,16 @@ public:
 
 	void Execute() override
 	{
-		m_actualPosition = m_position.value_or(m_document->GetItemsCount());
 		m_document->InsertParagraph(m_text, m_position);
 	}
 
 	void Unexecute() override
 	{
-		m_document->DeleteItem(m_actualPosition);
+		m_document->DeleteItem(m_position.value_or(m_document->GetItemsCount()));
 	}
 
 private:
 	std::shared_ptr<IDocument> m_document;
 	std::string m_text;
 	std::optional<size_t> m_position;
-	size_t m_actualPosition = 0;
 };

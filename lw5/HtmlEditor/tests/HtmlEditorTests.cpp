@@ -148,13 +148,13 @@ TEST_F(CommandControllerTests, CannotDeleteItemAtInvalidPosition)
 // InsertImage tests
 TEST_F(CommandControllerTests, InsertsImageAtEnd)
 {
-	SetupInput("InsertImage end 400 300 ../tests/images/test.png\nList\n");
+	SetupInput("InsertImage end 400 300 ../tests/images/test.svg\nList\n");
 	CommandController controller(input, output);
 
 	controller.Run();
 
 	EXPECT_EQ("Title: \n"
-			  "1. Image: 400 300 images/image_1.png\n",
+			  "1. Image: 400 300 images/image_1.svg\n",
 		output.str());
 }
 
@@ -162,7 +162,7 @@ TEST_F(CommandControllerTests, InsertsImageAtPosition)
 {
 	SetupInput("InsertParagraph end First paragraph\n"
 			   "InsertParagraph end Second paragraph\n"
-			   "InsertImage 2 400 300 ../tests/images/test.png\n"
+			   "InsertImage 2 400 300 ../tests/images/test.svg\n"
 			   "List\n");
 	CommandController controller(input, output);
 
@@ -170,14 +170,14 @@ TEST_F(CommandControllerTests, InsertsImageAtPosition)
 
 	EXPECT_EQ("Title: \n"
 			  "1. Paragraph: First paragraph\n"
-			  "2. Image: 400 300 images/image_1.png\n"
+			  "2. Image: 400 300 images/image_1.svg\n"
 			  "3. Paragraph: Second paragraph\n",
 		output.str());
 }
 
 TEST_F(CommandControllerTests, CannotInsertImageAtInvalidPosition)
 {
-	SetupInput("InsertImage 5 400 300 ../tests/images/test.png\n");
+	SetupInput("InsertImage 5 400 300 ../tests/images/test.svg\n");
 	CommandController controller(input, output);
 
 	controller.Run();
@@ -187,7 +187,7 @@ TEST_F(CommandControllerTests, CannotInsertImageAtInvalidPosition)
 
 TEST_F(CommandControllerTests, CannotInsertImageWithInvalidDimensions)
 {
-	SetupInput("InsertImage end 0 300 ../tests/images/test.png\n");
+	SetupInput("InsertImage end 0 300 ../tests/images/test.svg\n");
 	CommandController controller(input, output);
 
 	controller.Run();
@@ -197,7 +197,7 @@ TEST_F(CommandControllerTests, CannotInsertImageWithInvalidDimensions)
 
 TEST_F(CommandControllerTests, CannotInsertImageWithNonexistentFile)
 {
-	SetupInput("InsertImage end 400 300 ../tests/images/nonexistent.png\n");
+	SetupInput("InsertImage end 400 300 ../tests/images/nonexistent.svg\n");
 	CommandController controller(input, output);
 
 	controller.Run();

@@ -33,7 +33,9 @@ TEST_F(CommandControllerTests, PrintsHelp)
 		"  ReplaceText: Usage: ReplaceText <position> <text>. Replaces a paragraph with specified text.\n"
 		"  DeleteItem: Usage: DeleteItem <position>. Deletes the item at specified position.\n"
 		"  InsertImage: Usage: InsertImage <position>|end <width> <height> <path>. Inserts an image.\n"
-		"  ResizeImage: Usage: ResizeImage <position> <width> <height>. Resizes an image.\n",
+		"  ResizeImage: Usage: ResizeImage <position> <width> <height>. Resizes an image.\n"
+		"  Undo: Usage: Undo. Undoes the last command.\n"
+		"  Redo: Usage: Redo. Redoes the previously undone command.\n",
 		output.str());
 }
 
@@ -466,4 +468,57 @@ TEST_F(CommandMergingTests, ImageDoesNotDeleteDuringUndoRedo)
 	EXPECT_FALSE(std::filesystem::exists(imagePath));
 
 	std::filesystem::remove_all("images");
+}
+
+// Tests for Undo/Redo edge cases
+TEST_F(CommandMergingTests, CannotUndoInEmptyDocument)
+{
+	EXPECT_FALSE(document.CanUndo());
+	EXPECT_THROW(document.Undo(), std::logic_error);
+}
+
+TEST_F(CommandMergingTests, CannotRedoInEmptyDocument)
+{
+	EXPECT_FALSE(document.CanRedo());
+	EXPECT_THROW(document.Redo(), std::logic_error);
+}
+
+TEST_F(CommandMergingTests, CannotRedoWithoutUndo)
+{
+	document.SetTitle("Title");
+	document.InsertParagraph("Paragraph", std::nullopt);
+
+	EXPECT_FALSE(document.CanRedo());
+	EXPECT_THROW(document.Redo(), std::logic_error);
+}
+
+TEST_F(CommandMergingTests, CannotUndoAfterAllCommandsUndone)
+{
+	document.SetTitle("Title");
+	document.InsertParagraph("Paragraph", std::nullopt);
+
+	ASSERT_TRUE(document.CanUndo());
+	document.Undo();
+	ASSERT_TRUE(document.CanUndo());
+	document.Undo();
+
+	EXPECT_FALSE(document.CanUndo());
+	EXPECT_THROW(document.Undo(), std::logic_error);
+}
+
+TEST_F(CommandMergingTests, CannotRedoAfterAllCommandsRedone)
+{
+	document.SetTitle("Title");
+	document.InsertParagraph("Paragraph", std::nullopt);
+
+	document.Undo();
+	document.Undo();
+
+	ASSERT_TRUE(document.CanRedo());
+	document.Redo();
+	ASSERT_TRUE(document.CanRedo());
+	document.Redo();
+
+	EXPECT_FALSE(document.CanRedo());
+	EXPECT_THROW(document.Redo(), std::logic_error);
 }

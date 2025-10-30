@@ -52,6 +52,14 @@ public:
 			"ResizeImage",
 			"Usage: ResizeImage <position> <width> <height>. Resizes an image.",
 			std::bind_front(&CommandController::ResizeImage, this));
+		m_menu.AddItem(
+			"Undo",
+			"Usage: Undo. Undoes the last command.",
+			[this](std::istream&) { Undo(); });
+		m_menu.AddItem(
+			"Redo",
+			"Usage: Redo. Redoes the previously undone command.",
+			[this](std::istream&) { Redo(); });
 	}
 
 	void Run()
@@ -179,6 +187,24 @@ private:
 		--position;
 
 		m_document->ResizeImage(width, height, position);
+	}
+
+	void Undo()
+	{
+		if (!m_document->CanUndo())
+		{
+			throw std::logic_error("Cannot undo");
+		}
+		m_document->Undo();
+	}
+
+	void Redo()
+	{
+		if (!m_document->CanRedo())
+		{
+			throw std::logic_error("Cannot redo");
+		}
+		m_document->Redo();
 	}
 
 	static std::optional<size_t> PositionStringToNumber(const std::string& positionStr)

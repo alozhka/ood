@@ -20,13 +20,13 @@ public:
 	}
 
 	// Возвращает указатель на параграф, либо nullptr, если элемент не является параграфом
-	std::shared_ptr<IParagraph> GetParagraph() const
+	std::shared_ptr<IParagraph> GetParagraph()
 	{
 		return m_paragraph;
 	}
 
 	// Возвращает указатель на изображение, либо nullptr, если элемент не является изображением
-	std::shared_ptr<IImage> GetImage() const
+	std::shared_ptr<IImage> GetImage()
 	{
 		return m_image;
 	}

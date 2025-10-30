@@ -217,3 +217,13 @@ TEST_F(CommandControllerTests, ResisesImage)
 			  "1. Image: 200 250 images/image_1.svg\n",
 		output.str());
 }
+
+TEST_F(CommandControllerTests, CannotResizeImageAtInvalidIndex)
+{
+	SetupInput("ResizeImage 1 200 250\n");
+	CommandController controller(input, output);
+
+	controller.Run();
+
+	EXPECT_EQ("Invalid item index\n", output.str());
+}

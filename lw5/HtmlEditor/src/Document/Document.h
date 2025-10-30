@@ -20,21 +20,14 @@ public:
 		auto item = std::make_shared<DocumentItem>(paragraph);
 
 		size_t insertPos = position.value_or(m_items.size());
-
-		if (insertPos > m_items.size())
-		{
-			throw std::out_of_range("Invalid position for insertion");
-		}
+		EnsurePositionValidForInsertion(insertPos);
 
 		m_items.insert(m_items.begin() + insertPos, item);
 	}
 
 	void ReplaceText(const std::string& newText, size_t position) override
 	{
-		if (position >= m_items.size())
-		{
-			throw std::runtime_error("Position out of range");
-		}
+		EnsureIndexInRange(position);
 
 		std::shared_ptr<IParagraph> paragraph = m_items[position]->GetParagraph();
 		paragraph->SetText(newText);
@@ -49,11 +42,7 @@ public:
 		}
 
 		size_t insertPos = position.value_or(m_items.size());
-
-		if (insertPos > m_items.size())
-		{
-			throw std::out_of_range("Invalid position for insertion");
-		}
+		EnsurePositionValidForInsertion(insertPos);
 
 		// Создаём каталог images, если его нет
 		std::filesystem::create_directories("images");
@@ -143,6 +132,14 @@ private:
 		if (index >= m_items.size())
 		{
 			throw std::out_of_range("Invalid item index");
+		}
+	}
+
+	void EnsurePositionValidForInsertion(size_t position) const
+	{
+		if (position > m_items.size())
+		{
+			throw std::out_of_range("Invalid position for insertion");
 		}
 	}
 

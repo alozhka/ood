@@ -3,6 +3,7 @@
 #include "Document/Command/InsertImageCommand.h"
 #include "Document/Command/InsertParagraphCommand.h"
 #include "Document/Command/RenameTextCommand.h"
+#include "Document/Command/ResizeImageCommand.h"
 #include "Document/Document.h"
 #include "Document/DocumentItem.h"
 #include "Document/History.h"
@@ -54,6 +55,10 @@ public:
 			"InsertImage",
 			"Usage: InsertImage <position>|end <width> <height> <path>. Inserts an image.",
 			std::bind_front(&CommandController::InsertImage, this));
+		m_menu.AddItem(
+			"ResizeImage",
+			"Usage: ResizeImage <position> <width> <height>. Resizes an image.",
+			std::bind_front(&CommandController::ResizeImage, this));
 	}
 
 	void Run()
@@ -171,6 +176,20 @@ private:
 		std::optional<size_t> position = PositionStringToNumber(positionStr);
 
 		auto command = std::make_unique<InsertImageCommand>(m_document, path, width, height, position);
+		m_history.AddAndExecute(std::move(command));
+	}
+
+	void ResizeImage(std::istream& input)
+	{
+		size_t position;
+		int width, height;
+		if (!(input >> position >> width >> height))
+		{
+			throw std::runtime_error("Not all arguments are specified");
+		}
+		--position;
+
+		auto command = std::make_unique<ResizeImageCommand>(m_document, position, width, height);
 		m_history.AddAndExecute(std::move(command));
 	}
 

@@ -32,7 +32,8 @@ TEST_F(CommandControllerTests, PrintsHelp)
 		"  InsertParagraph: Usage: InsertParagraph <position>|end <text>. Inserts a paragraph.\n"
 		"  ReplaceText: Usage: ReplaceText <position> <text>. Replaces a paragraph with specified text.\n"
 		"  DeleteItem: Usage: DeleteItem <position>. Deletes the item at specified position.\n"
-		"  InsertImage: Usage: InsertImage <position>|end <width> <height> <path>. Inserts an image.\n",
+		"  InsertImage: Usage: InsertImage <position>|end <width> <height> <path>. Inserts an image.\n"
+		"  ResizeImage: Usage: ResizeImage <position> <width> <height>. Resizes an image.\n",
 		output.str());
 }
 
@@ -203,4 +204,16 @@ TEST_F(CommandControllerTests, CannotInsertImageWithNonexistentFile)
 	controller.Run();
 
 	EXPECT_EQ("Image file not found\n", output.str());
+}
+
+TEST_F(CommandControllerTests, ResisesImage)
+{
+	SetupInput("InsertImage end 400 300 ../tests/images/test.svg\nResizeImage 1 200 250\nList\n");
+	CommandController controller(input, output);
+
+	controller.Run();
+
+	EXPECT_EQ("Title: \n"
+			  "1. Image: 200 250 images/image_1.svg\n",
+		output.str());
 }

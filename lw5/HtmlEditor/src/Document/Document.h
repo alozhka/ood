@@ -74,7 +74,15 @@ public:
 
 	void ResizeImage(int width, int height, size_t position) override
 	{
-		// TODO: implement
+		EnsureIndexInRange(position);
+		std::shared_ptr<DocumentItem> item = GetItem(position);
+		std::shared_ptr<IImage> image = item->GetImage();
+		if (!image)
+		{
+			throw std::runtime_error("Item is not an image");
+		}
+
+		image->Resize(width, height);
 	}
 
 	size_t GetItemsCount() const override

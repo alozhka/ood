@@ -123,7 +123,40 @@ public:
 
 	void Save(const std::string& path) override
 	{
-		// TODO: implement
+		std::ofstream file(path);
+		if (!file.is_open())
+		{
+			throw std::runtime_error("Cannot open file for writing");
+		}
+
+		// Записываем HTML структуру
+		file << "<!DOCTYPE html>\n";
+		file << "<html>\n";
+		file << "<head>\n";
+		file << "<title>" << HtmlEscape(m_title) << "</title>\n";
+		file << "</head>\n";
+		file << "<body>\n";
+
+		// Записываем элементы документа
+		for (const auto& item : m_items)
+		{
+			if (auto paragraph = item->GetParagraph())
+			{
+				file << "<p>" << HtmlEscape(paragraph->GetText()) << "</p>\n";
+			}
+			else if (auto image = item->GetImage())
+			{
+				file << "<img src=\"" << HtmlEscape(image->GetPath())
+					 << "\" width=\"" << image->GetWidth()
+					 << "\" height=\"" << image->GetHeight()
+					 << "\" />\n";
+			}
+		}
+
+		file << "</body>\n";
+		file << "</html>\n";
+
+		file.close();
 	}
 
 private:
@@ -141,6 +174,39 @@ private:
 		{
 			throw std::out_of_range("Invalid position for insertion");
 		}
+	}
+
+	std::string HtmlEscape(const std::string& text) const
+	{
+		std::string result;
+		result.reserve(text.size());
+
+		for (char ch : text)
+		{
+			switch (ch)
+			{
+			case '<':
+				result += "&lt;";
+				break;
+			case '>':
+				result += "&gt;";
+				break;
+			case '&':
+				result += "&amp;";
+				break;
+			case '"':
+				result += "&quot;";
+				break;
+			case '\'':
+				result += "&apos;";
+				break;
+			default:
+				result += ch;
+				break;
+			}
+		}
+
+		return result;
 	}
 
 	std::string m_title{};

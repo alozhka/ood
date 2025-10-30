@@ -227,3 +227,48 @@ TEST_F(CommandControllerTests, CannotResizeImageAtInvalidIndex)
 
 	EXPECT_EQ("Invalid item index\n", output.str());
 }
+
+TEST_F(CommandControllerTests, SavesDocumentInHtml)
+{
+	SetupInput("SetTitle Document with <special> & \"characters\"\n"
+			   "InsertParagraph end First paragraph\n"
+			   "InsertImage end 400 300 ../tests/images/test.svg\n"
+			   "InsertParagraph end Text with <tags> & \"quotes\" and 'apostrophes'\n"
+			   "InsertImage end 640 480 ../tests/images/test.svg\n"
+			   "InsertParagraph end Last paragraph\n"
+			   "Save test_document.html\n");
+	CommandController controller(input, output);
+
+	controller.Run();
+
+	// Проверяем, что файл создан
+	ASSERT_TRUE(std::filesystem::exists("test_document.html"));
+
+	// Читаем содержимое файла
+	std::ifstream file("test_document.html");
+	std::stringstream buffer;
+	buffer << file.rdbuf();
+	std::string content = buffer.str();
+
+	// Ожидаемый HTML
+	std::string expectedHtml =
+		"<!DOCTYPE html>\n"
+		"<html>\n"
+		"<head>\n"
+		"<title>Document with &lt;special&gt; &amp; &quot;characters&quot;</title>\n"
+		"</head>\n"
+		"<body>\n"
+		"<p>First paragraph</p>\n"
+		"<img src=\"images/image_1.svg\" width=\"400\" height=\"300\" />\n"
+		"<p>Text with &lt;tags&gt; &amp; &quot;quotes&quot; and &apos;apostrophes&apos;</p>\n"
+		"<img src=\"images/image_2.svg\" width=\"640\" height=\"480\" />\n"
+		"<p>Last paragraph</p>\n"
+		"</body>\n"
+		"</html>\n";
+
+	EXPECT_EQ(expectedHtml, content);
+
+	// Удаляем тестовый файл
+	std::filesystem::remove("test_document.html");
+	std::filesystem::remove_all("images");
+}

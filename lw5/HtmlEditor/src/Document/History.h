@@ -21,7 +21,6 @@ public:
 			auto& lastCommand = m_commands[m_currentCommandIndex - 1];
 			if (lastCommand->TryMerge(command.get()))
 			{
-				// Склеивание успешно - выполняем только новую команду
 				command->Execute();
 				return;
 			}
@@ -32,8 +31,6 @@ public:
 		m_commands.push_back(std::move(command));
 		++m_currentCommandIndex;
 
-		// Ограничиваем размер истории до 10 команд
-		constexpr size_t MAX_HISTORY_SIZE = 10;
 		if (m_commands.size() > MAX_HISTORY_SIZE)
 		{
 			m_commands.pop_front();
@@ -74,6 +71,8 @@ public:
 	}
 
 private:
+	constexpr static size_t MAX_HISTORY_SIZE = 10;
+
 	std::deque<ICommandPtr> m_commands;
 	size_t m_currentCommandIndex = 0;
 };

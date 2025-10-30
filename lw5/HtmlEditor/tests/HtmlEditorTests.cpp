@@ -413,3 +413,42 @@ TEST_F(CommandMergingTests, DoesNotMergeResizeImageForDifferentImages)
 
 	std::filesystem::remove_all("images");
 }
+
+// Tests for history branch deletion after undo
+TEST_F(CommandMergingTests, NewCommandAfterUndoDeletesRedoBranch)
+{
+	// Выполняем команды A, B, C
+	document.SetTitle("Title A");
+	document.InsertParagraph("Paragraph A", std::nullopt);
+	document.SetTitle("Title B");
+	document.SetTitle("Title C");
+
+	EXPECT_EQ("Title C", document.GetTitle());
+	EXPECT_EQ(1, document.GetItemsCount());
+
+	ASSERT_TRUE(document.CanUndo());
+	document.Undo();
+	EXPECT_EQ("Title A", document.GetTitle());
+	EXPECT_EQ(1, document.GetItemsCount());
+
+	ASSERT_TRUE(document.CanRedo());
+	document.Redo();
+	EXPECT_EQ("Title C", document.GetTitle());
+
+	EXPECT_TRUE(document.CanUndo());
+	document.Undo();
+	EXPECT_EQ("Title A", document.GetTitle());
+	EXPECT_EQ(1, document.GetItemsCount());
+
+	document.InsertParagraph("Paragraph B", std::nullopt);
+	EXPECT_EQ("Title A", document.GetTitle());
+	EXPECT_EQ(2, document.GetItemsCount());
+	
+	document.Undo();
+	EXPECT_EQ("Title A", document.GetTitle());
+	EXPECT_EQ(1, document.GetItemsCount());
+	
+	document.Undo();
+	EXPECT_EQ("Title A", document.GetTitle());
+	EXPECT_EQ(0, document.GetItemsCount());
+}

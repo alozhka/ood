@@ -522,3 +522,23 @@ TEST_F(CommandMergingTests, CannotRedoAfterAllCommandsRedone)
 	EXPECT_FALSE(document.CanRedo());
 	EXPECT_THROW(document.Redo(), std::logic_error);
 }
+
+TEST_F(CommandControllerTests, CannotUndoWhenNoCommandsToUndo)
+{
+	SetupInput("SetTitle Title\nInsertParagraph end Paragraph\nUndo\nUndo\nUndo\n");
+	CommandController controller(input, output);
+
+	controller.Run();
+
+	EXPECT_EQ("Cannot undo\n", output.str());
+}
+
+TEST_F(CommandControllerTests, CannotRedoWhenNoCommandsToRedo)
+{
+	SetupInput("SetTitle Title\nInsertParagraph end Paragraph\nUndo\nUndo\nRedo\nRedo\nRedo\n");
+	CommandController controller(input, output);
+
+	controller.Run();
+
+	EXPECT_EQ("Cannot redo\n", output.str());
+}

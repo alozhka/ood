@@ -31,7 +31,8 @@ TEST_F(CommandControllerTests, PrintsHelp)
 		"  List: Shows the document title and items.\n"
 		"  InsertParagraph: Usage: InsertParagraph <position>|end <text>. Inserts a paragraph.\n"
 		"  ReplaceText: Usage: ReplaceText <position> <text>. Replaces a paragraph with specified text.\n"
-		"  DeleteItem: Usage: DeleteItem <position>. Deletes the item at specified position.\n",
+		"  DeleteItem: Usage: DeleteItem <position>. Deletes the item at specified position.\n"
+		"  InsertImage: Usage: InsertImage <position>|end <width> <height> <path>. Inserts an image.\n",
 		output.str());
 }
 
@@ -142,4 +143,64 @@ TEST_F(CommandControllerTests, CannotDeleteItemAtInvalidPosition)
 	controller.Run();
 
 	EXPECT_EQ("Invalid item index\n", output.str());
+}
+
+// InsertImage tests
+TEST_F(CommandControllerTests, InsertsImageAtEnd)
+{
+	SetupInput("InsertImage end 400 300 ../tests/images/test.png\nList\n");
+	CommandController controller(input, output);
+
+	controller.Run();
+
+	EXPECT_EQ("Title: \n"
+			  "1. Image: 400 300 images/image_1.png\n",
+		output.str());
+}
+
+TEST_F(CommandControllerTests, InsertsImageAtPosition)
+{
+	SetupInput("InsertParagraph end First paragraph\n"
+			   "InsertParagraph end Second paragraph\n"
+			   "InsertImage 2 400 300 ../tests/images/test.png\n"
+			   "List\n");
+	CommandController controller(input, output);
+
+	controller.Run();
+
+	EXPECT_EQ("Title: \n"
+			  "1. Paragraph: First paragraph\n"
+			  "2. Image: 400 300 images/image_1.png\n"
+			  "3. Paragraph: Second paragraph\n",
+		output.str());
+}
+
+TEST_F(CommandControllerTests, CannotInsertImageAtInvalidPosition)
+{
+	SetupInput("InsertImage 5 400 300 ../tests/images/test.png\n");
+	CommandController controller(input, output);
+
+	controller.Run();
+
+	EXPECT_EQ("Invalid position for insertion\n", output.str());
+}
+
+TEST_F(CommandControllerTests, CannotInsertImageWithInvalidDimensions)
+{
+	SetupInput("InsertImage end 0 300 ../tests/images/test.png\n");
+	CommandController controller(input, output);
+
+	controller.Run();
+
+	EXPECT_EQ("Invalid image dimensions (must be 1-10000)\n", output.str());
+}
+
+TEST_F(CommandControllerTests, CannotInsertImageWithNonexistentFile)
+{
+	SetupInput("InsertImage end 400 300 ../tests/images/nonexistent.png\n");
+	CommandController controller(input, output);
+
+	controller.Run();
+
+	EXPECT_EQ("Image file not found\n", output.str());
 }

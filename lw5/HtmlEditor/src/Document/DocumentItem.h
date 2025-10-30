@@ -1,4 +1,5 @@
 #pragma once
+#include "IImage.h"
 #include "IParagraph.h"
 #include <memory>
 
@@ -13,16 +14,24 @@ public:
 	{
 	}
 
+	explicit DocumentItem(std::shared_ptr<IImage> image)
+		: m_image(std::move(image))
+	{
+	}
+
 	// Возвращает указатель на параграф, либо nullptr, если элемент не является параграфом
 	std::shared_ptr<IParagraph> GetParagraph() const
 	{
 		return m_paragraph;
 	}
 
-	// TODO: добавить поддержку изображений
-	// std::shared_ptr<IImage> GetImage() const;
+	// Возвращает указатель на изображение, либо nullptr, если элемент не является изображением
+	std::shared_ptr<IImage> GetImage() const
+	{
+		return m_image;
+	}
 
 private:
 	std::shared_ptr<IParagraph> m_paragraph;
-	// TODO: std::shared_ptr<IImage> m_image;
+	std::shared_ptr<IImage> m_image;
 };

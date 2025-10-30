@@ -4,17 +4,21 @@
 
 #include <memory>
 #include <optional>
-#include <vector>
+#include <string>
 
-class InsertParagraphCommand final : public ICommand
+class InsertImageCommand final : public ICommand
 {
 public:
-	InsertParagraphCommand(
+	InsertImageCommand(
 		std::shared_ptr<IDocument>& document,
-		const std::string& text,
+		const std::string& path,
+		int width,
+		int height,
 		std::optional<size_t> position)
 		: m_document(document)
-		, m_text(text)
+		, m_path(path)
+		, m_width(width)
+		, m_height(height)
 		, m_position(position)
 	{
 	}
@@ -22,7 +26,7 @@ public:
 	void Execute() override
 	{
 		m_actualPosition = m_position.value_or(m_document->GetItemsCount());
-		m_document->InsertParagraph(m_text, m_position);
+		m_document->InsertImage(m_path, m_width, m_height, m_position);
 	}
 
 	void Unexecute() override
@@ -32,7 +36,9 @@ public:
 
 private:
 	std::shared_ptr<IDocument> m_document;
-	std::string m_text;
+	std::string m_path;
+	int m_width;
+	int m_height;
 	std::optional<size_t> m_position;
 	size_t m_actualPosition = 0;
 };

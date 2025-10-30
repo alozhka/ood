@@ -1,10 +1,11 @@
 #pragma once
-#include "Command/InsertParagraphCommand.h"
-#include "Command/RenameTextCommand.h"
 #include "DocumentItem.h"
-#include "History.h"
 #include "IDocument.h"
+#include "Image.h"
+#include "Paragraph.h"
 
+#include <filesystem>
+#include <fstream>
 #include <memory>
 #include <stdexcept>
 #include <string>
@@ -41,7 +42,34 @@ public:
 
 	void InsertImage(const std::string& path, int width, int height, std::optional<size_t> position) override
 	{
-		// TODO: implement
+		// Проверяем существование файла
+		if (!std::filesystem::exists(path))
+		{
+			throw std::runtime_error("Image file not found");
+		}
+
+		size_t insertPos = position.value_or(m_items.size());
+
+		if (insertPos > m_items.size())
+		{
+			throw std::out_of_range("Invalid position for insertion");
+		}
+
+		// Создаём каталог images, если его нет
+		std::filesystem::create_directories("images");
+
+		// Генерируем имя для изображения
+		std::string extension = std::filesystem::path(path).extension().string();
+		std::string newImageName = "image_" + std::to_string(++m_imageCounter) + extension;
+		std::string newImagePath = "images/" + newImageName;
+
+		// Копируем файл
+		std::filesystem::copy_file(path, newImagePath, std::filesystem::copy_options::overwrite_existing);
+
+		auto image = std::make_shared<Image>(newImagePath, width, height);
+		auto item = std::make_shared<DocumentItem>(image);
+
+		m_items.insert(m_items.begin() + insertPos, item);
 	}
 
 	void ResizeImage(int width, int height, size_t position) override
@@ -112,5 +140,5 @@ private:
 
 	std::string m_title{};
 	std::vector<std::shared_ptr<DocumentItem>> m_items;
-	History m_history{};
+	size_t m_imageCounter = 0;
 };

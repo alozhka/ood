@@ -12,6 +12,7 @@ public:
 		, m_position(position)
 	{
 	}
+
 	void Execute() override
 	{
 		m_oldText = m_document->GetItem(m_position)->GetParagraph()->GetText();

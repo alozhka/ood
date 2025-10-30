@@ -272,3 +272,144 @@ TEST_F(CommandControllerTests, SavesDocumentInHtml)
 	std::filesystem::remove("test_document.html");
 	std::filesystem::remove_all("images");
 }
+
+class CommandMergingTests : public testing::Test
+{
+protected:
+	Document document;
+};
+
+TEST_F(CommandMergingTests, MergesConsecutiveSetTitleCommands)
+{
+	document.SetTitle("First Title");
+	document.SetTitle("Second Title");
+	document.SetTitle("Third Title");
+
+	EXPECT_EQ("Third Title", document.GetTitle());
+
+	ASSERT_TRUE(document.CanUndo());
+	document.Undo();
+
+	EXPECT_EQ("", document.GetTitle());
+}
+
+TEST_F(CommandMergingTests, DoesNotMergeSetTitleWhenOtherCommandInBetween)
+{
+	document.SetTitle("First Title");
+	document.InsertParagraph("Some text", std::nullopt);
+	document.SetTitle("Second Title");
+
+	EXPECT_EQ("Second Title", document.GetTitle());
+
+	// Отмена SetTitle
+	ASSERT_TRUE(document.CanUndo());
+	document.Undo();
+	EXPECT_EQ("First Title", document.GetTitle());
+
+	// Отмена InsertParagraph
+	ASSERT_TRUE(document.CanUndo());
+	document.Undo();
+	EXPECT_EQ(0, document.GetItemsCount());
+
+	// Отмена SetTitle
+	ASSERT_TRUE(document.CanUndo());
+	document.Undo();
+	EXPECT_EQ("", document.GetTitle());
+}
+
+TEST_F(CommandMergingTests, ReplaceTextCommandMerges)
+{
+	document.InsertParagraph("Initial text", std::nullopt);
+
+	document.ReplaceText("First change", 0);
+	document.ReplaceText("Second change", 0);
+	document.ReplaceText("Third change", 0);
+
+	auto item = document.GetItem(0);
+	EXPECT_EQ("Third change", item->GetParagraph()->GetText());
+
+	ASSERT_TRUE(document.CanUndo());
+	document.Undo();
+
+	item = document.GetItem(0);
+	EXPECT_EQ("Initial text", item->GetParagraph()->GetText());
+}
+
+TEST_F(CommandMergingTests, DoesNotMergeForDifferentItems)
+{
+	document.InsertParagraph("First paragraph", std::nullopt);
+	document.InsertParagraph("Second paragraph", std::nullopt);
+
+	document.ReplaceText("Changed first", 0);
+	document.ReplaceText("Changed second", 1);
+
+	auto item0 = document.GetItem(0);
+	auto item1 = document.GetItem(1);
+	EXPECT_EQ("Changed first", item0->GetParagraph()->GetText());
+	EXPECT_EQ("Changed second", item1->GetParagraph()->GetText());
+
+	// Отменяем изменение второго параграфа
+	ASSERT_TRUE(document.CanUndo());
+	document.Undo();
+	item1 = document.GetItem(1);
+	EXPECT_EQ("Second paragraph", item1->GetParagraph()->GetText());
+
+	// Отменяем изменение первого параграфа
+	ASSERT_TRUE(document.CanUndo());
+	document.Undo();
+	item0 = document.GetItem(0);
+	EXPECT_EQ("First paragraph", item0->GetParagraph()->GetText());
+}
+
+
+// ResizeImage merging tests
+TEST_F(CommandMergingTests, MergesConsecutiveResizeImageCommandsForSameImage)
+{
+	document.InsertImage("../tests/images/test.svg", 100, 100, std::nullopt);
+
+	document.ResizeImage(200, 150, 0);
+	document.ResizeImage(300, 250, 0);
+	document.ResizeImage(400, 300, 0);
+
+	auto item = document.GetItem(0);
+	auto image = item->GetImage();
+	EXPECT_EQ(400, image->GetWidth());
+	EXPECT_EQ(300, image->GetHeight());
+
+	// После отмены должны вернуться к начальному размеру
+	ASSERT_TRUE(document.CanUndo());
+	document.Undo();
+
+	image = item->GetImage();
+	EXPECT_EQ(100, image->GetWidth());
+	EXPECT_EQ(100, image->GetHeight());
+
+	// Удаляем созданные файлы
+	std::filesystem::remove_all("images");
+}
+
+TEST_F(CommandMergingTests, DoesNotMergeResizeImageForDifferentImages)
+{
+	document.InsertImage("../tests/images/test.svg", 100, 100, std::nullopt);
+	document.InsertImage("../tests/images/test.svg", 200, 200, std::nullopt);
+
+	document.ResizeImage(150, 150, 0);
+	document.ResizeImage(250, 250, 1);
+
+	auto item0 = document.GetItem(0);
+	auto item1 = document.GetItem(1);
+	EXPECT_EQ(150, item0->GetImage()->GetWidth());
+	EXPECT_EQ(250, item1->GetImage()->GetWidth());
+
+	ASSERT_TRUE(document.CanUndo());
+	document.Undo();
+	item1 = document.GetItem(1);
+	EXPECT_EQ(200, item1->GetImage()->GetWidth());
+
+	ASSERT_TRUE(document.CanUndo());
+	document.Undo();
+	item0 = document.GetItem(0);
+	EXPECT_EQ(100, item0->GetImage()->GetWidth());
+
+	std::filesystem::remove_all("images");
+}

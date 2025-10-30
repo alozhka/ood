@@ -68,6 +68,11 @@ public:
 		--m_imageCounter;
 	}
 
+	bool TryMerge(const ICommand* other) override
+	{
+		return false;
+	}
+
 private:
 	std::vector<std::shared_ptr<DocumentItem>>& m_items;
 	size_t& m_imageCounter;

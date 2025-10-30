@@ -27,6 +27,11 @@ public:
 		m_items.insert(m_items.begin() + m_position, m_deletedItem);
 	}
 
+	bool TryMerge(const ICommand* other) override
+	{
+		return false;
+	}
+
 private:
 	std::vector<std::shared_ptr<DocumentItem>>& m_items;
 	size_t m_position;

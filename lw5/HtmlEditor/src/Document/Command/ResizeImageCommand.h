@@ -39,6 +39,18 @@ public:
 		image->Resize(m_oldWidth, m_oldHeight);
 	}
 
+	bool TryMerge(const ICommand* other) override
+	{
+		auto otherResize = dynamic_cast<const ResizeImageCommand*>(other);
+		if (otherResize && otherResize->m_position == m_position)
+		{
+			m_width = otherResize->m_width;
+			m_height = otherResize->m_height;
+			return true;
+		}
+		return false;
+	}
+
 private:
 	std::vector<std::shared_ptr<DocumentItem>>& m_items;
 	size_t m_position;

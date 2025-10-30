@@ -37,6 +37,11 @@ public:
 		m_items.erase(m_items.begin() + m_actualPosition);
 	}
 
+	bool TryMerge(const ICommand* other) override
+	{
+		return false;
+	}
+
 private:
 	std::vector<std::shared_ptr<DocumentItem>>& m_items;
 	std::string m_text;

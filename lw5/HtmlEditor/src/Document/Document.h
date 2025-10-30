@@ -9,6 +9,7 @@
 #include "Command/DeleteItemCommand.h"
 #include "Command/RenameTextCommand.h"
 #include "Command/ResizeImageCommand.h"
+#include "Command/SetTitleCommand.h"
 
 #include <filesystem>
 #include <fstream>
@@ -80,7 +81,8 @@ public:
 
 	void SetTitle(const std::string& title) override
 	{
-		m_title = title;
+		auto command = std::make_unique<SetTitleCommand>(m_title, title);
+		m_history.AddAndExecute(std::move(command));
 	}
 
 	bool CanUndo() const override

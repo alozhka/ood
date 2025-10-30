@@ -35,6 +35,17 @@ public:
 		paragraph->SetText(m_oldText);
 	}
 
+	bool TryMerge(const ICommand* other) override
+	{
+		auto otherRename = dynamic_cast<const RenameTextCommand*>(other);
+		if (otherRename && otherRename->m_position == m_position)
+		{
+			m_newText = otherRename->m_newText;
+			return true;
+		}
+		return false;
+	}
+
 private:
 	std::vector<std::shared_ptr<DocumentItem>>& m_items;
 	std::string m_oldText{};

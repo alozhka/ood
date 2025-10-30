@@ -16,6 +16,17 @@ public:
 			m_commands.erase(m_commands.begin() + m_currentCommandIndex, m_commands.end());
 		}
 
+		if (m_currentCommandIndex > 0 && m_currentCommandIndex == m_commands.size())
+		{
+			auto& lastCommand = m_commands[m_currentCommandIndex - 1];
+			if (lastCommand->TryMerge(command.get()))
+			{
+				// Склеивание успешно - выполняем только новую команду
+				command->Execute();
+				return;
+			}
+		}
+
 		command->Execute();
 
 		m_commands.push_back(std::move(command));

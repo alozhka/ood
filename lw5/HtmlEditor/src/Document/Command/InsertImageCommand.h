@@ -30,21 +30,27 @@ public:
 
 	void Execute() override
 	{
-		// Проверяем существование файла
+		if (m_isMarkedForDeletion)
+		{
+			auto image = std::make_shared<Image>(m_imagePath, m_width, m_height);
+			auto item = std::make_shared<DocumentItem>(image);
+			m_items.insert(m_items.begin() + m_actualPosition, item);
+			m_isMarkedForDeletion = false;
+			++m_imageCounter;
+			return;
+		}
+
 		if (!std::filesystem::exists(m_sourcePath))
 		{
 			throw std::runtime_error("Image file not found");
 		}
 
-		// Создаём каталог images, если его нет
 		std::filesystem::create_directories("images");
 
-		// Генерируем имя для изображения
 		std::string extension = std::filesystem::path(m_sourcePath).extension().string();
 		std::string newImageName = "image_" + std::to_string(++m_imageCounter) + extension;
 		m_imagePath = "images/" + newImageName;
 
-		// Копируем файл
 		std::filesystem::copy_file(m_sourcePath, m_imagePath, std::filesystem::copy_options::overwrite_existing);
 
 		auto image = std::make_shared<Image>(m_imagePath, m_width, m_height);
@@ -53,24 +59,28 @@ public:
 		size_t insertPos = m_position.value_or(m_items.size());
 		m_items.insert(m_items.begin() + insertPos, item);
 
-		// Сохраняем фактическую позицию вставки для отмены
 		m_actualPosition = insertPos;
 	}
 
 	void Unexecute() override
 	{
 		m_items.erase(m_items.begin() + m_actualPosition);
-		// Удаляем скопированный файл
-		if (std::filesystem::exists(m_imagePath))
-		{
-			std::filesystem::remove(m_imagePath);
-		}
+		// Помечаем файл для удаления вместо немедленного удаления
+		m_isMarkedForDeletion = true;
 		--m_imageCounter;
 	}
 
 	bool TryMerge(const ICommand* other) override
 	{
 		return false;
+	}
+
+	~InsertImageCommand() override
+	{
+		if (m_isMarkedForDeletion && std::filesystem::exists(m_imagePath))
+		{
+			std::filesystem::remove(m_imagePath);
+		}
 	}
 
 private:
@@ -82,4 +92,5 @@ private:
 	int m_height;
 	std::optional<size_t> m_position;
 	size_t m_actualPosition = 0;
+	bool m_isMarkedForDeletion = false;
 };

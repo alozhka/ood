@@ -3,6 +3,12 @@
 #include "IDocument.h"
 #include "Image.h"
 #include "Paragraph.h"
+#include "History.h"
+#include "Command/InsertParagraphCommand.h"
+#include "Command/InsertImageCommand.h"
+#include "Command/DeleteItemCommand.h"
+#include "Command/RenameTextCommand.h"
+#include "Command/ResizeImageCommand.h"
 
 #include <filesystem>
 #include <fstream>
@@ -16,62 +22,36 @@ class Document : public IDocument
 public:
 	void InsertParagraph(const std::string& text, std::optional<size_t> position) override
 	{
-		auto paragraph = std::make_shared<Paragraph>(text);
-		auto item = std::make_shared<DocumentItem>(paragraph);
-
 		size_t insertPos = position.value_or(m_items.size());
 		EnsurePositionValidForInsertion(insertPos);
 
-		m_items.insert(m_items.begin() + insertPos, item);
+		auto command = std::make_unique<InsertParagraphCommand>(m_items, text, position);
+		m_history.AddAndExecute(std::move(command));
 	}
 
 	void ReplaceText(const std::string& newText, size_t position) override
 	{
 		EnsureIndexInRange(position);
 
-		std::shared_ptr<IParagraph> paragraph = m_items[position]->GetParagraph();
-		paragraph->SetText(newText);
+		auto command = std::make_unique<RenameTextCommand>(m_items, newText, position);
+		m_history.AddAndExecute(std::move(command));
 	}
 
 	void InsertImage(const std::string& path, int width, int height, std::optional<size_t> position) override
 	{
-		// Проверяем существование файла
-		if (!std::filesystem::exists(path))
-		{
-			throw std::runtime_error("Image file not found");
-		}
-
 		size_t insertPos = position.value_or(m_items.size());
 		EnsurePositionValidForInsertion(insertPos);
 
-		// Создаём каталог images, если его нет
-		std::filesystem::create_directories("images");
-
-		// Генерируем имя для изображения
-		std::string extension = std::filesystem::path(path).extension().string();
-		std::string newImageName = "image_" + std::to_string(++m_imageCounter) + extension;
-		std::string newImagePath = "images/" + newImageName;
-
-		// Копируем файл
-		std::filesystem::copy_file(path, newImagePath, std::filesystem::copy_options::overwrite_existing);
-
-		auto image = std::make_shared<Image>(newImagePath, width, height);
-		auto item = std::make_shared<DocumentItem>(image);
-
-		m_items.insert(m_items.begin() + insertPos, item);
+		auto command = std::make_unique<InsertImageCommand>(m_items, m_imageCounter, path, width, height, position);
+		m_history.AddAndExecute(std::move(command));
 	}
 
 	void ResizeImage(int width, int height, size_t position) override
 	{
 		EnsureIndexInRange(position);
-		std::shared_ptr<DocumentItem> item = GetItem(position);
-		std::shared_ptr<IImage> image = item->GetImage();
-		if (!image)
-		{
-			throw std::runtime_error("Item is not an image");
-		}
 
-		image->Resize(width, height);
+		auto command = std::make_unique<ResizeImageCommand>(m_items, position, width, height);
+		m_history.AddAndExecute(std::move(command));
 	}
 
 	size_t GetItemsCount() const override
@@ -88,7 +68,9 @@ public:
 	void DeleteItem(size_t index) override
 	{
 		EnsureIndexInRange(index);
-		m_items.erase(m_items.begin() + index);
+
+		auto command = std::make_unique<DeleteItemCommand>(m_items, index);
+		m_history.AddAndExecute(std::move(command));
 	}
 
 	std::string GetTitle() const override
@@ -103,22 +85,22 @@ public:
 
 	bool CanUndo() const override
 	{
-		return false;
+		return m_history.CanUndo();
 	}
 
 	void Undo() override
 	{
-		// TODO: implement
+		m_history.Undo();
 	}
 
 	bool CanRedo() const override
 	{
-		return false;
+		return m_history.CanRedo();
 	}
 
 	void Redo() override
 	{
-		// TODO: implement
+		m_history.Redo();
 	}
 
 	void Save(const std::string& path) override
@@ -176,7 +158,7 @@ private:
 		}
 	}
 
-	std::string HtmlEscape(const std::string& text) const
+	static std::string HtmlEscape(const std::string& text)
 	{
 		std::string result;
 		result.reserve(text.size());
@@ -212,4 +194,5 @@ private:
 	std::string m_title{};
 	std::vector<std::shared_ptr<DocumentItem>> m_items;
 	size_t m_imageCounter = 0;
+	History m_history;
 };

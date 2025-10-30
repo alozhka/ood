@@ -1,32 +1,34 @@
 #pragma once
-#include "../IDocument.h"
-#include "ICommand.h"
 #include "../DocumentItem.h"
+#include "ICommand.h"
 
 #include <memory>
+#include <vector>
 
 class DeleteItemCommand final : public ICommand
 {
 public:
-	DeleteItemCommand(std::shared_ptr<IDocument>& m_document, size_t m_position)
-		: m_document(m_document)
-		, m_position(m_position)
+	DeleteItemCommand(
+		std::vector<std::shared_ptr<DocumentItem>>& items,
+		size_t position)
+		: m_items(items)
+		, m_position(position)
 	{
 	}
 
 	void Execute() override
 	{
-		m_deletedItem = m_document->GetItem(m_position);
-		m_document->DeleteItem(m_position);
+		m_deletedItem = m_items[m_position];
+		m_items.erase(m_items.begin() + m_position);
 	}
 
 	void Unexecute() override
 	{
-		// TODO: implement
+		m_items.insert(m_items.begin() + m_position, m_deletedItem);
 	}
 
 private:
-	std::shared_ptr<IDocument> m_document;
+	std::vector<std::shared_ptr<DocumentItem>>& m_items;
 	size_t m_position;
 	std::shared_ptr<DocumentItem> m_deletedItem;
 };

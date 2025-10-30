@@ -1,23 +1,24 @@
 #pragma once
-#include <utility>
+#include "../DocumentItem.h"
+#include "ICommand.h"
 
-#include "../IDocument.h"
+#include <memory>
+#include <vector>
 
 class ResizeImageCommand final : public ICommand
 {
 public:
 	ResizeImageCommand(
-		std::shared_ptr<IDocument> document,
-		size_t m_position,
-		int m_width,
-		int m_height)
-		: m_document(std::move(document))
-		, m_position(m_position)
-		, m_width(m_width)
-		, m_height(m_height)
+		std::vector<std::shared_ptr<DocumentItem>>& items,
+		size_t position,
+		int width,
+		int height)
+		: m_items(items)
+		, m_position(position)
+		, m_width(width)
+		, m_height(height)
 	{
-		std::shared_ptr<DocumentItem> item = m_document->GetItem(m_position);
-		std::shared_ptr<IImage> image = item->GetImage();
+		auto image = m_items[m_position]->GetImage();
 		if (!image)
 		{
 			throw std::runtime_error("Item is not an image");
@@ -28,16 +29,18 @@ public:
 
 	void Execute() override
 	{
-		m_document->ResizeImage(m_width, m_height, m_position);
+		auto image = m_items[m_position]->GetImage();
+		image->Resize(m_width, m_height);
 	}
 
 	void Unexecute() override
 	{
-		m_document->ResizeImage(m_oldWidth, m_oldHeight, m_position);
+		auto image = m_items[m_position]->GetImage();
+		image->Resize(m_oldWidth, m_oldHeight);
 	}
 
 private:
-	std::shared_ptr<IDocument> m_document;
+	std::vector<std::shared_ptr<DocumentItem>>& m_items;
 	size_t m_position;
 	int m_width, m_height;
 	int m_oldWidth, m_oldHeight;

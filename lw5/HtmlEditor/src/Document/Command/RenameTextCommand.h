@@ -1,13 +1,18 @@
 #pragma once
-#include <utility>
-
+#include "../DocumentItem.h"
 #include "ICommand.h"
+
+#include <memory>
+#include <vector>
 
 class RenameTextCommand final : public ICommand
 {
 public:
-	RenameTextCommand(std::shared_ptr<IDocument> document, const std::string& newText, size_t position)
-		: m_document(std::move(document))
+	RenameTextCommand(
+		std::vector<std::shared_ptr<DocumentItem>>& items,
+		const std::string& newText,
+		size_t position)
+		: m_items(items)
 		, m_newText(newText)
 		, m_position(position)
 	{
@@ -15,17 +20,24 @@ public:
 
 	void Execute() override
 	{
-		m_oldText = m_document->GetItem(m_position)->GetParagraph()->GetText();
-		m_document->ReplaceText(m_newText, m_position);
+		auto paragraph = m_items[m_position]->GetParagraph();
+		if (!paragraph)
+		{
+			throw std::runtime_error("Item is not a paragraph");
+		}
+		m_oldText = paragraph->GetText();
+		paragraph->SetText(m_newText);
 	}
 
 	void Unexecute() override
 	{
-		m_document->ReplaceText(m_oldText, m_position);
+		auto paragraph = m_items[m_position]->GetParagraph();
+		paragraph->SetText(m_oldText);
 	}
 
 private:
-	std::shared_ptr<IDocument> m_document;
-	std::string m_oldText{}, m_newText;
+	std::vector<std::shared_ptr<DocumentItem>>& m_items;
+	std::string m_oldText{};
+	std::string m_newText;
 	size_t m_position;
 };

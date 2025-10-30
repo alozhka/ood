@@ -1,12 +1,5 @@
 #pragma once
-#include "Document/Command/DeleteItemCommand.h"
-#include "Document/Command/InsertImageCommand.h"
-#include "Document/Command/InsertParagraphCommand.h"
-#include "Document/Command/RenameTextCommand.h"
-#include "Document/Command/ResizeImageCommand.h"
 #include "Document/Document.h"
-#include "Document/DocumentItem.h"
-#include "Document/History.h"
 #include "Document/IDocument.h"
 #include "Menu.h"
 
@@ -125,29 +118,27 @@ private:
 
 		std::optional<size_t> position = PositionStringToNumber(positionStr);
 
-		auto command = std::make_unique<InsertParagraphCommand>(m_document, text, position);
-		m_history.AddAndExecute(std::move(command));
+		m_document->InsertParagraph(text, position);
 	}
 
 	void ReplateText(std::istream& input)
 	{
-		size_t userPosition;
+		size_t position;
 
-		if (!(input >> userPosition))
+		if (!(input >> position))
 		{
 			throw std::invalid_argument("Position is not specified");
 		}
 
-		if (userPosition == 0)
+		if (position == 0)
 		{
 			throw std::invalid_argument("Position must be >= 1");
 		}
 
 		std::string text = ReadText(input);
 
-		size_t position = userPosition - 1;
-		auto command = std::make_unique<RenameTextCommand>(m_document, text, position);
-		m_history.AddAndExecute(std::move(command));
+		--position;
+		m_document->ReplaceText(text, position);
 	}
 
 	void DeleteItem(std::istream& input)
@@ -159,8 +150,7 @@ private:
 		}
 
 		--position;
-		auto command = std::make_unique<DeleteItemCommand>(m_document, position);
-		m_history.AddAndExecute(std::move(command));
+		m_document->DeleteItem(position);
 	}
 
 	void InsertImage(std::istream& input)
@@ -175,8 +165,7 @@ private:
 		}
 		std::optional<size_t> position = PositionStringToNumber(positionStr);
 
-		auto command = std::make_unique<InsertImageCommand>(m_document, path, width, height, position);
-		m_history.AddAndExecute(std::move(command));
+		m_document->InsertImage(path, width, height, position);
 	}
 
 	void ResizeImage(std::istream& input)
@@ -189,8 +178,7 @@ private:
 		}
 		--position;
 
-		auto command = std::make_unique<ResizeImageCommand>(m_document, position, width, height);
-		m_history.AddAndExecute(std::move(command));
+		m_document->ResizeImage(width, height, position);
 	}
 
 	static std::optional<size_t> PositionStringToNumber(const std::string& positionStr)
@@ -202,15 +190,11 @@ private:
 				size_t userPosition = std::stoull(positionStr);
 				if (userPosition == 0)
 				{
-					throw std::invalid_argument("Position must be >= 1");
+					throw std::out_of_range("Position must be >= 1");
 				}
 				return userPosition - 1;
 			}
 			catch (const std::invalid_argument&)
-			{
-				throw;
-			}
-			catch (...)
 			{
 				throw std::invalid_argument("Invalid position format");
 			}
@@ -233,7 +217,6 @@ private:
 	}
 
 	std::shared_ptr<IDocument> m_document = std::make_shared<Document>();
-	History m_history{};
 	Menu m_menu;
 	std::ostream& m_output;
 };

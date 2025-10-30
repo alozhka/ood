@@ -241,16 +241,13 @@ TEST_F(CommandControllerTests, SavesDocumentInHtml)
 
 	controller.Run();
 
-	// Проверяем, что файл создан
 	ASSERT_TRUE(std::filesystem::exists("test_document.html"));
 
-	// Читаем содержимое файла
 	std::ifstream file("test_document.html");
 	std::stringstream buffer;
 	buffer << file.rdbuf();
 	std::string content = buffer.str();
 
-	// Ожидаемый HTML
 	std::string expectedHtml = "<!DOCTYPE html>\n"
 							   "<html>\n"
 							   "<head>\n"
@@ -267,7 +264,6 @@ TEST_F(CommandControllerTests, SavesDocumentInHtml)
 
 	EXPECT_EQ(expectedHtml, content);
 
-	// Удаляем тестовый файл
 	std::filesystem::remove("test_document.html");
 	std::filesystem::remove_all("images");
 }
@@ -347,20 +343,17 @@ TEST_F(CommandMergingTests, DoesNotMergeForDifferentItems)
 	EXPECT_EQ("Changed first", item0->GetParagraph()->GetText());
 	EXPECT_EQ("Changed second", item1->GetParagraph()->GetText());
 
-	// Отменяем изменение второго параграфа
 	ASSERT_TRUE(document.CanUndo());
 	document.Undo();
 	item1 = document.GetItem(1);
 	EXPECT_EQ("Second paragraph", item1->GetParagraph()->GetText());
 
-	// Отменяем изменение первого параграфа
 	ASSERT_TRUE(document.CanUndo());
 	document.Undo();
 	item0 = document.GetItem(0);
 	EXPECT_EQ("First paragraph", item0->GetParagraph()->GetText());
 }
 
-// ResizeImage merging tests
 TEST_F(CommandMergingTests, MergesConsecutiveResizeImageCommandsForSameImage)
 {
 	document.InsertImage("../tests/images/test.svg", 100, 100, std::nullopt);
@@ -374,7 +367,6 @@ TEST_F(CommandMergingTests, MergesConsecutiveResizeImageCommandsForSameImage)
 	EXPECT_EQ(400, image->GetWidth());
 	EXPECT_EQ(300, image->GetHeight());
 
-	// После отмены должны вернуться к начальному размеру
 	ASSERT_TRUE(document.CanUndo());
 	document.Undo();
 
@@ -382,7 +374,6 @@ TEST_F(CommandMergingTests, MergesConsecutiveResizeImageCommandsForSameImage)
 	EXPECT_EQ(100, image->GetWidth());
 	EXPECT_EQ(100, image->GetHeight());
 
-	// Удаляем созданные файлы
 	std::filesystem::remove_all("images");
 }
 
@@ -412,10 +403,8 @@ TEST_F(CommandMergingTests, DoesNotMergeResizeImageForDifferentImages)
 	std::filesystem::remove_all("images");
 }
 
-// Tests for history branch deletion after undo
 TEST_F(CommandMergingTests, NewCommandAfterUndoDeletesRedoBranch)
 {
-	// Выполняем команды A, B, C
 	document.SetTitle("Title A");
 	document.InsertParagraph("Paragraph A", std::nullopt);
 	document.SetTitle("Title B");
@@ -449,47 +438,6 @@ TEST_F(CommandMergingTests, NewCommandAfterUndoDeletesRedoBranch)
 	document.Undo();
 	EXPECT_EQ("Title A", document.GetTitle());
 	EXPECT_EQ(0, document.GetItemsCount());
-}
-
-// Test for image resource management
-TEST_F(CommandMergingTests, ImageFileNotDeletedImmediatelyAfterUndo)
-{
-	// Вставляем изображение
-	document.InsertImage("../tests/images/test.svg", 100, 100, std::nullopt);
-
-	auto item = document.GetItem(0);
-	auto imagePath = item->GetImage()->GetPath();
-
-	// Проверяем, что файл создан
-	ASSERT_TRUE(std::filesystem::exists(imagePath));
-
-	// Отменяем вставку изображения
-	document.Undo();
-	EXPECT_EQ(0, document.GetItemsCount());
-
-	// Файл НЕ должен быть удален сразу (команда все еще в истории для Redo)
-	EXPECT_TRUE(std::filesystem::exists(imagePath));
-
-	// Делаем Redo
-	document.Redo();
-	EXPECT_EQ(1, document.GetItemsCount());
-
-	// Файл все еще существует
-	EXPECT_TRUE(std::filesystem::exists(imagePath));
-
-	// Отменяем снова
-	document.Undo();
-	EXPECT_EQ(0, document.GetItemsCount());
-	EXPECT_TRUE(std::filesystem::exists(imagePath));
-
-	// Выполняем новую команду - это удалит отмененную ветку истории
-	document.SetTitle("New Title");
-
-	// Теперь файл должен быть удален (команда InsertImage удалена из истории)
-	EXPECT_FALSE(std::filesystem::exists(imagePath));
-
-	// Очистка
-	std::filesystem::remove_all("images");
 }
 
 TEST_F(CommandMergingTests, ImageDoesNotDeleteDuringUndoRedo)

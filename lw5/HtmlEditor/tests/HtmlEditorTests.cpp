@@ -148,7 +148,6 @@ TEST_F(CommandControllerTests, CannotDeleteItemAtInvalidPosition)
 	EXPECT_EQ("Invalid item index\n", output.str());
 }
 
-// InsertImage tests
 TEST_F(CommandControllerTests, InsertsImageAtEnd)
 {
 	SetupInput("InsertImage end 400 300 ../tests/images/test.svg\nList\n");
@@ -330,6 +329,9 @@ TEST_F(CommandMergingTests, ReplaceTextCommandMerges)
 
 	item = document.GetItem(0);
 	EXPECT_EQ("Initial text", item->GetParagraph()->GetText());
+
+	document.Redo();
+	EXPECT_EQ("Third change", item->GetParagraph()->GetText());
 }
 
 TEST_F(CommandMergingTests, DoesNotMergeForDifferentItems)
@@ -470,7 +472,6 @@ TEST_F(CommandMergingTests, ImageDoesNotDeleteDuringUndoRedo)
 	std::filesystem::remove_all("images");
 }
 
-// Tests for Undo/Redo edge cases
 TEST_F(CommandMergingTests, CannotUndoInEmptyDocument)
 {
 	EXPECT_FALSE(document.CanUndo());

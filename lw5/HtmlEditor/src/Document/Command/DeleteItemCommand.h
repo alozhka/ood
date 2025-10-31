@@ -16,6 +16,7 @@ public:
 	{
 	}
 
+	// TODO: удалить изображение, если оно уже не в модели и не в истории
 	void Execute() override
 	{
 		m_deletedItem = m_items[m_position];

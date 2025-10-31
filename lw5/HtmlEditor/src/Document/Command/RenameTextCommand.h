@@ -40,6 +40,7 @@ public:
 		auto otherRename = dynamic_cast<const RenameTextCommand*>(other);
 		if (otherRename && otherRename->m_position == m_position)
 		{
+			// TODO: покрыть тестами
 			m_newText = otherRename->m_newText;
 			return true;
 		}

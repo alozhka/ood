@@ -12,7 +12,7 @@ void BeginMacroCommand(Menu& menu)
 	do
 	{
 		std::getline(std::cin, shortcut);
-	} while (menu.IsCommandExists(shortcut) && std::cout << "Command already exists!\n");
+	} while (menu.CommandExists(shortcut) && std::cout << "Command already exists!\n");
 
 	std::cout << "Command description: ";
 	std::getline(std::cin, description);
@@ -24,7 +24,7 @@ void BeginMacroCommand(Menu& menu)
 		&& std::getline(std::cin, command)
 		&& command != "end_macro")
 	{
-		if (menu.IsCommandExists(command))
+		if (menu.CommandExists(command))
 		{
 			commands.push_back(command);
 		}

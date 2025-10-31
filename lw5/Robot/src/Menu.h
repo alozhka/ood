@@ -70,7 +70,7 @@ public:
 		m_exit = true;
 	}
 
-	bool IsCommandExists(const std::string& shortcut)
+	bool CommandExists(const std::string& shortcut) const
 	{
 		const auto it = std::ranges::find_if(m_items, [&](const Item& item) {
 			return item.shortcut == shortcut;

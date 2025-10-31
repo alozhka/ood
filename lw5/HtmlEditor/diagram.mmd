@@ -1,8 +1,253 @@
 classDiagram
+    %% Interfaces
     class IDocument {
-        +InsertParagraph() void
+        <<interface>>
+        +InsertParagraph(text: string, position: optional~size_t~) void
+        +ReplaceText(newText: string, position: size_t) void
+        +InsertImage(path: string, width: int, height: int, position: optional~size_t~) void
+        +ResizeImage(width: int, height: int, position: size_t) void
+        +GetItemsCount() size_t
+        +GetItem(index: size_t) shared_ptr~DocumentItem~
+        +DeleteItem(index: size_t) void
+        +GetTitle() string
+        +SetTitle(title: string) void
+        +CanUndo() bool
+        +Undo() void
+        +CanRedo() bool
+        +Redo() void
+        +Save(path: string) void
+    }
+
+    class IParagraph {
+        <<interface>>
+        +GetText() string
+        +SetText(text: string) void
+    }
+
+    class IImage {
+        <<interface>>
+        +GetPath() string
+        +GetWidth() int
+        +GetHeight() int
+        +Resize(width: int, height: int) void
+    }
+
+    class ICommand {
+        <<interface>>
+        +Execute() void
+        +Unexecute() void
+        +TryMerge(other: ICommand*) bool
+    }
+
+    %% Core Classes
+    class Document {
+        -m_title: string
+        -m_items: vector~shared_ptr~DocumentItem~~
+        -m_imageCounter: size_t
+        -m_history: History
+        +InsertParagraph(text: string, position: optional~size_t~) void
+        +ReplaceText(newText: string, position: size_t) void
+        +InsertImage(path: string, width: int, height: int, position: optional~size_t~) void
+        +ResizeImage(width: int, height: int, position: size_t) void
+        +GetItemsCount() size_t
+        +GetItem(index: size_t) shared_ptr~DocumentItem~
+        +DeleteItem(index: size_t) void
+        +GetTitle() string
+        +SetTitle(title: string) void
+        +CanUndo() bool
+        +Undo() void
+        +CanRedo() bool
+        +Redo() void
+        +Save(path: string) void
+        -EnsureIndexInRange(index: size_t) void
+        -EnsurePositionValidForInsertion(position: size_t) void
+        -HtmlEscape(text: string) string
+    }
+
+    class Paragraph {
+        -m_text: string
+        +Paragraph(text: string)
+        +GetText() string
+        +SetText(text: string) void
+    }
+
+    class Image {
+        -m_path: string
+        -m_width: int
+        -m_height: int
+        +Image(path: string, width: int, height: int)
+        +GetPath() string
+        +GetWidth() int
+        +GetHeight() int
+        +Resize(width: int, height: int) void
+        -EnsureDimensionsAreValid(width: int, height: int) void
+    }
+
+    class DocumentItem {
+        -m_paragraph: shared_ptr~IParagraph~
+        -m_image: shared_ptr~IImage~
+        +DocumentItem(paragraph: shared_ptr~IParagraph~)
+        +DocumentItem(image: shared_ptr~IImage~)
+        +GetParagraph() shared_ptr~IParagraph~
+        +GetImage() shared_ptr~IImage~
     }
 
     class History {
-
+        -m_commands: deque~unique_ptr~ICommand~~
+        -m_currentCommandIndex: size_t
+        -MAX_HISTORY_SIZE: size_t
+        +AddAndExecute(command: unique_ptr~ICommand~) void
+        +CanUndo() bool
+        +Undo() void
+        +CanRedo() bool
+        +Redo() void
     }
+
+    %% Command Classes
+    class SetTitleCommand {
+        -m_currentTitle: string&
+        -m_oldTitle: string
+        -m_newTitle: string
+        +SetTitleCommand(title: string&, newTitle: string)
+        +Execute() void
+        +Unexecute() void
+        +TryMerge(other: ICommand*) bool
+    }
+
+    class InsertParagraphCommand {
+        -m_items: vector~shared_ptr~DocumentItem~~&
+        -m_text: string
+        -m_position: optional~size_t~
+        -m_actualPosition: size_t
+        +InsertParagraphCommand(items: vector&, text: string, position: optional~size_t~)
+        +Execute() void
+        +Unexecute() void
+        +TryMerge(other: ICommand*) bool
+    }
+
+    class InsertImageCommand {
+        -m_items: vector~shared_ptr~DocumentItem~~&
+        -m_imageCounter: size_t&
+        -m_sourcePath: string
+        -m_imagePath: string
+        -m_width: int
+        -m_height: int
+        -m_position: optional~size_t~
+        -m_actualPosition: size_t
+        -m_isMarkedForDeletion: bool
+        +InsertImageCommand(items: vector&, imageCounter: size_t&, path: string, width: int, height: int, position: optional~size_t~)
+        +Execute() void
+        +Unexecute() void
+        +TryMerge(other: ICommand*) bool
+    }
+
+    class RenameTextCommand {
+        -m_items: vector~shared_ptr~DocumentItem~~&
+        -m_oldText: string
+        -m_newText: string
+        -m_position: size_t
+        +RenameTextCommand(items: vector&, newText: string, position: size_t)
+        +Execute() void
+        +Unexecute() void
+        +TryMerge(other: ICommand*) bool
+    }
+
+    class ResizeImageCommand {
+        -m_items: vector~shared_ptr~DocumentItem~~&
+        -m_position: size_t
+        -m_width: int
+        -m_height: int
+        -m_oldWidth: int
+        -m_oldHeight: int
+        +ResizeImageCommand(items: vector&, position: size_t, width: int, height: int)
+        +Execute() void
+        +Unexecute() void
+        +TryMerge(other: ICommand*) bool
+    }
+
+    class DeleteItemCommand {
+        -m_items: vector~shared_ptr~DocumentItem~~&
+        -m_position: size_t
+        -m_deletedItem: shared_ptr~DocumentItem~
+        +DeleteItemCommand(items: vector&, position: size_t)
+        +Execute() void
+        +Unexecute() void
+        +TryMerge(other: ICommand*) bool
+    }
+
+    %% UI Classes
+    class Menu {
+        -m_items: vector~Item~
+        -m_exit: bool
+        -m_input: istream&
+        -m_output: ostream&
+        +Menu(input: istream&, output: ostream&)
+        +AddItem(shortcut: string, description: string, command: Command) void
+        +Run() void
+        +ShowInstructions() void
+        +Exit() void
+        -ExecuteCommand(line: string) void
+    }
+
+    class CommandController {
+        -m_document: shared_ptr~IDocument~
+        -m_menu: Menu
+        -m_output: ostream&
+        +CommandController(input: istream&, output: ostream&)
+        +Run() void
+        -PrintHelp() void
+        -Exit() void
+        -Save(input: istream&) void
+        -SetTitle(input: istream&) void
+        -List() void
+        -InsertParagraph(input: istream&) void
+        -ReplateText(input: istream&) void
+        -DeleteItem(input: istream&) void
+        -InsertImage(input: istream&) void
+        -ResizeImage(input: istream&) void
+        -Undo() void
+        -Redo() void
+        -PositionStringToNumber(positionStr: string) optional~size_t~
+        -ReadText(input: istream&) string
+    }
+
+    %% Relationships - Implementation
+    IDocument <|.. Document
+    IParagraph <|.. Paragraph
+    IImage <|.. Image
+    ICommand <|.. SetTitleCommand
+    ICommand <|.. InsertParagraphCommand
+    ICommand <|.. InsertImageCommand
+    ICommand <|.. RenameTextCommand
+    ICommand <|.. ResizeImageCommand
+    ICommand <|.. DeleteItemCommand
+
+    %% Relationships - Composition
+    Document *-- History
+    Document o-- DocumentItem
+    History o-- ICommand
+    DocumentItem o-- IParagraph
+    DocumentItem o-- IImage
+
+    %% Relationships - Usage
+    Document ..> SetTitleCommand : creates
+    Document ..> InsertParagraphCommand : creates
+    Document ..> InsertImageCommand : creates
+    Document ..> RenameTextCommand : creates
+    Document ..> ResizeImageCommand : creates
+    Document ..> DeleteItemCommand : creates
+    Document ..> Paragraph : creates
+    Document ..> Image : creates
+
+    CommandController *-- Menu
+    CommandController *-- IDocument
+    CommandController ..> Document : creates
+
+    %% Command usage
+    InsertParagraphCommand ..> Paragraph : creates
+    InsertParagraphCommand ..> DocumentItem : manipulates
+    InsertImageCommand ..> Image : creates
+    InsertImageCommand ..> DocumentItem : manipulates
+    RenameTextCommand ..> DocumentItem : manipulates
+    ResizeImageCommand ..> DocumentItem : manipulates
+    DeleteItemCommand ..> DocumentItem : manipulates

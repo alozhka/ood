@@ -1,5 +1,6 @@
 #pragma once
 #include "../DocumentItem.h"
+#include "../Image/ImageService.h"
 #include "ICommand.h"
 
 #include <memory>
@@ -16,7 +17,6 @@ public:
 	{
 	}
 
-	// TODO: удалить изображение, если оно уже не в модели и не в истории
 	void Execute() override
 	{
 		m_deletedItem = m_items[m_position];
@@ -25,7 +25,18 @@ public:
 
 	void Unexecute() override
 	{
-		m_items.insert(m_items.begin() + m_position, m_deletedItem);
+		if (m_deletedItem)
+		{
+			m_items.insert(m_items.begin() + m_position, m_deletedItem);
+		}
+	}
+
+	~DeleteItemCommand() override
+	{
+		if (auto image = m_deletedItem->GetImage())
+		{
+			ImageService::RemoveImage(image->GetPath());
+		}
 	}
 
 	bool TryMerge(const ICommand* other) override

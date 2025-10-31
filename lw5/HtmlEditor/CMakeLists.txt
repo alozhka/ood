@@ -18,6 +18,7 @@ add_executable(HtmlEditor main.cpp
         src/Document/IImage.h
         src/Document/Command/InsertParagraphCommand.h
         src/Document/Command/ResizeImageCommand.h
+        src/Document/Image/ImageService.h
 )
 
 include(FetchContent)

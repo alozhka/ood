@@ -472,6 +472,38 @@ TEST_F(CommandMergingTests, ImageDoesNotDeleteDuringUndoRedo)
 	std::filesystem::remove_all("images");
 }
 
+TEST_F(CommandMergingTests, DeletesImage)
+{
+	document.InsertImage("../tests/images/test.svg", 460, 460, std::nullopt);
+	document.InsertImage("../tests/images/test.svg", 460, 460, std::nullopt);
+
+	EXPECT_TRUE(std::filesystem::exists("images/image_1.svg"));
+	EXPECT_TRUE(std::filesystem::exists("images/image_2.svg"));
+
+	document.DeleteItem(1);
+	document.DeleteItem(0);
+	EXPECT_TRUE(std::filesystem::exists("images/image_1.svg"));
+	EXPECT_TRUE(std::filesystem::exists("images/image_2.svg"));
+
+	document.Undo();
+	EXPECT_TRUE(std::filesystem::exists("images/image_1.svg"));
+	EXPECT_TRUE(std::filesystem::exists("images/image_2.svg"));
+
+	document.Redo();
+	EXPECT_TRUE(std::filesystem::exists("images/image_1.svg"));
+	EXPECT_TRUE(std::filesystem::exists("images/image_2.svg"));
+
+	document.Undo();
+	EXPECT_TRUE(std::filesystem::exists("images/image_1.svg"));
+	EXPECT_TRUE(std::filesystem::exists("images/image_2.svg"));
+
+	document.InsertParagraph("Text", std::nullopt);
+	EXPECT_FALSE(std::filesystem::exists("images/image_1.svg"));
+	EXPECT_TRUE(std::filesystem::exists("images/image_2.svg"));
+
+	std::filesystem::remove("images/image_2.svg");
+}
+
 TEST_F(CommandMergingTests, CannotUndoInEmptyDocument)
 {
 	EXPECT_FALSE(document.CanUndo());

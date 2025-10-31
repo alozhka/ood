@@ -1,15 +1,15 @@
 #pragma once
-#include "DocumentItem.h"
-#include "IDocument.h"
-#include "Image.h"
-#include "Paragraph.h"
-#include "History.h"
-#include "Command/InsertParagraphCommand.h"
-#include "Command/InsertImageCommand.h"
 #include "Command/DeleteItemCommand.h"
+#include "Command/InsertImageCommand.h"
+#include "Command/InsertParagraphCommand.h"
 #include "Command/RenameTextCommand.h"
 #include "Command/ResizeImageCommand.h"
 #include "Command/SetTitleCommand.h"
+#include "DocumentItem.h"
+#include "History.h"
+#include "IDocument.h"
+#include "Image.h"
+#include "Paragraph.h"
 
 #include <filesystem>
 #include <fstream>
@@ -43,7 +43,7 @@ public:
 		size_t insertPos = position.value_or(m_items.size());
 		EnsurePositionValidForInsertion(insertPos);
 
-		auto command = std::make_unique<InsertImageCommand>(m_items, m_imageCounter, path, width, height, position);
+		auto command = std::make_unique<InsertImageCommand>(m_items, ++m_imageCounter, path, width, height, position);
 		m_history.AddAndExecute(std::move(command));
 	}
 

@@ -36,7 +36,7 @@ classDiagram
         <<interface>>
         +Execute() void
         +Unexecute() void
-        +TryMerge(other: ICommand*) bool
+        +TryMerge(other: const ICommand*) bool
     }
 
     %% Core Classes
@@ -111,7 +111,7 @@ classDiagram
         +SetTitleCommand(title: string&, newTitle: string)
         +Execute() void
         +Unexecute() void
-        +TryMerge(other: ICommand*) bool
+        +TryMerge(other: const ICommand*) bool
     }
 
     class InsertParagraphCommand {
@@ -122,47 +122,43 @@ classDiagram
         +InsertParagraphCommand(items: vector&, text: string, position: optional~size_t~)
         +Execute() void
         +Unexecute() void
-        +TryMerge(other: ICommand*) bool
+        +TryMerge(other: const ICommand*) bool
     }
 
     class InsertImageCommand {
         -m_items: vector~shared_ptr~DocumentItem~~&
-        -m_imageCounter: size_t&
+        -m_imageItem: shared_ptr~DocumentItem~
         -m_sourcePath: string
-        -m_imagePath: string
-        -m_width: int
-        -m_height: int
-        -m_position: optional~size_t~
-        -m_actualPosition: size_t
-        -m_isMarkedForDeletion: bool
-        +InsertImageCommand(items: vector&, imageCounter: size_t&, path: string, width: int, height: int, position: optional~size_t~)
+        -m_position: size_t
+        -m_isDeleted: bool
+        +InsertImageCommand(items: vector&, imageItem: shared_ptr~DocumentItem~, sourcePath: string, position: optional~size_t~)
         +Execute() void
         +Unexecute() void
-        +TryMerge(other: ICommand*) bool
+        +TryMerge(other: const ICommand*) bool
     }
 
     class RenameTextCommand {
-        -m_items: vector~shared_ptr~DocumentItem~~&
+        -m_paragraph: shared_ptr~IParagraph~
         -m_oldText: string
-        -m_newText: string
+        -m_text: string
         -m_position: size_t
-        +RenameTextCommand(items: vector&, newText: string, position: size_t)
+        +RenameTextCommand(paragraph: shared_ptr~IParagraph~, newText: string, position: size_t)
         +Execute() void
         +Unexecute() void
-        +TryMerge(other: ICommand*) bool
+        +TryMerge(other: const ICommand*) bool
     }
 
     class ResizeImageCommand {
-        -m_items: vector~shared_ptr~DocumentItem~~&
+        -m_image: shared_ptr~IImage~
         -m_position: size_t
         -m_width: int
         -m_height: int
         -m_oldWidth: int
         -m_oldHeight: int
-        +ResizeImageCommand(items: vector&, position: size_t, width: int, height: int)
+        +ResizeImageCommand(image: shared_ptr~IImage~, width: int, height: int, position: size_t)
         +Execute() void
         +Unexecute() void
-        +TryMerge(other: ICommand*) bool
+        +TryMerge(other: const ICommand*) bool
     }
 
     class DeleteItemCommand {
@@ -172,7 +168,14 @@ classDiagram
         +DeleteItemCommand(items: vector&, position: size_t)
         +Execute() void
         +Unexecute() void
-        +TryMerge(other: ICommand*) bool
+        +TryMerge(other: const ICommand*) bool
+    }
+
+    %% Service Classes
+    class ImageService {
+        <<utility>>
+        +BuildImagePath(sourcePath: string, imageCounter: size_t) string
+        +RemoveImage(path: string) void
     }
 
     %% UI Classes
@@ -245,9 +248,8 @@ classDiagram
 
     %% Command usage
     InsertParagraphCommand ..> Paragraph : creates
-    InsertParagraphCommand ..> DocumentItem : manipulates
-    InsertImageCommand ..> Image : creates
-    InsertImageCommand ..> DocumentItem : manipulates
-    RenameTextCommand ..> DocumentItem : manipulates
-    ResizeImageCommand ..> DocumentItem : manipulates
-    DeleteItemCommand ..> DocumentItem : manipulates
+    InsertImageCommand ..> ImageService : uses
+    DeleteItemCommand ..> ImageService : uses
+    Document ..> ImageService : uses
+    RenameTextCommand ..> IParagraph : uses
+    ResizeImageCommand ..> IImage : uses

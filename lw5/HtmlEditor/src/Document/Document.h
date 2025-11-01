@@ -33,8 +33,13 @@ public:
 	void ReplaceText(const std::string& newText, size_t position) override
 	{
 		EnsureIndexInRange(position);
+		auto paragraph = m_items[position]->GetParagraph();
+		if (!paragraph)
+		{
+			throw std::runtime_error("Item is not a paragraph");
+		}
 
-		auto command = std::make_unique<RenameTextCommand>(m_items, newText, position);
+		auto command = std::make_unique<RenameTextCommand>(paragraph, newText, position);
 		m_history.AddAndExecute(std::move(command));
 	}
 
@@ -43,15 +48,30 @@ public:
 		size_t insertPos = position.value_or(m_items.size());
 		EnsurePositionValidForInsertion(insertPos);
 
-		auto command = std::make_unique<InsertImageCommand>(m_items, ++m_imageCounter, path, width, height, position);
+		if (!std::filesystem::exists(path))
+		{
+			throw std::runtime_error("Image file not found");
+		}
+		std::filesystem::create_directories("images");
+
+		std::string imagePath = ImageService::BuildImagePath(path, ++m_imageCounter);
+		auto image = std::make_shared<Image>(imagePath, width, height);
+		auto item = std::make_shared<DocumentItem>(image);
+
+		auto command = std::make_unique<InsertImageCommand>(m_items, item, path, position);
 		m_history.AddAndExecute(std::move(command));
 	}
 
 	void ResizeImage(int width, int height, size_t position) override
 	{
 		EnsureIndexInRange(position);
+		std::shared_ptr<IImage> image = m_items[position]->GetImage();
+		if (!image)
+		{
+			throw std::runtime_error("Item is not an image");
+		}
 
-		auto command = std::make_unique<ResizeImageCommand>(m_items, position, width, height);
+		auto command = std::make_unique<ResizeImageCommand>(image, width, height, position);
 		m_history.AddAndExecute(std::move(command));
 	}
 

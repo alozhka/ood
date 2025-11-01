@@ -8,6 +8,7 @@
 #include <memory>
 #include <optional>
 #include <string>
+#include <utility>
 #include <vector>
 
 class InsertImageCommand final : public ICommand
@@ -15,52 +16,37 @@ class InsertImageCommand final : public ICommand
 public:
 	InsertImageCommand(
 		std::vector<std::shared_ptr<DocumentItem>>& items,
-		size_t imageCounter,
-		const std::string& path,
-		int width,
-		int height,
+		std::shared_ptr<DocumentItem> imageItem,
+		const std::string& sourcePath,
 		std::optional<size_t> position)
 		: m_items(items)
-		, m_sourcePath(path)
-		, m_width(width)
-		, m_height(height)
-		, m_position(position)
+		, m_imageItem(std::move(imageItem))
+		, m_sourcePath(sourcePath)
+		, m_position(position.value_or(items.size()))
 	{
-		m_imagePath = ImageService::BuildImagePath(m_sourcePath, imageCounter);
 	}
 
 	void Execute() override
 	{
 		if (m_isDeleted)
 		{
-			m_items.insert(m_items.begin() + m_actualPosition, m_imageItem);
+			m_items.insert(m_items.begin() + m_position, m_imageItem);
 			m_isDeleted = false;
 			return;
 		}
 
-		if (!std::filesystem::exists(m_sourcePath))
-		{
-			throw std::runtime_error("Image file not found");
-		}
+		std::filesystem::copy_file(
+			m_sourcePath,
+			m_imageItem->GetImage()->GetPath(),
+			std::filesystem::copy_options::overwrite_existing);
 
-		std::filesystem::create_directories("images");
-
-		std::filesystem::copy_file(m_sourcePath, m_imagePath, std::filesystem::copy_options::overwrite_existing);
-
-		auto image = std::make_shared<Image>(m_imagePath, m_width, m_height);
-		auto item = std::make_shared<DocumentItem>(image);
-
-		size_t insertPos = m_position.value_or(m_items.size());
-		m_items.insert(m_items.begin() + insertPos, item);
-
-		m_actualPosition = insertPos;
+		m_items.insert(m_items.begin() + m_position, m_imageItem);
 	}
 
 	void Unexecute() override
 	{
-		m_imageItem = m_items[m_actualPosition];
-		m_items.erase(m_items.begin() + m_actualPosition);
-		// Помечаем файл для удаления вместо немедленного удаления
+		m_imageItem = m_items[m_position];
+		m_items.erase(m_items.begin() + m_position);
 		m_isDeleted = true;
 	}
 
@@ -73,7 +59,7 @@ public:
 	{
 		if (m_isDeleted)
 		{
-			ImageService::RemoveImage(m_imagePath);
+			ImageService::RemoveImage(m_imageItem->GetImage()->GetPath());
 		}
 	}
 
@@ -81,10 +67,6 @@ private:
 	std::vector<std::shared_ptr<DocumentItem>>& m_items;
 	std::shared_ptr<DocumentItem> m_imageItem;
 	std::string m_sourcePath;
-	std::string m_imagePath;
-	int m_width;
-	int m_height;
-	std::optional<size_t> m_position;
-	size_t m_actualPosition = 0;
+	size_t m_position;
 	bool m_isDeleted = false;
 };

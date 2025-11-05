@@ -19,52 +19,64 @@ public:
 	virtual ~ICanvasDrawable() = default;
 };
 
-class CTriangle : public ICanvasDrawable
+class Triangle : public ICanvasDrawable
 {
 public:
-	CTriangle(const Point& p1, const Point& p2, const Point& p3)
+	Triangle(const Point& p1, const Point& p2, const Point& p3)
+		: m_p1(p1)
+		, m_p2(p2)
+		, m_p3(p3)
 	{
-		// TODO: написать код конструктора
 	}
 	void Draw(graphics_lib::ICanvas& canvas) const override
 	{
-		// TODO: написать код рисования треугольника на холсте
+		canvas.MoveTo(m_p1.x, m_p1.y);
+		canvas.LineTo(m_p2.x, m_p2.y);
+		canvas.LineTo(m_p3.x, m_p3.y);
+		canvas.LineTo(m_p1.x, m_p1.y);
 	}
 
 private:
-	// TODO: дописать приватную часть
+	Point m_p1, m_p2, m_p3;
 };
 
-class CRectangle : public ICanvasDrawable
+class Rectangle : public ICanvasDrawable
 {
 public:
-	CRectangle(const Point& leftTop, int width, int height)
+	Rectangle(const Point& leftTop, int width, int height)
+		: m_leftTop(leftTop)
+		, width(width)
+		, height(height)
 	{
-		// TODO: написать код конструктора
 	}
 	void Draw(graphics_lib::ICanvas& canvas) const override
 	{
-		// TODO: написать код рисования прямоугольника на холсте
+		canvas.MoveTo(m_leftTop.x, m_leftTop.y);
+		canvas.LineTo(m_leftTop.x + width, m_leftTop.y);
+		canvas.LineTo(m_leftTop.x + width, m_leftTop.y + height);
+		canvas.LineTo(m_leftTop.x, m_leftTop.y + height);
+		canvas.LineTo(m_leftTop.x, m_leftTop.y);
 	}
 
 private:
-	// TODO: дописать приватную часть
+	Point m_leftTop;
+	int width, height;
 };
 
 // Художник, способный рисовать ICanvasDrawable-объекты на ICanvas
-class CCanvasPainter
+class CanvasPainter
 {
 public:
-	CCanvasPainter(graphics_lib::ICanvas& canvas)
+	explicit CanvasPainter(graphics_lib::ICanvas& canvas)
+		: m_canvas(canvas)
 	{
-		// TODO: дописать конструктор класса
 	}
 	void Draw(const ICanvasDrawable& drawable)
 	{
-		// TODO: дописать код рисования ICanvasDrawable на canvas, переданном в конструктор
+		drawable.Draw(m_canvas);
 	}
 
 private:
-	// TODO: дописать приватную часть
+	graphics_lib::ICanvas& m_canvas;
 };
 } // namespace shape_drawing_lib

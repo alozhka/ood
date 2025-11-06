@@ -17,6 +17,20 @@ public:
 	int y;
 };
 
+// Цвет в формате RGBA, каждый компонент принимает значения от 0.0f до 1.0f
+class RGBAColor
+{
+public:
+	RGBAColor(float r, float g, float b, float a)
+		: r(r)
+		, g(g)
+		, b(b)
+		, a(a)
+	{
+	}
+	float r, g, b, a;
+};
+
 // Класс для современного рисования графики
 class ModernGraphicsRenderer
 {
@@ -46,18 +60,23 @@ public:
 	}
 
 	// Выполняет рисование линии
-	void DrawLine(const Point& start, const Point& end)
+	void DrawLine(const Point& start, const Point& end, const RGBAColor& color)
 	{
 		if (!m_drawing)
 		{
 			throw std::logic_error("DrawLine is allowed between BeginDraw()/EndDraw() only");
 		}
+
 		m_out << std::format(
-			R"(  <line fromX="{}" fromY="{}" toX="{}" toY="{}"/>)",
+			R"(<line fromX="{}" fromY="{}" toX="{}" toY="{}"><color r="{}" g="{}" b="{}" a="{}" /></line>)",
 			start.x,
 			start.y,
 			end.x,
-			end.y)
+			end.y,
+			color.r,
+			color.g,
+			color.b,
+			color.a)
 			  << std::endl;
 	}
 

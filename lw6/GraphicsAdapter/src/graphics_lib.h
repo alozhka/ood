@@ -15,7 +15,7 @@ public:
 };
 
 // Реализация холста для рисования
-class CCanvas : public ICanvas
+class Canvas : public ICanvas
 {
 public:
 	void MoveTo(int x, int y) override

@@ -1,10 +1,10 @@
-#include "src/adapter/ModernToOldGraphicsAdapted.h"
+#include "src/adapter/ModernGraphicsAdapter.h"
 #include "src/modern_graphics_lib.h"
 #include "src/shapes_drawing_lib.h"
+
 // Пространство имен приложения (доступно для модификации)
 namespace app
 {
-
 void PaintPicture(shape_drawing_lib::CanvasPainter& painter)
 {
 	using namespace shape_drawing_lib;
@@ -17,7 +17,7 @@ void PaintPicture(shape_drawing_lib::CanvasPainter& painter)
 
 void PaintPictureOnCanvas()
 {
-	graphics_lib::CCanvas simpleCanvas;
+	graphics_lib::Canvas simpleCanvas;
 	shape_drawing_lib::CanvasPainter painter(simpleCanvas);
 	PaintPicture(painter);
 }
@@ -25,7 +25,7 @@ void PaintPictureOnCanvas()
 void PaintPictureOnModernGraphicsRenderer()
 {
 	modern_graphics_lib::ModernGraphicsRenderer renderer(std::cout);
-	ModernToOldGraphicsAdapter adapter{ renderer };
+	ModernGraphicsAdapter adapter{ renderer };
 	shape_drawing_lib::CanvasPainter painter{ adapter };
 
 	renderer.BeginDraw();

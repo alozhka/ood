@@ -2,10 +2,10 @@
 #include "../graphics_lib.h"
 #include "../modern_graphics_lib.h"
 
-class ModernToOldGraphicsAdapter final : public graphics_lib::ICanvas
+class ModernGraphicsAdapter final : public graphics_lib::ICanvas
 {
 public:
-	explicit ModernToOldGraphicsAdapter(modern_graphics_lib::ModernGraphicsRenderer& renderer)
+	explicit ModernGraphicsAdapter(modern_graphics_lib::ModernGraphicsRenderer& renderer)
 		: m_renderer(renderer)
 	{
 	}

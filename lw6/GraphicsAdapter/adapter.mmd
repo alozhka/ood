@@ -1,0 +1,81 @@
+classDiagram
+    namespace modern_graphics_lib {
+        class Point {
+            +x: int
+            +y: int
+        }
+        class ModernGraphicsRenderer {
+            -m_out: ostream
+            -m_drawing: bool
+            +BeginDraw() void
+            +DrawLine(start: Point, end: Point) void
+            +EndDraw() void
+        }
+    }
+
+    namespace graphics_lib {
+        class ICanvas {
+            <<interface>>
+            +MoveTo(x: int, y: int) void
+            +LineTo(x: int, y: int) void
+        }
+        class Canvas {
+            +MoveTo(x: int, y: int) void
+            +LineTo(x: int, y: int) void
+        }
+    }
+
+    namespace shapes_drawing_lib {
+        class CPoint {
+            +x: int
+            +y: int
+        }
+        class ICanvasDrawable {
+            <<interface>>
+            +Draw(canvas: ICanvas)
+        }
+        class Triangle {
+            -CPoint m_p1
+            -CPoint m_p2
+            -CPoint m_p3
+            +Draw(canvas: ICanvas)
+        }
+        class Rectangle {
+            -m_leftTop: CPoint
+            -m_width: int
+            -m_height: int
+            +Draw(canvas: ICanvas)
+        }
+        class CanvasPainter {
+            -m_canvas: ICanvas
+            +Draw(drawable: ICanvasDrawable)
+        }
+    }
+
+    class ModernGraphicsAdapter {
+        <<adapter>>
+        -m_renderer: ModernGraphicsRenderer
+        +MoveTo(x: int, y: int) void
+        +LineTo(x: int, y: int) void
+    }
+    class ModernGraphicsClassAdapter {
+        <<adapter>>
+        +MoveTo(x: int, y: int) void
+        +LineTo(x: int, y: int) void
+    }
+
+    ModernGraphicsRenderer *-- Point
+    ICanvas <|.. Canvas
+    CanvasPainter *-- ICanvas
+    CanvasPainter <.. ICanvasDrawable
+    ICanvasDrawable <|.. Triangle
+    ICanvasDrawable <|.. Rectangle
+    ICanvasDrawable <.. ICanvas
+    Triangle <.. ICanvas
+    Rectangle <.. ICanvas
+    Triangle o-- CPoint
+    Rectangle o-- CPoint
+    ICanvas <|.. ModernGraphicsAdapter
+    ICanvas <|.. ModernGraphicsClassAdapter
+    ModernGraphicsAdapter *-- ModernGraphicsRenderer
+    ModernGraphicsRenderer <|-- ModernGraphicsClassAdapter

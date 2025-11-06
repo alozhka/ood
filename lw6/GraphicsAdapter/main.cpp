@@ -21,6 +21,7 @@ void PaintPictureOnCanvas()
 	shape_drawing_lib::CanvasPainter painter(simpleCanvas);
 	PaintPicture(painter);
 }
+
 void PaintPictureOnModernGraphicsRenderer()
 {
 	modern_graphics_lib::ModernGraphicsRenderer renderer(std::cout);

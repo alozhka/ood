@@ -28,9 +28,9 @@ void PaintPictureOnModernGraphicsRenderer()
 	ModernGraphicsAdapter adapter{ renderer };
 	shape_drawing_lib::CanvasPainter painter{ adapter };
 
-	renderer.BeginDraw();
+	adapter.BeginDraw();
 	PaintPicture(painter);
-	renderer.EndDraw();
+	adapter.EndDraw();
 }
 } // namespace app
 

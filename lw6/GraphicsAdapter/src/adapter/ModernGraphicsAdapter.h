@@ -10,6 +10,16 @@ public:
 	{
 	}
 
+	void BeginDraw()
+	{
+		m_renderer.BeginDraw();
+	}
+
+	void EndDraw()
+	{
+		m_renderer.EndDraw();
+	}
+
 	void SetColor(uint32_t rgbColor) override
 	{
 		m_color = OldToModernColor(rgbColor);

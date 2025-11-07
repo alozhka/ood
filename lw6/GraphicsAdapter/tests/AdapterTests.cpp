@@ -19,10 +19,10 @@ TEST_F(AdapterTests, ObjectAdapterDrawsPictures)
 	ModernGraphicsAdapter objectAdapter(renderer);
 	shape_drawing_lib::CanvasPainter painter(objectAdapter);
 
-	renderer.BeginDraw();
+	objectAdapter.BeginDraw();
 	painter.Draw(triangle);
 	painter.Draw(rectangle);
-	renderer.EndDraw();
+	objectAdapter.EndDraw();
 
 	std::string expected = R"(<draw>
 <line fromX="10" fromY="15" toX="100" toY="200"><color r="1" g="1" b="0" a="1" /></line>

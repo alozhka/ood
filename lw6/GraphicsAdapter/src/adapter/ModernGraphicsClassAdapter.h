@@ -9,8 +9,10 @@ public:
 	explicit ModernGraphicsClassAdapter(std::ostream& strm)
 		: ModernGraphicsRenderer(strm)
 	{
-		BeginDraw();
 	}
+
+	using ModernGraphicsRenderer::BeginDraw;
+	using ModernGraphicsRenderer::EndDraw;
 
 	void SetColor(uint32_t rgbColor) override
 	{
@@ -32,15 +34,15 @@ public:
 private:
 	static modern_graphics_lib::RGBAColor OldToModernColor(uint32_t color)
 	{
-		constexpr float colorScale = 1.0f / 255.0f;
-
-		const auto red = static_cast<float>((color >> 16) & 0xFF) * colorScale;
-		const auto green = static_cast<float>((color >> 8) & 0xFF) * colorScale;
-		const auto blue = static_cast<float>(color & 0xFF) * colorScale;
-		const auto alpha = ((color >> 24) & 0xFF) == 0 ? 1.0f : static_cast<float>((color >> 24) & 0xFF) * colorScale;
+		const auto red = static_cast<float>((color >> 16) & 0xFF) * COLOR_SCALE;
+		const auto green = static_cast<float>((color >> 8) & 0xFF) * COLOR_SCALE;
+		const auto blue = static_cast<float>(color & 0xFF) * COLOR_SCALE;
+		const auto alpha = ((color >> 24) & 0xFF) == 0 ? 1.0f : static_cast<float>((color >> 24) & 0xFF) * COLOR_SCALE;
 
 		return { red, green, blue, alpha };
 	}
+
+	static constexpr float COLOR_SCALE = 1.0f / 255.0f;
 
 	modern_graphics_lib::RGBAColor m_color{ 0, 0, 0, 0 };
 	modern_graphics_lib::Point m_position{ 0, 0 };

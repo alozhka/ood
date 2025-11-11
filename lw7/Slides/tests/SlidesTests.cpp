@@ -17,10 +17,15 @@ protected:
 
 TEST_F(SlidesTests, InsertsShapes)
 {
-	SetupInput("InsertShape rectangle 0xff0000FF 0x00ff0080 350 200 100 120\n"
+	SetupInput("InsertShape rectangle 0xff0000ff 0x00ff0080 350 200 100 120\n"
+			   "InsertShape circle 0xff4010ff 0x0b78fa80 600 610 70 80\n"
+			   "InsertShape triangle 0x00ffffee 0x1920aaa0 430 400 100 200\n"
 			   "List\n");
 
 	controller.Run();
 
-	EXPECT_EQ("1. Type: rectangle; Color: outline #ff0000ff, inline #00ff0080; Frame: left: 350, top: 200, width: 100, height: 120\n", output.str());
+	EXPECT_EQ("1. Type: rectangle; Color: outline #ff0000ff, inline #00ff0080; Frame: left: 350, top: 200, width: 100, height: 120\n"
+			  "2. Type: circle; Color: outline #ff4010ff, inline #0b78fa80; Frame: left: 600, top: 610, width: 70, height: 80\n"
+			  "3. Type: triangle; Color: outline #00ffffee, inline #1920aaa0; Frame: left: 430, top: 400, width: 100, height: 200\n",
+		output.str());
 }

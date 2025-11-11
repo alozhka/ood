@@ -8,11 +8,13 @@ add_executable(Slides main.cpp
         src/parse/Menu.h
         src/slide/ISlide.h
         src/slide/Slide.h
-        src/shape/IShape.h
-        src/shape/factory/IShapesFactory.h
+        src/shape/Shape.h
         src/shape/factory/ShapesFactory.h
-        src/shape/Rectangle.h
-        src/shape/Point.h)
+        src/shape/types/Rectangle.h
+        src/shape/Point.h
+        src/shape/Style.h
+        src/shape/TemplateFrame.h
+        src/canvas/ICanvas.h)
 
 
 include(FetchContent)

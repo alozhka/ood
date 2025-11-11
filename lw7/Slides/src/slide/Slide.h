@@ -7,7 +7,7 @@
 class Slide final : public ISlide
 {
 public:
-    void AddShape(std::shared_ptr<IShape> shape) override
+    void AddShape(std::shared_ptr<Shape> shape) override
     {
         m_shapes.push_back(shape);
     }
@@ -17,7 +17,7 @@ public:
         return m_shapes.size();
     }
 
-    std::shared_ptr<IShape> GetShapeAt(size_t index) override
+    std::shared_ptr<Shape> GetShapeAt(size_t index) override
     {
         EnsureValidIndex(index);
         return m_shapes[index];
@@ -32,5 +32,5 @@ private:
         }
     }
 
-    std::vector<std::shared_ptr<IShape>> m_shapes;
+    std::vector<std::shared_ptr<Shape>> m_shapes;
 };

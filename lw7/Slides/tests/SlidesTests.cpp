@@ -17,9 +17,10 @@ protected:
 
 TEST_F(SlidesTests, InsertsShapes)
 {
-    SetupInput("InsertShape rectangle 350 200 100 120 #ff0000FF #00ff0080\nList\n");
+    SetupInput("InsertShape rectangle 350 200 100 120 #ff0000FF #00ff0080\n"
+        "List\n");
 
     controller.Run();
 
-    EXPECT_EQ("1. Type: rectangle; Params: x: 350, y: 200, width: 100, height: 120\n", output.str());
+    EXPECT_EQ("1. Type: rectangle; Color: outline #ff0000FF, inline #00ff0088 Params: x: 350, y: 200, width: 100, height: 120\n", output.str());
 }

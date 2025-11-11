@@ -1,4 +1,6 @@
 #pragma once
+#include <iomanip>
+
 #include "Menu.h"
 
 #include <istream>
@@ -21,7 +23,7 @@ public:
             [this](std::istream&) { List(); });
         m_menu.AddItem(
             "InsertShape",
-            "Usage: InsertShape <shapeType> <params>. Inserts shape into slide",
+            "Usage: InsertShape <shapeType> <fillColor> <lineColor> <x> <y> <width> <height>. Inserts shape into slide",
             std::bind_front(&CommandController::InsertShape, this));
     }
 
@@ -39,7 +41,7 @@ private:
             throw std::invalid_argument("Shape type is not specified");
         }
 
-        std::shared_ptr<IShape> shape = m_shapesFactory->Create(type, input);
+        std::shared_ptr<Shape> shape = ShapesFactory::Create(type, input);
         m_slide->AddShape(shape);
     }
 
@@ -47,17 +49,25 @@ private:
     {
         for (size_t i = 0; i < m_slide->GetShapesCount(); ++i)
         {
-            std::shared_ptr<IShape> shape = m_slide->GetShapeAt(i);
-            m_output << std::format("{}. Type: {}; Params: {}\n",
+            std::shared_ptr<Shape> shape = m_slide->GetShapeAt(i);
+            m_output << std::format("{}. Type: {}; Color: outline {}, inline {}; Params: {}\n",
                                     i + 1,
                                     shape->GetType(),
+                                    StyleToString(shape->GetLineStyle()),
+                                    StyleToString(shape->GetFillStyle()),
                                     shape->ListParams());
         }
     }
 
+    static std::string StyleToString(Style style)
+    {
+        std::ostringstream ss;
+        ss << '#' << std::setw(8) << std::setfill('0') << std::hex << style.GetColor();
+        return ss.str();
+    }
+
     Menu m_menu;
     std::unique_ptr<ISlide> m_slide{std::make_unique<Slide>()};
-    std::unique_ptr<IShapesFactory> m_shapesFactory{std::make_unique<ShapesFactory>()};
 
     std::istream& m_input;
     std::ostream& m_output;

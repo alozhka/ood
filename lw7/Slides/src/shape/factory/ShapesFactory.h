@@ -1,32 +1,31 @@
 #pragma once
-#include "IShapesFactory.h"
-#include "../Rectangle.h"
+#include "../types/Rectangle.h"
 
 class Rectangle;
 
-class ShapesFactory final : public IShapesFactory
+class ShapesFactory
 {
 public:
-    std::shared_ptr<IShape> Create(const std::string& type, std::istream& params) override
+    static std::shared_ptr<Shape> Create(const std::string& type, std::istream& params)
     {
+        int left, top, width, height;
+        RGBAColor fillColor, lineColor;
+        if (!(params >> std::hex >> fillColor >> lineColor))
+        {
+            throw std::invalid_argument("Failed to read colors");
+        }
+        if (!(params >> left >> top >> width >> height))
+        {
+            throw std::invalid_argument("Not all args are specified");
+        }
+
+        Frame frame(left, top, width, height);
+
         if (type == "rectangle")
         {
-            return CreateRectangle(params);
+            return std::make_shared<Rectangle>(frame, fillColor, lineColor);
         }
 
         throw std::invalid_argument("Cannot create unsupported shape");
-    }
-
-private:
-    static std::shared_ptr<IShape> CreateRectangle(std::istream& params)
-    {
-        int x, y, width, height;
-
-        if (!(params >> x >> y >> width >> height))
-        {
-            throw std::invalid_argument("Not all args are specified. Usage: rectangle <x> <y> <width> <height>");
-        }
-
-        return std::make_shared<Rectangle>(x, y, width, height);
     }
 };

@@ -11,7 +11,6 @@ add_executable(Slides main.cpp
         src/shape/Shape.h
         src/shape/factory/ShapesFactory.h
         src/shape/types/Rectangle.h
-        src/shape/Point.h
         src/shape/Style.h
         src/shape/TemplateFrame.h
         src/canvas/ICanvas.h)

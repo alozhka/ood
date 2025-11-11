@@ -12,63 +12,65 @@
 class CommandController
 {
 public:
-    CommandController(std::istream& input, std::ostream& output)
-        : m_menu{input, output}
-          , m_input{input}
-          , m_output{output}
-    {
-        m_menu.AddItem(
-            "List",
-            "Usage: List. Lists shapes",
-            [this](std::istream&) { List(); });
-        m_menu.AddItem(
-            "InsertShape",
-            "Usage: InsertShape <shapeType> <fillColor> <lineColor> <x> <y> <width> <height>. Inserts shape into slide",
-            std::bind_front(&CommandController::InsertShape, this));
-    }
+	CommandController(std::istream& input, std::ostream& output)
+		: m_menu{ input, output }
+		, m_input{ input }
+		, m_output{ output }
+	{
+		m_menu.AddItem(
+			"List",
+			"Usage: List. Lists shapes",
+			[this](std::istream&) { List(); });
+		m_menu.AddItem(
+			"InsertShape",
+			"Usage: InsertShape <shapeType> <fillColor> <lineColor> <x> <y> <width> <height>. Inserts shape into slide",
+			std::bind_front(&CommandController::InsertShape, this));
+	}
 
-    void Run()
-    {
-        m_menu.Run();
-    }
+	void Run()
+	{
+		m_menu.Run();
+	}
 
 private:
-    void InsertShape(std::istream& input)
-    {
-        std::string type;
-        if (!(input >> type))
-        {
-            throw std::invalid_argument("Shape type is not specified");
-        }
+	void InsertShape(std::istream& input)
+	{
+		std::string type;
+		if (!(input >> type))
+		{
+			throw std::invalid_argument("Shape type is not specified");
+		}
 
-        std::shared_ptr<Shape> shape = ShapesFactory::Create(type, input);
-        m_slide->AddShape(shape);
-    }
+		std::shared_ptr<Shape> shape = ShapesFactory::Create(type, input);
+		m_slide->AddShape(shape);
+	}
 
-    void List() const
-    {
-        for (size_t i = 0; i < m_slide->GetShapesCount(); ++i)
-        {
-            std::shared_ptr<Shape> shape = m_slide->GetShapeAt(i);
-            m_output << std::format("{}. Type: {}; Color: outline {}, inline {}; Params: {}\n",
-                                    i + 1,
-                                    shape->GetType(),
-                                    StyleToString(shape->GetLineStyle()),
-                                    StyleToString(shape->GetFillStyle()),
-                                    shape->ListParams());
-        }
-    }
+	void List() const
+	{
+		for (size_t i = 0; i < m_slide->GetShapesCount(); ++i)
+		{
+			std::shared_ptr<Shape> shape = m_slide->GetShapeAt(i);
+			Frame frame = shape->GetFrame();
+			m_output << std::format(
+				"{}. Type: {}; Color: outline {}, inline {}; Frame: left: {}, top: {}, width: {}, height: {}\n",
+				i + 1,
+				shape->GetType(),
+				StyleToString(shape->GetLineStyle()),
+				StyleToString(shape->GetFillStyle()),
+				frame.left, frame.top, frame.width, frame.height);
+		}
+	}
 
-    static std::string StyleToString(Style style)
-    {
-        std::ostringstream ss;
-        ss << '#' << std::setw(8) << std::setfill('0') << std::hex << style.GetColor();
-        return ss.str();
-    }
+	static std::string StyleToString(Style style)
+	{
+		std::ostringstream ss;
+		ss << '#' << std::setw(8) << std::setfill('0') << std::hex << style.GetColor();
+		return ss.str();
+	}
 
-    Menu m_menu;
-    std::unique_ptr<ISlide> m_slide{std::make_unique<Slide>()};
+	Menu m_menu;
+	std::unique_ptr<ISlide> m_slide{ std::make_unique<Slide>() };
 
-    std::istream& m_input;
-    std::ostream& m_output;
+	std::istream& m_input;
+	std::ostream& m_output;
 };

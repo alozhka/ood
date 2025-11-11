@@ -3,21 +3,17 @@
 #include <string>
 
 #include "../Shape.h"
-#include "../Point.h"
 
 class Rectangle : public Shape
 {
 public:
-    Rectangle(const Frame& frame, RGBAColor fillColor, RGBAColor lineColor)
-        : Shape(frame, fillColor, lineColor)
-    {
-    }
+	Rectangle(const Frame& frame, Style lineStyle, Style fillStyle)
+		: Shape(frame, lineStyle, fillStyle)
+	{
+	}
 
-    std::string GetType() const override
-    {
-        return "rectangle";
-    }
-
-private:
-    int m_width, m_height;
+	std::string GetType() const override
+	{
+		return "rectangle";
+	}
 };

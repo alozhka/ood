@@ -8,8 +8,8 @@ class IShape
 {
 public:
 	virtual void SetFrame(const Frame& rect) = 0;
-	virtual void SetLineStyle(RGBAColor color) = 0;
-	virtual void SetFillStyle(RGBAColor color) = 0;
+	virtual void SetLineStyle(RGBAColor color, bool isEnabled) = 0;
+	virtual void SetFillStyle(RGBAColor color, bool isEnabled) = 0;
 
 	// TODO: сделать рисование
 	// virtual void Draw(ICanvas& canvas) const = 0;

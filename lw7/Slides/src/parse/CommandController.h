@@ -35,11 +35,11 @@ public:
 			std::bind_front(&CommandController::GroupShapes, this));
 		m_menu.AddItem(
 			"SetLineStyle",
-			"Usage: SetLineStyle <index> <color>. Sets line style color for shape",
+			"Usage: SetLineStyle <index> <color> <enabled|disabled>. Sets line style color for shape",
 			std::bind_front(&CommandController::SetLineStyle, this));
 		m_menu.AddItem(
 			"SetFillStyle",
-			"Usage: SetFillStyle <index> <color>. Sets fill style color for shape",
+			"Usage: SetFillStyle <index> <color> <enabled|disabled>. Sets fill style color for shape",
 			std::bind_front(&CommandController::SetFillStyle, this));
 	}
 
@@ -90,26 +90,30 @@ private:
 	{
 		int index;
 		RGBAColor color;
+		std::string enabledStr;
 
-		if (!(input >> index >> std::hex >> color))
+		if (!(input >> index >> std::hex >> color >> enabledStr))
 		{
 			throw std::invalid_argument("Not all args are specified");
 		}
 
-		m_slide->SetLineStyle(--index, color);
+		bool isEnabled = ParseEnabledFlag(enabledStr);
+		m_slide->SetLineStyle(--index, color, isEnabled);
 	}
 
 	void SetFillStyle(std::istream& input)
 	{
 		int index;
 		RGBAColor color;
+		std::string enabledStr;
 
-		if (!(input >> index >> std::hex >> color))
+		if (!(input >> index >> std::hex >> color >> enabledStr))
 		{
 			throw std::invalid_argument("Not all args are specified");
 		}
 
-		m_slide->SetFillStyle(--index, color);
+		bool isEnabled = ParseEnabledFlag(enabledStr);
+		m_slide->SetFillStyle(--index, color, isEnabled);
 	}
 
 	void List() const
@@ -128,6 +132,19 @@ private:
 		}
 	}
 
+	static bool ParseEnabledFlag(const std::string& str)
+	{
+		if (str == "enabled")
+		{
+			return true;
+		}
+		if (str == "disabled")
+		{
+			return false;
+		}
+		throw std::invalid_argument("Invalid enabled flag");
+	}
+
 	static std::string StyleToString(std::optional<Style> style)
 	{
 		std::ostringstream ss;
@@ -138,10 +155,16 @@ private:
 		}
 		else
 		{
-			ss << '#' << std::setw(8) << std::setfill('0') << std::hex << style->GetColor();
+			ss << '#' << std::setw(8) << std::setfill('0') << std::hex << style->GetColor()
+			   << " " << PrintEnabled(style->IsEnabled());
 		}
 
 		return ss.str();
+	}
+
+	static std::string PrintEnabled(bool isEnabled)
+	{
+		return isEnabled ? "enabled" : "disabled";
 	}
 
 	static std::string FrameToString(std::optional<Frame> frame)

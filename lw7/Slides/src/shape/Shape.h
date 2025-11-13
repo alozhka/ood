@@ -17,14 +17,16 @@ public:
 		m_frame = rect;
 	}
 
-	void SetLineStyle(RGBAColor color) override
+	void SetLineStyle(RGBAColor color, bool isEnabled) override
 	{
 		m_lineStyle.SetColor(color);
+		m_lineStyle.Enable(isEnabled);
 	}
 
-	void SetFillStyle(RGBAColor color) override
+	void SetFillStyle(RGBAColor color, bool isEnabled) override
 	{
 		m_fillStyle.SetColor(color);
+		m_fillStyle.Enable(isEnabled);
 	}
 
 	std::optional<Frame> GetFrame() const override

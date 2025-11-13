@@ -21,16 +21,16 @@ public:
 		shape->SetFrame(frame);
 	}
 
-	void SetLineStyle(int index, RGBAColor color) override
+	void SetLineStyle(int index, RGBAColor color, bool isEnabled) override
 	{
 		std::shared_ptr<IShape> shape = GetShapeAt(index);
-		shape->SetLineStyle(color);
+		shape->SetLineStyle(color, isEnabled);
 	}
 
-	void SetFillStyle(int index, RGBAColor color) override
+	void SetFillStyle(int index, RGBAColor color, bool isEnabled) override
 	{
 		std::shared_ptr<IShape> shape = GetShapeAt(index);
-		shape->SetFillStyle(color);
+		shape->SetFillStyle(color, isEnabled);
 	}
 
 	void GroupShapes(const std::set<int>& indexes) override

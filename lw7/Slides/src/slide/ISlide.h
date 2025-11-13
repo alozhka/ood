@@ -8,8 +8,8 @@ class ISlide
 public:
 	virtual void AddShape(const std::shared_ptr<IShape>& shape) = 0;
 	virtual void TransformShape(int index, double left, double top, double width, double height) = 0;
-	virtual void SetLineStyle(int index, RGBAColor color) = 0;
-	virtual void SetFillStyle(int index, RGBAColor color) = 0;
+	virtual void SetLineStyle(int index, RGBAColor color, bool isEnabled) = 0;
+	virtual void SetFillStyle(int index, RGBAColor color, bool isEnabled) = 0;
 
 	virtual void GroupShapes(const std::set<int>& indexes) = 0;
 

@@ -1,6 +1,7 @@
 #pragma once
 #include "../types/Ellipse.h"
 
+#include <istream>
 #include <memory>
 
 #include "../types/Rectangle.h"

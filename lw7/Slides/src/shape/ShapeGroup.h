@@ -15,19 +15,19 @@ public:
 		throw std::logic_error("Not implemented yet!");
 	}
 
-	void SetLineStyle(RGBAColor color) override
+	void SetLineStyle(RGBAColor color, bool isEnabled) override
 	{
 		for (const std::shared_ptr<IShape>& shape : m_shapes)
 		{
-			shape->SetLineStyle(color);
+			shape->SetLineStyle(color, isEnabled);
 		}
 	}
 
-	void SetFillStyle(RGBAColor color) override
+	void SetFillStyle(RGBAColor color, bool isEnabled) override
 	{
 		for (const std::shared_ptr<IShape>& shape : m_shapes)
 		{
-			shape->SetFillStyle(color);
+			shape->SetFillStyle(color, isEnabled);
 		}
 	}
 

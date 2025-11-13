@@ -15,7 +15,9 @@ add_executable(Slides main.cpp
         src/shape/TemplateFrame.h
         src/canvas/ICanvas.h
         src/shape/types/Ellipse.h
-        src/shape/types/Triangle.h)
+        src/shape/types/Triangle.h
+        src/shape/IShape.h
+        src/shape/ShapeGroup.h)
 
 
 include(FetchContent)

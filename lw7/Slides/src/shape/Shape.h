@@ -1,9 +1,8 @@
 #pragma once
-#include "Style.h"
+#include "IShape.h"
 #include "TemplateFrame.h"
-#include <string>
 
-class Shape
+class Shape : public IShape
 {
 public:
 	Shape(const Frame& frame, const Style& lineStyle, const Style& fillStyle)
@@ -13,42 +12,38 @@ public:
 	{
 	}
 
-	void SetFrame(const Frame& rect)
+	void SetFrame(const Frame& rect) override
 	{
 		m_frame = rect;
 	}
 
-	void SetLineStyle(const Style& style)
+	void SetLineStyle(RGBAColor color) override
 	{
-		m_lineStyle = style;
+		m_lineStyle.SetColor(color);
 	}
 
-	void SetFillStyle(const Style& style)
+	void SetFillStyle(RGBAColor color) override
 	{
-		m_fillStyle = style;
+		m_fillStyle.SetColor(color);
 	}
 
 	// TODO: сделать рисование
 	// virtual void Draw(ICanvas& canvas) const = 0;
 
-	Frame GetFrame() const
+	Frame GetFrame() const override
 	{
 		return m_frame;
 	}
 
-	Style GetLineStyle() const
+	std::optional<Style> GetLineStyle() const override
 	{
 		return m_lineStyle;
 	}
 
-	Style GetFillStyle() const
+	std::optional<Style> GetFillStyle() const override
 	{
 		return m_fillStyle;
 	}
-
-	virtual std::string GetType() const = 0;
-
-	virtual ~Shape() = default;
 
 protected:
 	Frame m_frame{};

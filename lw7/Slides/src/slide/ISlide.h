@@ -1,16 +1,18 @@
 #pragma once
-#include <memory>
-
 #include "../shape/Shape.h"
+#include <memory>
+#include <vector>
 
 class ISlide
 {
 public:
-	virtual void AddShape(std::shared_ptr<Shape> shape) = 0;
+	virtual void AddShape(const std::shared_ptr<IShape>& shape) = 0;
 	virtual void TransformShape(int index, double left, double top, double width, double height) = 0;
 
+	virtual void GroupShapes(const std::vector<int>& indexes) = 0;
+
 	virtual size_t GetShapesCount() const = 0;
-	virtual std::shared_ptr<Shape> GetShapeAt(size_t index) = 0;
+	virtual std::shared_ptr<IShape> GetShapeAt(size_t index) = 0;
 
 	virtual ~ISlide() = default;
 };

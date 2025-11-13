@@ -29,6 +29,10 @@ public:
 			"TransformShape",
 			"Usage: TransformShape <index> <left> <top> <width> <height>. Transforms shape's frame",
 			std::bind_front(&CommandController::TransformShape, this));
+		m_menu.AddItem(
+			"GroupShapes",
+			"Usage: GroupShapes <index1> <index2> <...>. Groups shapes into single group",
+			std::bind_front(&CommandController::GroupShapes, this));
 	}
 
 	void Run()
@@ -62,11 +66,23 @@ private:
 		m_slide->TransformShape(--index, left, top, width, height);
 	}
 
+	void GroupShapes(std::istream& input)
+	{
+		std::vector<int> indexes;
+		int index;
+		while (input >> index)
+		{
+			indexes.push_back(--index);
+		}
+
+		m_slide->GroupShapes(indexes);
+	}
+
 	void List() const
 	{
 		for (size_t i = 0; i < m_slide->GetShapesCount(); ++i)
 		{
-			std::shared_ptr<Shape> shape = m_slide->GetShapeAt(i);
+			std::shared_ptr<IShape> shape = m_slide->GetShapeAt(i);
 			Frame frame = shape->GetFrame();
 			m_output << std::format(
 				"{}. Type: {}; Color: outline {}, inline {}; Frame: left: {}, top: {}, width: {}, height: {}\n",
@@ -78,10 +94,19 @@ private:
 		}
 	}
 
-	static std::string StyleToString(Style style)
+	static std::string StyleToString(std::optional<Style> style)
 	{
 		std::ostringstream ss;
-		ss << '#' << std::setw(8) << std::setfill('0') << std::hex << style.GetColor();
+
+		if (!style)
+		{
+			ss << "none";
+		}
+		else
+		{
+			ss << '#' << std::setw(8) << std::setfill('0') << std::hex << style->GetColor();
+		}
+
 		return ss.str();
 	}
 

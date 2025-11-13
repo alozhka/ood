@@ -72,10 +72,10 @@ public:
 			return std::nullopt;
 		}
 
-		std::optional<Style> firstStyle = m_shapes[0]->GetLineStyle();
+		std::optional<Style> firstStyle = m_shapes[0]->GetFillStyle();
 		for (const std::shared_ptr<IShape>& shape : m_shapes)
 		{
-			std::optional<Style> style = shape->GetLineStyle();
+			std::optional<Style> style = shape->GetFillStyle();
 			if (firstStyle->GetColor() != style->GetColor())
 			{
 				return std::nullopt;

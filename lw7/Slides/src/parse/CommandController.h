@@ -33,6 +33,14 @@ public:
 			"GroupShapes",
 			"Usage: GroupShapes <index1> <index2> <...>. Groups shapes into single group",
 			std::bind_front(&CommandController::GroupShapes, this));
+		m_menu.AddItem(
+			"SetLineStyle",
+			"Usage: SetLineStyle <index> <color>. Sets line style color for shape",
+			std::bind_front(&CommandController::SetLineStyle, this));
+		m_menu.AddItem(
+			"SetFillStyle",
+			"Usage: SetFillStyle <index> <color>. Sets fill style color for shape",
+			std::bind_front(&CommandController::SetFillStyle, this));
 	}
 
 	void Run()
@@ -76,6 +84,32 @@ private:
 		}
 
 		m_slide->GroupShapes(indexes);
+	}
+
+	void SetLineStyle(std::istream& input)
+	{
+		int index;
+		RGBAColor color;
+
+		if (!(input >> index >> std::hex >> color))
+		{
+			throw std::invalid_argument("Not all args are specified");
+		}
+
+		m_slide->SetLineStyle(--index, color);
+	}
+
+	void SetFillStyle(std::istream& input)
+	{
+		int index;
+		RGBAColor color;
+
+		if (!(input >> index >> std::hex >> color))
+		{
+			throw std::invalid_argument("Not all args are specified");
+		}
+
+		m_slide->SetFillStyle(--index, color);
 	}
 
 	void List() const

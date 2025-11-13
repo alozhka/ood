@@ -17,12 +17,18 @@ public:
 
 	void SetLineStyle(RGBAColor color) override
 	{
-		throw std::logic_error("Not implemented yet!");
+		for (const std::shared_ptr<IShape>& shape : m_shapes)
+		{
+			shape->SetLineStyle(color);
+		}
 	}
 
 	void SetFillStyle(RGBAColor color) override
 	{
-		throw std::logic_error("Not implemented yet!");
+		for (const std::shared_ptr<IShape>& shape : m_shapes)
+		{
+			shape->SetFillStyle(color);
+		}
 	}
 
 	std::optional<Frame> GetFrame() const override

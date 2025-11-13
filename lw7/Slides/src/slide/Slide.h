@@ -21,6 +21,18 @@ public:
 		shape->SetFrame(frame);
 	}
 
+	void SetLineStyle(int index, RGBAColor color) override
+	{
+		std::shared_ptr<IShape> shape = GetShapeAt(index);
+		shape->SetLineStyle(color);
+	}
+
+	void SetFillStyle(int index, RGBAColor color) override
+	{
+		std::shared_ptr<IShape> shape = GetShapeAt(index);
+		shape->SetFillStyle(color);
+	}
+
 	void GroupShapes(const std::set<int>& indexes) override
 	{
 		std::vector<std::shared_ptr<IShape>> shapes;
@@ -32,7 +44,7 @@ public:
 
 		auto group = std::make_shared<ShapeGroup>(shapes);
 
-		for (int i = indexes.size() - 1; i >= 0; --i)
+		for (int i = m_shapes.size() - 1; i >= 0; --i)
 		{
 			if (indexes.contains(i))
 			{

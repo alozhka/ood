@@ -89,6 +89,26 @@ TEST_F(SlidesTests, EmptyGroupShowsNoFrame)
 		output.str());
 }
 
+TEST_F(SlidesTests, ShapesGroupSetsStyleToEveryShape)
+{
+	SetupInput("InsertShape rectangle 0xff0000ff 0x00ff0080 0 0 180 120\n"
+			   "InsertShape rectangle 0xff4010ff 0x0b78fa80 100 610 70 80\n"
+			   "GroupShapes 1 2\n"
+			   "List\n"
+			   "SetFillStyle 1 0xff4010ff\n"
+			   "List\n"
+			   "SetLineStyle 1 0x0b78fa80\n"
+			   "List\n");
+
+	controller.Run();
+
+	EXPECT_EQ(
+		"1. Type: group; Color: outline none, inline none; Frame: left: 0, top: 0, width: 180, height: 690\n"
+		"1. Type: group; Color: outline none, inline #ff4010ff; Frame: left: 0, top: 0, width: 180, height: 690\n"
+		"1. Type: group; Color: outline #0b78fa80, inline #ff4010ff; Frame: left: 0, top: 0, width: 180, height: 690\n",
+		output.str());
+}
+
 class ShapesTests : public testing::Test
 {
 protected:

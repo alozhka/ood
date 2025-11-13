@@ -27,10 +27,7 @@ public:
 		m_fillStyle.SetColor(color);
 	}
 
-	// TODO: сделать рисование
-	// virtual void Draw(ICanvas& canvas) const = 0;
-
-	Frame GetFrame() const override
+	std::optional<Frame> GetFrame() const override
 	{
 		return m_frame;
 	}

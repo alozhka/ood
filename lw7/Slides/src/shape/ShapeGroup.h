@@ -25,8 +25,13 @@ public:
 		throw std::logic_error("Not implemented yet!");
 	}
 
-	Frame GetFrame() const override
+	std::optional<Frame> GetFrame() const override
 	{
+		if (m_shapes.empty())
+		{
+			return std::nullopt;
+		}
+
 		double left = std::numeric_limits<double>::max();
 		double bottom = std::numeric_limits<double>::lowest();
 		double top = std::numeric_limits<double>::max();
@@ -34,11 +39,16 @@ public:
 
 		for (const std::shared_ptr<IShape>& shape : m_shapes)
 		{
-			Frame frame = shape->GetFrame();
-			left = std::min(left, frame.left);
-			top = std::min(top, frame.top);
-			right = std::max(right, frame.left + frame.width);
-			bottom = std::max(bottom, frame.top + frame.height);
+			std::optional<Frame> frame = shape->GetFrame();
+			if (!frame)
+			{
+				return std::nullopt;
+			}
+
+			left = std::min(left, frame->left);
+			top = std::min(top, frame->top);
+			right = std::max(right, frame->left + frame->width);
+			bottom = std::max(bottom, frame->top + frame->height);
 		}
 
 		return Frame{ left, top, right - left, bottom - top };

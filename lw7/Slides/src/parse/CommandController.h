@@ -68,11 +68,11 @@ private:
 
 	void GroupShapes(std::istream& input)
 	{
-		std::vector<int> indexes;
+		std::set<int> indexes;
 		int index;
 		while (input >> index)
 		{
-			indexes.push_back(--index);
+			indexes.insert(--index);
 		}
 
 		m_slide->GroupShapes(indexes);
@@ -83,14 +83,14 @@ private:
 		for (size_t i = 0; i < m_slide->GetShapesCount(); ++i)
 		{
 			std::shared_ptr<IShape> shape = m_slide->GetShapeAt(i);
-			Frame frame = shape->GetFrame();
+			std::optional<Frame> frame = shape->GetFrame();
 			m_output << std::format(
-				"{}. Type: {}; Color: outline {}, inline {}; Frame: left: {}, top: {}, width: {}, height: {}\n",
+				"{}. Type: {}; Color: outline {}, inline {}; Frame: {}\n",
 				i + 1,
 				shape->GetType(),
 				StyleToString(shape->GetLineStyle()),
 				StyleToString(shape->GetFillStyle()),
-				frame.left, frame.top, frame.width, frame.height);
+				FrameToString(frame));
 		}
 	}
 
@@ -108,6 +108,21 @@ private:
 		}
 
 		return ss.str();
+	}
+
+	static std::string FrameToString(std::optional<Frame> frame)
+	{
+		if (!frame)
+		{
+			return "none";
+		}
+
+		return std::format(
+			"left: {}, top: {}, width: {}, height: {}",
+			frame->left,
+			frame->top,
+			frame->width,
+			frame->height);
 	}
 
 	Menu m_menu;

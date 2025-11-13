@@ -76,3 +76,28 @@ TEST_F(SlidesTests, ShapesGroupShowsColor)
 		"1. Type: group; Color: outline #ff4010ff, inline #0b78fa80; Frame: left: 0, top: 0, width: 180, height: 690\n",
 		output.str());
 }
+
+TEST_F(SlidesTests, EmptyGroupShowsNoFrame)
+{
+	SetupInput("GroupShapes \n"
+			   "List\n");
+
+	controller.Run();
+
+	EXPECT_EQ(
+		"1. Type: group; Color: outline none, inline none; Frame: none\n",
+		output.str());
+}
+
+class ShapesTests : public testing::Test
+{
+protected:
+	static std::shared_ptr<Rectangle> CreateRectangle()
+	{
+		Style fill, line;
+		fill.SetColor(0xff4010ff);
+		line.SetColor(0x0b78fa80);
+		Frame frame{ 0, 0, 10, 20 };
+		return std::make_shared<Rectangle>(frame, fill, line);
+	}
+};

@@ -21,13 +21,8 @@ public:
 		shape->SetFrame(frame);
 	}
 
-	void GroupShapes(const std::vector<int>& indexes) override
+	void GroupShapes(const std::set<int>& indexes) override
 	{
-		if (indexes.size() < 2)
-		{
-			throw std::runtime_error("At least 2 shapes are required for grouping.");
-		}
-
 		std::vector<std::shared_ptr<IShape>> shapes;
 		for (int index : indexes)
 		{
@@ -37,9 +32,12 @@ public:
 
 		auto group = std::make_shared<ShapeGroup>(shapes);
 
-		for (int index : std::ranges::reverse_view(indexes))
+		for (int i = indexes.size() - 1; i >= 0; --i)
 		{
-			m_shapes.erase(m_shapes.begin() + index);
+			if (indexes.contains(i))
+			{
+				m_shapes.erase(m_shapes.begin() + i);
+			}
 		}
 
 		AddShape(group);

@@ -39,6 +39,8 @@ TEST_F(SlidesTests, TransformsShape)
 
 	controller.Run();
 
-	EXPECT_EQ("1. Type: rectangle; Color: outline #ff0000ff, inline #00ff0080; Frame: left: 200, top: 210, width: 50, height: 60\n",
+	EXPECT_EQ(
+		"1. Type: rectangle; Color: outline #ff0000ff, inline #00ff0080; Frame: left: 350, top: 200, width: 100, height: 120\n"
+		"1. Type: rectangle; Color: outline #ff0000ff, inline #00ff0080; Frame: left: 200, top: 210, width: 50, height: 60\n",
 		output.str());
 }

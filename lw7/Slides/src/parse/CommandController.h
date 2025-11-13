@@ -25,6 +25,10 @@ public:
 			"InsertShape",
 			"Usage: InsertShape <shapeType> <fillColor> <lineColor> <x> <y> <width> <height>. Inserts shape into slide",
 			std::bind_front(&CommandController::InsertShape, this));
+		m_menu.AddItem(
+			"TransformShape",
+			"Usage: TransformShape <index> <left> <top> <width> <height>. Transforms shape's frame",
+			std::bind_front(&CommandController::TransformShape, this));
 	}
 
 	void Run()
@@ -43,6 +47,19 @@ private:
 
 		std::shared_ptr<Shape> shape = ShapesFactory::Create(type, input);
 		m_slide->AddShape(shape);
+	}
+
+	void TransformShape(std::istream& input)
+	{
+		int index;
+		double left, top, width, height;
+
+		if (!(input >> index >> left >> top >> width >> height))
+		{
+			throw std::invalid_argument("Not all args are specified");
+		}
+
+		m_slide->TransformShape(--index, left, top, width, height);
 	}
 
 	void List() const

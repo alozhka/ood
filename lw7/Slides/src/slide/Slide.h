@@ -12,6 +12,13 @@ public:
 		m_shapes.push_back(shape);
 	}
 
+	void TransformShape(int index, double left, double top, double width, double height) override
+	{
+		std::shared_ptr<Shape> shape = GetShapeAt(index);
+		Frame frame(left, top, width, height);
+		shape->SetFrame(frame);
+	}
+
 	size_t GetShapesCount() const override
 	{
 		return m_shapes.size();

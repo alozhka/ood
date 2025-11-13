@@ -1,6 +1,7 @@
 #pragma once
 #include "Style.h"
 #include "TemplateFrame.h"
+#include <string>
 
 class Shape
 {

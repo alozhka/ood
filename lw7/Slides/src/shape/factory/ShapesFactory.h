@@ -1,7 +1,10 @@
 #pragma once
+#include "../types/Ellipse.h"
+
 #include <memory>
 
 #include "../types/Rectangle.h"
+#include "../types/Triangle.h"
 
 class Rectangle;
 
@@ -29,6 +32,14 @@ public:
 		if (type == "rectangle")
 		{
 			return std::make_shared<Rectangle>(frame, lineStyle, fillStyle);
+		}
+		if (type == "ellipse")
+		{
+			return std::make_shared<Ellipse>(frame, lineStyle, fillStyle);
+		}
+		if (type == "triangle")
+		{
+			return std::make_shared<Triangle>(frame, lineStyle, fillStyle);
 		}
 
 		throw std::invalid_argument("Cannot create unsupported shape");

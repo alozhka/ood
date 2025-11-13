@@ -109,15 +109,19 @@ TEST_F(SlidesTests, ShapesGroupSetsStyleToEveryShape)
 		output.str());
 }
 
-class ShapesTests : public testing::Test
+TEST_F(SlidesTests, ShapesGroupTransformsProportionally)
 {
-protected:
-	static std::shared_ptr<Rectangle> CreateRectangle()
-	{
-		Style fill, line;
-		fill.SetColor(0xff4010ff);
-		line.SetColor(0x0b78fa80);
-		Frame frame{ 0, 0, 10, 20 };
-		return std::make_shared<Rectangle>(frame, fill, line);
-	}
-};
+	SetupInput("InsertShape rectangle 0xff0000ff 0x00ff0080 0 0 100 100\n"
+			   "InsertShape rectangle 0xff0000ff 0x00ff0080 100 100 100 100\n"
+			   "GroupShapes 1 2\n"
+			   "List\n"
+			   "TransformShape 1 0 0 400 400\n"
+			   "List\n");
+
+	controller.Run();
+
+	EXPECT_EQ(
+		"1. Type: group; Color: outline #ff0000ff enabled, inline #00ff0080 enabled; Frame: left: 0, top: 0, width: 200, height: 200\n"
+		"1. Type: group; Color: outline #ff0000ff enabled, inline #00ff0080 enabled; Frame: left: 0, top: 0, width: 400, height: 400\n",
+		output.str());
+}

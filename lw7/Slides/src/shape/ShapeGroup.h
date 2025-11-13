@@ -12,7 +12,33 @@ public:
 
 	void SetFrame(const Frame& rect) override
 	{
-		throw std::logic_error("Not implemented yet!");
+		if (m_shapes.empty())
+		{
+			return;
+		}
+		std::optional<Frame> groupFrame = GetFrame();
+		if (!groupFrame)
+		{
+			return;
+		}
+
+		double widthScale = rect.width / groupFrame->width;
+		double heightScale = rect.height / groupFrame->height;
+		for (const auto& shape : m_shapes)
+		{
+			std::optional<Frame> shapeFrame = shape->GetFrame();
+
+			double leftOffset = shapeFrame->left - groupFrame->left;
+			double scaledLeft = widthScale * leftOffset;
+			double topOffset = shapeFrame->top - groupFrame->top;
+			double scaledTop = heightScale * topOffset;
+
+			shape->SetFrame(
+				{ rect.left + scaledLeft,
+					rect.top + scaledTop,
+					shapeFrame->width * widthScale,
+					shapeFrame->height * heightScale });
+		}
 	}
 
 	void SetLineStyle(RGBAColor color, bool isEnabled) override

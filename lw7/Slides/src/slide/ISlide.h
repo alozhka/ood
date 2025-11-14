@@ -13,6 +13,7 @@ public:
 	virtual void SetFillStyle(int index, RGBAColor color, bool isEnabled) = 0;
 
 	virtual void GroupShapes(const std::set<int>& indexes) = 0;
+	virtual void CloneShape(int index) = 0;
 
 	virtual size_t GetShapesCount() const = 0;
 	virtual std::shared_ptr<IShape> GetShapeAt(size_t index) = 0;

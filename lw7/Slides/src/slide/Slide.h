@@ -55,6 +55,14 @@ public:
 		AddShape(group);
 	}
 
+	void CloneShape(int index) override
+	{
+		EnsureValidIndex(index);
+		std::shared_ptr<IShape> shape = GetShapeAt(index);
+		std::shared_ptr<IShape> clonedShape = shape->Clone();
+		AddShape(clonedShape);
+	}
+
 	size_t GetShapesCount() const override
 	{
 		return m_shapes.size();

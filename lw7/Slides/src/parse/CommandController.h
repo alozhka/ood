@@ -44,6 +44,10 @@ public:
 			"Usage: SetFillStyle <index> <color> <enabled|disabled>. Sets fill style color for shape",
 			std::bind_front(&CommandController::SetFillStyle, this));
 		m_menu.AddItem(
+			"CloneShape",
+			"Usage: CloneShape <index>. Clones shape at specified index",
+			std::bind_front(&CommandController::CloneShape, this));
+		m_menu.AddItem(
 			"Export",
 			"Usage: Export <filename>. Export image in SVG",
 			std::bind_front(&CommandController::Export, this));
@@ -128,6 +132,18 @@ private:
 
 		bool isEnabled = ParseEnabledFlag(enabledStr);
 		m_slide->SetFillStyle(--index, color, isEnabled);
+	}
+
+	void CloneShape(std::istream& input)
+	{
+		int index;
+
+		if (!(input >> index))
+		{
+			throw std::invalid_argument("Shape index is not specified");
+		}
+
+		m_slide->CloneShape(--index);
 	}
 
 	void Export(std::istream& input)

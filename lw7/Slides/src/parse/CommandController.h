@@ -137,12 +137,10 @@ private:
 	void CloneShape(std::istream& input)
 	{
 		int index;
-
 		if (!(input >> index))
 		{
 			throw std::invalid_argument("Shape index is not specified");
 		}
-
 		m_slide->CloneShape(--index);
 	}
 

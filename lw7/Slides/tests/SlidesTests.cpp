@@ -1,5 +1,9 @@
 #include "../src/parse/CommandController.h"
 #include "../src/canvas/SVGCanvas.h"
+#include "../src/shape/types/Rectangle.h"
+#include "../src/shape/types/Triangle.h"
+#include "../src/shape/types/Ellipse.h"
+#include "../src/shape/ShapeGroup.h"
 #include "gtest/gtest.h"
 
 class SlidesTests : public testing::Test
@@ -155,4 +159,154 @@ TEST_F(SlidesTests, ExportsShapesToSVG)
 
 	// Clean up
 	std::remove("test_output.svg");
+}
+
+// Clone tests
+TEST_F(SlidesTests, CloneRectangle)
+{
+	Frame frame{ 350, 200, 100, 120 };
+	Style lineStyle;
+	lineStyle.SetColor(0xff0000ff);
+	lineStyle.Enable(true);
+	Style fillStyle;
+	fillStyle.SetColor(0x00ff0080);
+	fillStyle.Enable(true);
+
+	auto rectangle = std::make_shared<Rectangle>(frame, lineStyle, fillStyle);
+	auto clonedRectangle = rectangle->Clone();
+
+	EXPECT_EQ(rectangle->GetType(), clonedRectangle->GetType());
+	EXPECT_EQ(rectangle->GetFrame()->left, clonedRectangle->GetFrame()->left);
+	EXPECT_EQ(rectangle->GetFrame()->top, clonedRectangle->GetFrame()->top);
+	EXPECT_EQ(rectangle->GetFrame()->width, clonedRectangle->GetFrame()->width);
+	EXPECT_EQ(rectangle->GetFrame()->height, clonedRectangle->GetFrame()->height);
+	EXPECT_EQ(rectangle->GetLineStyle()->GetColor(), clonedRectangle->GetLineStyle()->GetColor());
+	EXPECT_EQ(rectangle->GetFillStyle()->GetColor(), clonedRectangle->GetFillStyle()->GetColor());
+
+	clonedRectangle->SetFrame({ 100, 100, 50, 50 });
+	EXPECT_NE(rectangle->GetFrame()->left, clonedRectangle->GetFrame()->left);
+	EXPECT_NE(rectangle->GetFrame()->width, clonedRectangle->GetFrame()->width);
+}
+
+TEST_F(SlidesTests, CloneTriangle)
+{
+	Frame frame{ 430, 400, 100, 200 };
+	Style lineStyle;
+	lineStyle.SetColor(0x00ffffee);
+	lineStyle.Enable(true);
+	Style fillStyle;
+	fillStyle.SetColor(0x1920aaa0);
+	fillStyle.Enable(true);
+
+	auto triangle = std::make_shared<Triangle>(frame, lineStyle, fillStyle);
+	auto clonedTriangle = triangle->Clone();
+
+	EXPECT_EQ(triangle->GetType(), clonedTriangle->GetType());
+	EXPECT_EQ(triangle->GetFrame()->left, clonedTriangle->GetFrame()->left);
+	EXPECT_EQ(triangle->GetFrame()->top, clonedTriangle->GetFrame()->top);
+	EXPECT_EQ(triangle->GetFrame()->width, clonedTriangle->GetFrame()->width);
+	EXPECT_EQ(triangle->GetFrame()->height, clonedTriangle->GetFrame()->height);
+
+	clonedTriangle->SetLineStyle(0xff0000ff, true);
+	EXPECT_NE(triangle->GetLineStyle()->GetColor(), clonedTriangle->GetLineStyle()->GetColor());
+}
+
+TEST_F(SlidesTests, CloneEllipse)
+{
+	Frame frame{ 600, 610, 70, 80 };
+	Style lineStyle;
+	lineStyle.SetColor(0xff4010ff);
+	lineStyle.Enable(true);
+	Style fillStyle;
+	fillStyle.SetColor(0x0b78fa80);
+	fillStyle.Enable(true);
+
+	auto ellipse = std::make_shared<Ellipse>(frame, lineStyle, fillStyle);
+	auto clonedEllipse = ellipse->Clone();
+
+	EXPECT_EQ(ellipse->GetType(), clonedEllipse->GetType());
+	EXPECT_EQ(ellipse->GetFrame()->left, clonedEllipse->GetFrame()->left);
+	EXPECT_EQ(ellipse->GetFrame()->top, clonedEllipse->GetFrame()->top);
+	EXPECT_EQ(ellipse->GetFrame()->width, clonedEllipse->GetFrame()->width);
+	EXPECT_EQ(ellipse->GetFrame()->height, clonedEllipse->GetFrame()->height);
+
+	clonedEllipse->SetFillStyle(0xff00ffff, true);
+	EXPECT_NE(ellipse->GetFillStyle()->GetColor(), clonedEllipse->GetFillStyle()->GetColor());
+}
+
+TEST_F(SlidesTests, CloneShapeGroup)
+{
+	Frame frame1{ 0, 0, 100, 100 };
+	Frame frame2{ 100, 100, 100, 100 };
+	Style lineStyle;
+	lineStyle.SetColor(0xff0000ff);
+	lineStyle.Enable(true);
+	Style fillStyle;
+	fillStyle.SetColor(0x00ff0080);
+	fillStyle.Enable(true);
+
+	auto rect1 = std::make_shared<Rectangle>(frame1, lineStyle, fillStyle);
+	auto rect2 = std::make_shared<Rectangle>(frame2, lineStyle, fillStyle);
+
+	std::vector<std::shared_ptr<IShape>> shapes{ rect1, rect2 };
+	auto group = std::make_shared<ShapeGroup>(shapes);
+
+	auto clonedGroup = group->Clone();
+
+	EXPECT_EQ(group->GetType(), clonedGroup->GetType());
+	EXPECT_EQ(group->GetFrame()->left, clonedGroup->GetFrame()->left);
+	EXPECT_EQ(group->GetFrame()->top, clonedGroup->GetFrame()->top);
+	EXPECT_EQ(group->GetFrame()->width, clonedGroup->GetFrame()->width);
+	EXPECT_EQ(group->GetFrame()->height, clonedGroup->GetFrame()->height);
+
+	clonedGroup->SetFillStyle(0xff00ffff, true);
+	EXPECT_NE(group->GetFillStyle()->GetColor(), clonedGroup->GetFillStyle()->GetColor());
+
+	EXPECT_EQ(rect1->GetFillStyle()->GetColor(), 0x00ff0080);
+	EXPECT_EQ(rect2->GetFillStyle()->GetColor(), 0x00ff0080);
+}
+
+TEST_F(SlidesTests, CloneNestedShapeGroup)
+{
+	// Create nested group structure
+	Frame frame1{ 0, 0, 50, 50 };
+	Frame frame2{ 50, 50, 50, 50 };
+	Frame frame3{ 100, 100, 50, 50 };
+
+	Style lineStyle;
+	lineStyle.SetColor(0xff0000ff);
+	lineStyle.Enable(true);
+	Style fillStyle;
+	fillStyle.SetColor(0x00ff0080);
+	fillStyle.Enable(true);
+
+	auto rect1 = std::make_shared<Rectangle>(frame1, lineStyle, fillStyle);
+	auto rect2 = std::make_shared<Rectangle>(frame2, lineStyle, fillStyle);
+	auto rect3 = std::make_shared<Rectangle>(frame3, lineStyle, fillStyle);
+
+	// Create inner group
+	std::vector<std::shared_ptr<IShape>> innerShapes{ rect1, rect2 };
+	auto innerGroup = std::make_shared<ShapeGroup>(innerShapes);
+
+	// Create outer group
+	std::vector<std::shared_ptr<IShape>> outerShapes{ innerGroup, rect3 };
+	auto outerGroup = std::make_shared<ShapeGroup>(outerShapes);
+
+	// Clone the outer group
+	auto clonedOuterGroup = outerGroup->Clone();
+
+	// Verify that clone has same properties
+	EXPECT_EQ(outerGroup->GetType(), clonedOuterGroup->GetType());
+	EXPECT_EQ(outerGroup->GetFrame()->left, clonedOuterGroup->GetFrame()->left);
+	EXPECT_EQ(outerGroup->GetFrame()->top, clonedOuterGroup->GetFrame()->top);
+	EXPECT_EQ(outerGroup->GetFrame()->width, clonedOuterGroup->GetFrame()->width);
+	EXPECT_EQ(outerGroup->GetFrame()->height, clonedOuterGroup->GetFrame()->height);
+
+	clonedOuterGroup->SetLineStyle(0x0000ffff, true);
+
+	EXPECT_EQ(rect1->GetLineStyle()->GetColor(), 0xff0000ff);
+	EXPECT_EQ(rect2->GetLineStyle()->GetColor(), 0xff0000ff);
+	EXPECT_EQ(rect3->GetLineStyle()->GetColor(), 0xff0000ff);
+
+	EXPECT_EQ(clonedOuterGroup->GetLineStyle()->GetColor(), 0x0000ffff);
 }

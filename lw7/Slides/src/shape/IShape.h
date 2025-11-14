@@ -4,6 +4,7 @@
 
 #include "../canvas/ICanvas.h"
 #include <string>
+#include <memory>
 
 class IShape
 {
@@ -18,6 +19,8 @@ public:
 	virtual std::optional<Style> GetLineStyle() const = 0;
 	virtual std::optional<Style> GetFillStyle() const = 0;
 	virtual std::string GetType() const = 0;
+
+	virtual std::shared_ptr<IShape> Clone() const = 0;
 
 	virtual ~IShape() = default;
 };

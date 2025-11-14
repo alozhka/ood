@@ -11,9 +11,6 @@
 #include "../slide/ISlide.h"
 #include "../slide/Slide.h"
 
-// TODO: определение паттерна компоновщик (тип, задача, применение)
-// TODO: примеры применения компоновщика
-// TODO: как определить конкретный тип объекта
 class CommandController
 {
 public:

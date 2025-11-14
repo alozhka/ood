@@ -44,7 +44,28 @@ public:
 		return m_fillStyle;
 	}
 
+	void Draw(ICanvas& canvas) const override
+	{
+		if (m_lineStyle.IsEnabled())
+		{
+			canvas.SetLineColor(m_lineStyle.GetColor());
+		}
+		if (m_fillStyle.IsEnabled())
+		{
+			canvas.BeginFill(m_fillStyle.GetColor());
+		}
+
+		DrawImpl(canvas);
+
+		if (m_fillStyle.IsEnabled())
+		{
+			canvas.EndFill();
+		}
+	}
+
 protected:
+	virtual void DrawImpl(ICanvas& canvas) const = 0;
+
 	Frame m_frame{};
 	Style m_lineStyle, m_fillStyle;
 };

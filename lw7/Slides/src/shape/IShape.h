@@ -2,6 +2,7 @@
 #include "Style.h"
 #include "TemplateFrame.h"
 
+#include "../canvas/ICanvas.h"
 #include <string>
 
 class IShape
@@ -11,8 +12,7 @@ public:
 	virtual void SetLineStyle(RGBAColor color, bool isEnabled) = 0;
 	virtual void SetFillStyle(RGBAColor color, bool isEnabled) = 0;
 
-	// TODO: сделать рисование
-	// virtual void Draw(ICanvas& canvas) const = 0;
+	virtual void Draw(ICanvas& canvas) const = 0;
 
 	virtual std::optional<Frame> GetFrame() const = 0;
 	virtual std::optional<Style> GetLineStyle() const = 0;

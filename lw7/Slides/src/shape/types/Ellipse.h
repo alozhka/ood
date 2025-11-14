@@ -13,4 +13,10 @@ public:
 	{
 		return "ellipse";
 	}
+
+protected:
+	void DrawImpl(ICanvas& canvas) const override
+	{
+		canvas.DrawEllipse(m_frame.left, m_frame.top, m_frame.width, m_frame.height);
+	}
 };

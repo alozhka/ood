@@ -132,6 +132,14 @@ public:
 		return "group";
 	}
 
+	void Draw(ICanvas& canvas) const override
+	{
+		for (const auto& shape : m_shapes)
+		{
+			shape->Draw(canvas);
+		}
+	}
+
 private:
 	std::vector<std::shared_ptr<IShape>> m_shapes;
 };

@@ -1,5 +1,6 @@
 #pragma once
 #include <iomanip>
+#include <fstream>
 
 #include "Menu.h"
 
@@ -8,6 +9,7 @@
 #include "../shape/factory/ShapesFactory.h"
 #include "../slide/ISlide.h"
 #include "../slide/Slide.h"
+#include "../canvas/SVGCanvas.h"
 
 class CommandController
 {
@@ -41,6 +43,10 @@ public:
 			"SetFillStyle",
 			"Usage: SetFillStyle <index> <color> <enabled|disabled>. Sets fill style color for shape",
 			std::bind_front(&CommandController::SetFillStyle, this));
+		m_menu.AddItem(
+			"Export",
+			"Usage: Export <filename>. Export image in SVG",
+			std::bind_front(&CommandController::Export, this));
 	}
 
 	void Run()
@@ -114,6 +120,26 @@ private:
 
 		bool isEnabled = ParseEnabledFlag(enabledStr);
 		m_slide->SetFillStyle(--index, color, isEnabled);
+	}
+
+	void Export(std::istream& input)
+	{
+		std::string filename;
+		if (!(input >> filename))
+		{
+			throw std::invalid_argument("Filename is not specified");
+		}
+
+		SVGCanvas canvas{ 1920, 1200 };
+		m_slide->Draw(canvas);
+
+		std::ofstream file(filename);
+		if (!file)
+		{
+			throw std::runtime_error("Cannot open file: " + filename);
+		}
+
+		canvas.Export(file);
 	}
 
 	void List() const

@@ -1,4 +1,5 @@
 #include "../src/parse/CommandController.h"
+#include "../src/canvas/SVGCanvas.h"
 #include "gtest/gtest.h"
 
 class SlidesTests : public testing::Test
@@ -124,4 +125,34 @@ TEST_F(SlidesTests, ShapesGroupTransformsProportionally)
 		"1. Type: group; Color: outline #ff0000ff enabled, inline #00ff0080 enabled; Frame: left: 0, top: 0, width: 200, height: 200\n"
 		"1. Type: group; Color: outline #ff0000ff enabled, inline #00ff0080 enabled; Frame: left: 0, top: 0, width: 400, height: 400\n",
 		output.str());
+}
+
+TEST_F(SlidesTests, ExportsShapesToSVG)
+{
+	SetupInput("InsertShape rectangle 0x000000ff 0xffffffff 100 100 200 150\n"
+			   "InsertShape ellipse 0xff0000ff 0x00ff00ff 400 200 100 80\n"
+			   "InsertShape triangle 0x0000ffff 0xffff00ff 200 350 150 100\n"
+			   "Export test_output.svg\n");
+
+	controller.Run();
+
+	// Read the generated SVG file
+	std::ifstream file("test_output.svg");
+	ASSERT_TRUE(file.is_open());
+	std::stringstream buffer;
+	buffer << file.rdbuf();
+	file.close();
+
+	std::string expected =
+		R"(<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="1920" height="1200">
+<polygon points="100,100 300,100 300,250 100,250 100,100" fill="#ffffff" stroke="#000000" stroke-width="1" />
+<ellipse cx="450" cy="240" rx="50" ry="40" fill="#00ff00" stroke="#ff0000" stroke-width="1" />
+<polygon points="200,450 275,350 350,450 200,450" fill="#ffff00" stroke="#0000ff" stroke-width="1" />
+</svg>
+)";
+
+	EXPECT_EQ(expected, buffer.str());
+
+	// Clean up
+	std::remove("test_output.svg");
 }

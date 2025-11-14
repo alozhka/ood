@@ -66,6 +66,14 @@ public:
 		return m_shapes[index];
 	}
 
+	void Draw(ICanvas& canvas) const override
+	{
+		for (const auto& shape : m_shapes)
+		{
+			shape->Draw(canvas);
+		}
+	}
+
 private:
 	void EnsureValidIndex(size_t index) const
 	{

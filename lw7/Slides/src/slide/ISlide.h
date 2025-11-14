@@ -1,5 +1,6 @@
 #pragma once
 #include "../shape/Shape.h"
+#include "../canvas/ICanvas.h"
 #include <memory>
 #include <set>
 
@@ -15,6 +16,8 @@ public:
 
 	virtual size_t GetShapesCount() const = 0;
 	virtual std::shared_ptr<IShape> GetShapeAt(size_t index) = 0;
+
+	virtual void Draw(ICanvas& canvas) const = 0;
 
 	virtual ~ISlide() = default;
 };

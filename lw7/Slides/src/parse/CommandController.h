@@ -1,15 +1,15 @@
 #pragma once
-#include <iomanip>
 #include <fstream>
+#include <iomanip>
 
 #include "Menu.h"
 
 #include <istream>
 
+#include "../canvas/SVGCanvas.h"
 #include "../shape/factory/ShapesFactory.h"
 #include "../slide/ISlide.h"
 #include "../slide/Slide.h"
-#include "../canvas/SVGCanvas.h"
 
 class CommandController
 {
@@ -47,6 +47,14 @@ public:
 			"Export",
 			"Usage: Export <filename>. Export image in SVG",
 			std::bind_front(&CommandController::Export, this));
+		m_menu.AddItem(
+			"Help",
+			"Prints command list.",
+			[this](std::istream&) { Help(); });
+		m_menu.AddItem(
+			"Exit",
+			"Exits the program.",
+			[this](std::istream&) { Exit(); });
 	}
 
 	void Run()
@@ -156,6 +164,16 @@ private:
 				StyleToString(shape->GetFillStyle()),
 				FrameToString(frame));
 		}
+	}
+
+	void Help() const
+	{
+		m_menu.ShowInstructions();
+	}
+
+	void Exit()
+	{
+		m_menu.Exit();
 	}
 
 	static bool ParseEnabledFlag(const std::string& str)

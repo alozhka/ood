@@ -1,9 +1,9 @@
-#include "../src/parse/CommandController.h"
 #include "../src/canvas/SVGCanvas.h"
+#include "../src/parse/CommandController.h"
+#include "../src/shape/ShapeGroup.h"
+#include "../src/shape/types/Ellipse.h"
 #include "../src/shape/types/Rectangle.h"
 #include "../src/shape/types/Triangle.h"
-#include "../src/shape/types/Ellipse.h"
-#include "../src/shape/ShapeGroup.h"
 #include "gtest/gtest.h"
 
 class SlidesTests : public testing::Test
@@ -140,13 +140,11 @@ TEST_F(SlidesTests, ExportsShapesToSVG)
 
 	controller.Run();
 
-	// Read the generated SVG file
 	std::ifstream file("test_output.svg");
 	ASSERT_TRUE(file.is_open());
 	std::stringstream buffer;
 	buffer << file.rdbuf();
 	file.close();
-
 	std::string expected =
 		R"(<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="1920" height="1200">
 <polygon points="100,100 300,100 300,250 100,250 100,100" fill="#ffffff" stroke="#000000" stroke-width="1" />
@@ -154,10 +152,7 @@ TEST_F(SlidesTests, ExportsShapesToSVG)
 <polygon points="200,450 275,350 350,450 200,450" fill="#ffff00" stroke="#0000ff" stroke-width="1" />
 </svg>
 )";
-
 	EXPECT_EQ(expected, buffer.str());
-
-	// Clean up
 	std::remove("test_output.svg");
 }
 
@@ -175,6 +170,7 @@ TEST_F(SlidesTests, CloneRectangle)
 	auto rectangle = std::make_shared<Rectangle>(frame, lineStyle, fillStyle);
 	auto clonedRectangle = rectangle->Clone();
 
+	EXPECT_NE(rectangle.get(), clonedRectangle.get());
 	EXPECT_EQ(rectangle->GetType(), clonedRectangle->GetType());
 	EXPECT_EQ(rectangle->GetFrame()->left, clonedRectangle->GetFrame()->left);
 	EXPECT_EQ(rectangle->GetFrame()->top, clonedRectangle->GetFrame()->top);
@@ -201,6 +197,7 @@ TEST_F(SlidesTests, CloneTriangle)
 	auto triangle = std::make_shared<Triangle>(frame, lineStyle, fillStyle);
 	auto clonedTriangle = triangle->Clone();
 
+	EXPECT_NE(triangle.get(), clonedTriangle.get());
 	EXPECT_EQ(triangle->GetType(), clonedTriangle->GetType());
 	EXPECT_EQ(triangle->GetFrame()->left, clonedTriangle->GetFrame()->left);
 	EXPECT_EQ(triangle->GetFrame()->top, clonedTriangle->GetFrame()->top);
@@ -224,6 +221,7 @@ TEST_F(SlidesTests, CloneEllipse)
 	auto ellipse = std::make_shared<Ellipse>(frame, lineStyle, fillStyle);
 	auto clonedEllipse = ellipse->Clone();
 
+	EXPECT_NE(ellipse.get(), clonedEllipse.get());
 	EXPECT_EQ(ellipse->GetType(), clonedEllipse->GetType());
 	EXPECT_EQ(ellipse->GetFrame()->left, clonedEllipse->GetFrame()->left);
 	EXPECT_EQ(ellipse->GetFrame()->top, clonedEllipse->GetFrame()->top);
@@ -253,6 +251,7 @@ TEST_F(SlidesTests, CloneShapeGroup)
 
 	auto clonedGroup = group->Clone();
 
+	EXPECT_NE(group.get(), clonedGroup.get());
 	EXPECT_EQ(group->GetType(), clonedGroup->GetType());
 	EXPECT_EQ(group->GetFrame()->left, clonedGroup->GetFrame()->left);
 	EXPECT_EQ(group->GetFrame()->top, clonedGroup->GetFrame()->top);
@@ -284,18 +283,15 @@ TEST_F(SlidesTests, CloneNestedShapeGroup)
 	auto rect2 = std::make_shared<Rectangle>(frame2, lineStyle, fillStyle);
 	auto rect3 = std::make_shared<Rectangle>(frame3, lineStyle, fillStyle);
 
-	// Create inner group
 	std::vector<std::shared_ptr<IShape>> innerShapes{ rect1, rect2 };
 	auto innerGroup = std::make_shared<ShapeGroup>(innerShapes);
 
-	// Create outer group
 	std::vector<std::shared_ptr<IShape>> outerShapes{ innerGroup, rect3 };
 	auto outerGroup = std::make_shared<ShapeGroup>(outerShapes);
 
-	// Clone the outer group
 	auto clonedOuterGroup = outerGroup->Clone();
 
-	// Verify that clone has same properties
+	EXPECT_NE(innerGroup.get(), clonedOuterGroup.get());
 	EXPECT_EQ(outerGroup->GetType(), clonedOuterGroup->GetType());
 	EXPECT_EQ(outerGroup->GetFrame()->left, clonedOuterGroup->GetFrame()->left);
 	EXPECT_EQ(outerGroup->GetFrame()->top, clonedOuterGroup->GetFrame()->top);

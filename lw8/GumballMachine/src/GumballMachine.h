@@ -187,6 +187,7 @@ public:
 		, m_noQuarterState(*this, out)
 		, m_hasQuarterState(*this, out)
 		, m_state(&m_soldOutState)
+		, m_output(out)
 	{
 		if (m_count > 0)
 		{
@@ -225,7 +226,7 @@ private:
 	{
 		if (m_count != 0)
 		{
-			std::cout << "A gumball comes rolling out the slot...\n";
+			m_output << "A gumball comes rolling out the slot...\n";
 			--m_count;
 		}
 	}
@@ -256,4 +257,6 @@ private:
 	NoQuarterState m_noQuarterState;
 	HasQuarterState m_hasQuarterState;
 	IState* m_state;
+
+	std::ostream& m_output;
 };

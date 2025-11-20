@@ -5,7 +5,9 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_executable(MultiGumballMachine main.cpp
         src/NaiveMultiGumballMachine.h
-        src/MultiGumballMachine.h)
+        src/MultiGumballMachine.h
+        src/Menu.h
+        src/CommandController.h)
 
 include(FetchContent)
 FetchContent_Declare(

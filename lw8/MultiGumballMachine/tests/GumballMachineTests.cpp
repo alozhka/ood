@@ -458,4 +458,3 @@ TEST_F(GumballMachineTests, RefillInSoldOutStateWithQuarters)
 		"Quarters inserted: 1/5\n"
 		"Machine is waiting for turn of crank");
 }
-

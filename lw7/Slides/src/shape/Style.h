@@ -27,6 +27,6 @@ public:
 	}
 
 private:
-	bool m_isEnabled{ false };
+	bool m_isEnabled{ true };
 	RGBAColor m_color{ 0 };
 };

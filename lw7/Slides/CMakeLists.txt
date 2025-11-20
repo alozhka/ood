@@ -13,7 +13,12 @@ add_executable(Slides main.cpp
         src/shape/types/Rectangle.h
         src/shape/Style.h
         src/shape/TemplateFrame.h
-        src/canvas/ICanvas.h)
+        src/canvas/ICanvas.h
+        src/shape/types/Ellipse.h
+        src/shape/types/Triangle.h
+        src/shape/IShape.h
+        src/shape/ShapeGroup.h
+        src/canvas/SVGCanvas.h)
 
 
 include(FetchContent)

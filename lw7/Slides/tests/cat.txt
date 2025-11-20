@@ -1,0 +1,13 @@
+InsertShape ellipse 0x000000ff 0xffa500ff 300 200 200 200
+InsertShape triangle 0x000000ff 0xffa500ff 280 150 80 100
+InsertShape triangle 0x000000ff 0xffa500ff 440 150 80 100
+InsertShape ellipse 0x000000ff 0xffff00ff 350 250 30 40
+InsertShape ellipse 0x000000ff 0xffff00ff 420 250 30 40
+InsertShape ellipse 0x000000ff 0x000000ff 360 265 10 15
+InsertShape ellipse 0x000000ff 0x000000ff 430 265 10 15
+InsertShape triangle 0x000000ff 0xff69b4ff 385 310 30 20
+InsertShape ellipse 0x000000ff 0xffa500ff 250 380 300 280
+InsertShape ellipse 0x000000ff 0xffa500ff 280 600 60 80
+InsertShape ellipse 0x000000ff 0xffa500ff 460 600 60 80
+InsertShape triangle 0x000000ff 0xffa500ff 520 450 100 120
+Export cat.svg

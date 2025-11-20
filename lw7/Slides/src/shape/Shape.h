@@ -1,8 +1,8 @@
 #pragma once
-#include "Style.h"
+#include "IShape.h"
 #include "TemplateFrame.h"
 
-class Shape
+class Shape : public IShape
 {
 public:
 	Shape(const Frame& frame, const Style& lineStyle, const Style& fillStyle)
@@ -12,44 +12,60 @@ public:
 	{
 	}
 
-	void SetFrame(const Frame& rect)
+	void SetFrame(const Frame& rect) override
 	{
 		m_frame = rect;
 	}
 
-	void SetLineStyle(const Style& style)
+	void SetLineStyle(RGBAColor color, bool isEnabled) override
 	{
-		m_lineStyle = style;
+		m_lineStyle.SetColor(color);
+		m_lineStyle.Enable(isEnabled);
 	}
 
-	void SetFillStyle(const Style& style)
+	void SetFillStyle(RGBAColor color, bool isEnabled) override
 	{
-		m_fillStyle = style;
+		m_fillStyle.SetColor(color);
+		m_fillStyle.Enable(isEnabled);
 	}
 
-	// TODO: сделать рисование
-	// virtual void Draw(ICanvas& canvas) const = 0;
-
-	Frame GetFrame() const
+	std::optional<Frame> GetFrame() const override
 	{
 		return m_frame;
 	}
 
-	Style GetLineStyle() const
+	std::optional<Style> GetLineStyle() const override
 	{
 		return m_lineStyle;
 	}
 
-	Style GetFillStyle() const
+	std::optional<Style> GetFillStyle() const override
 	{
 		return m_fillStyle;
 	}
 
-	virtual std::string GetType() const = 0;
+	void Draw(ICanvas& canvas) const override
+	{
+		if (m_lineStyle.IsEnabled())
+		{
+			canvas.SetLineColor(m_lineStyle.GetColor());
+		}
+		if (m_fillStyle.IsEnabled())
+		{
+			canvas.BeginFill(m_fillStyle.GetColor());
+		}
 
-	virtual ~Shape() = default;
+		DrawImpl(canvas);
+
+		if (m_fillStyle.IsEnabled())
+		{
+			canvas.EndFill();
+		}
+	}
 
 protected:
+	virtual void DrawImpl(ICanvas& canvas) const = 0;
+
 	Frame m_frame{};
 	Style m_lineStyle, m_fillStyle;
 };

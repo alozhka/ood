@@ -1,0 +1,11 @@
+---
+title: State diagram of a gumball machine
+---
+stateDiagram-v2
+    [*] --> NoQuarter
+    NoQuarter --> HasQuarter: insert a quarter
+    HasQuarter --> NoQuarter: eject a quarter
+    HasQuarter --> Sold: turn crank
+    Sold --> NoQuarter: dispense a gumball
+    Sold --> SoldOut: all gumballs are dispensed
+    SoldOut --> [*]

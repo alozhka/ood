@@ -39,7 +39,7 @@ void TestGumballMachine(GumballMachineType& m)
 
 int main()
 {
-	GumballMachine gumball(2);
+	GumballMachine gumball(2, std::cout);
 	TestGumballMachine(gumball);
 
 	return 0;

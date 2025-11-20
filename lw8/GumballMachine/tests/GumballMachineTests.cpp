@@ -125,3 +125,12 @@ TEST_F(GumballMachineTests, TestSoldOutState)
 		"delivering a gumball\n",
 		output.str());
 }
+
+TEST_F(GumballMachineTests, TestHasQuarterState)
+{
+	TestGumballMachine gumballMachine{ 2, output };
+	gumballMachine.SetState(gumballMachine.GetHasQuarterState());
+	gumballMachine.Dispense();
+
+	EXPECT_EQ("No gumball dispensed\n", output.str());
+}

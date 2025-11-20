@@ -13,8 +13,8 @@ protected:
 	}
 
 	std::ostringstream naiveOutput{}, stateOutput{};
-	NaiveMultiGumballMachine naiveMachine{3, naiveOutput};
-	MultiGumballMachine stateMachine{3, stateOutput};
+	NaiveMultiGumballMachine naiveMachine{ 3, naiveOutput };
+	MultiGumballMachine stateMachine{ 3, stateOutput };
 };
 
 TEST_F(GumballMachineTests, InitialState)
@@ -350,3 +350,112 @@ TEST_F(GumballMachineTests, ComplexUsageScenarioFullOutput)
 		"Quarters inserted: 1/5\n"
 		"Machine is waiting for turn of crank");
 }
+
+TEST_F(GumballMachineTests, RefillInSoldOutState)
+{
+	std::ostringstream naiveEmptyOutput, stateEmptyOutput;
+	NaiveMultiGumballMachine naiveEmpty(0, naiveEmptyOutput);
+	MultiGumballMachine stateEmpty(0, stateEmptyOutput);
+
+	naiveEmptyOutput.str("");
+	stateEmptyOutput.str("");
+	naiveEmpty.Refill(5);
+	stateEmpty.Refill(5);
+
+	EXPECT_EQ(naiveEmptyOutput.str(), stateEmptyOutput.str());
+	EXPECT_EQ("Machine refilled with 5 gumballs\n", naiveEmptyOutput.str());
+
+	std::string naiveString = naiveEmpty.ToString();
+	std::string stateString = stateEmpty.ToString();
+	EXPECT_EQ(naiveString, stateString);
+	EXPECT_EQ(naiveString,
+		"Mighty Gumball, Inc.\n"
+		"C++-enabled Standing Gumball Model #2016 (Multi-Quarter)\n"
+		"Inventory: 5 gumballs\n"
+		"Quarters inserted: 0/5\n"
+		"Machine is waiting for quarter");
+}
+
+TEST_F(GumballMachineTests, RefillInNoQuarterState)
+{
+	ClearOutputs();
+	naiveMachine.Refill(10);
+	stateMachine.Refill(10);
+
+	EXPECT_EQ(naiveOutput.str(), stateOutput.str());
+	EXPECT_EQ("Machine refilled with 10 gumballs\n", naiveOutput.str());
+
+	std::string naiveString = naiveMachine.ToString();
+	std::string stateString = stateMachine.ToString();
+	EXPECT_EQ(naiveString, stateString);
+	EXPECT_EQ(naiveString,
+		"Mighty Gumball, Inc.\n"
+		"C++-enabled Standing Gumball Model #2016 (Multi-Quarter)\n"
+		"Inventory: 10 gumballs\n"
+		"Quarters inserted: 0/5\n"
+		"Machine is waiting for quarter");
+}
+
+TEST_F(GumballMachineTests, RefillInHasQuarterState)
+{
+	naiveMachine.InsertQuarter();
+	stateMachine.InsertQuarter();
+
+	ClearOutputs();
+	naiveMachine.Refill(7);
+	stateMachine.Refill(7);
+
+	EXPECT_EQ(naiveOutput.str(), stateOutput.str());
+	EXPECT_EQ("Machine refilled with 7 gumballs\n", naiveOutput.str());
+
+	std::string naiveString = naiveMachine.ToString();
+	std::string stateString = stateMachine.ToString();
+	EXPECT_EQ(naiveString, stateString);
+	EXPECT_EQ(naiveString,
+		"Mighty Gumball, Inc.\n"
+		"C++-enabled Standing Gumball Model #2016 (Multi-Quarter)\n"
+		"Inventory: 7 gumballs\n"
+		"Quarters inserted: 1/5\n"
+		"Machine is waiting for turn of crank");
+}
+
+TEST_F(GumballMachineTests, RefillInSoldOutStateWithQuarters)
+{
+	std::ostringstream naiveEmptyOutput, stateEmptyOutput;
+	NaiveMultiGumballMachine naiveEmpty(1, naiveEmptyOutput);
+	MultiGumballMachine stateEmpty(1, stateEmptyOutput);
+
+	naiveEmpty.InsertQuarter();
+	stateEmpty.InsertQuarter();
+	naiveEmpty.InsertQuarter();
+	stateEmpty.InsertQuarter();
+	naiveEmpty.TurnCrank();
+	stateEmpty.TurnCrank();
+
+	std::string beforeRefill = naiveEmpty.ToString();
+	EXPECT_EQ(beforeRefill,
+		"Mighty Gumball, Inc.\n"
+		"C++-enabled Standing Gumball Model #2016 (Multi-Quarter)\n"
+		"Inventory: 0 gumballs\n"
+		"Quarters inserted: 1/5\n"
+		"Machine is sold out");
+
+	naiveEmptyOutput.str("");
+	stateEmptyOutput.str("");
+	naiveEmpty.Refill(4);
+	stateEmpty.Refill(4);
+
+	EXPECT_EQ(naiveEmptyOutput.str(), stateEmptyOutput.str());
+	EXPECT_EQ("Machine refilled with 4 gumballs\n", naiveEmptyOutput.str());
+
+	std::string naiveString = naiveEmpty.ToString();
+	std::string stateString = stateEmpty.ToString();
+	EXPECT_EQ(naiveString, stateString);
+	EXPECT_EQ(naiveString,
+		"Mighty Gumball, Inc.\n"
+		"C++-enabled Standing Gumball Model #2016 (Multi-Quarter)\n"
+		"Inventory: 4 gumballs\n"
+		"Quarters inserted: 1/5\n"
+		"Machine is waiting for turn of crank");
+}
+

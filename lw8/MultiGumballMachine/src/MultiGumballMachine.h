@@ -13,6 +13,7 @@ struct IMultiGumballMachine
 	virtual unsigned RemoveQuarter() = 0;
 	virtual bool HasQuarters() const = 0;
 	virtual bool IsFullOfQuarters() const = 0;
+	virtual void SetBallCount(unsigned count) = 0;
 
 	virtual void SetSoldOutState() = 0;
 	virtual void SetNoQuarterState() = 0;
@@ -28,6 +29,7 @@ struct IState
 	virtual void EjectQuarter() = 0;
 	virtual void TurnCrank() = 0;
 	virtual void Dispense() = 0;
+	virtual void Refill(unsigned numBalls) = 0;
 	virtual std::string ToString() const = 0;
 	virtual ~IState() = default;
 };
@@ -76,6 +78,11 @@ public:
 		}
 	}
 
+	void Refill(unsigned numBalls) override
+	{
+		out << "Can't refill while delivering a gumball\n";
+	}
+
 	std::string ToString() const override
 	{
 		return "delivering a gumball";
@@ -120,6 +127,20 @@ public:
 	void Dispense() override
 	{
 		out << "No gumball dispensed\n";
+	}
+
+	void Refill(unsigned numBalls) override
+	{
+		m_gumballMachine.SetBallCount(numBalls);
+		out << "Machine refilled with " << numBalls << " gumball" << (numBalls != 1 ? "s" : "") << "\n";
+		if (m_gumballMachine.HasQuarters())
+		{
+			m_gumballMachine.SetHasQuarterState();
+		}
+		else
+		{
+			m_gumballMachine.SetNoQuarterState();
+		}
 	}
 
 	std::string ToString() const override
@@ -171,6 +192,12 @@ public:
 		out << "No gumball dispensed\n";
 	}
 
+	void Refill(unsigned numBalls) override
+	{
+		m_gumballMachine.SetBallCount(numBalls);
+		out << "Machine refilled with " << numBalls << " gumball" << (numBalls != 1 ? "s" : "") << "\n";
+	}
+
 	std::string ToString() const override
 	{
 		return "waiting for turn of crank";
@@ -210,6 +237,12 @@ public:
 	void Dispense() override
 	{
 		out << "You need to pay first\n";
+	}
+
+	void Refill(unsigned numBalls) override
+	{
+		m_gumballMachine.SetBallCount(numBalls);
+		out << "Machine refilled with " << numBalls << " gumball" << (numBalls != 1 ? "s" : "") << "\n";
 	}
 
 	std::string ToString() const override
@@ -256,6 +289,11 @@ public:
 	{
 		m_state->TurnCrank();
 		m_state->Dispense();
+	}
+
+	void Refill(unsigned numBalls)
+	{
+		m_state->Refill(numBalls);
 	}
 
 	std::string ToString() const
@@ -346,6 +384,11 @@ private:
 	void SetHasQuarterState() override
 	{
 		m_state = &m_hasQuarterState;
+	}
+
+	void SetBallCount(unsigned count) override
+	{
+		m_count = count;
 	}
 
 	unsigned m_count = 0;

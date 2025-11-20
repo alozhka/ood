@@ -10,9 +10,8 @@ public:
 
 	explicit NaiveMultiGumballMachine(unsigned numBalls, std::ostream& out)
 		: m_count(numBalls)
-		, m_quarters(0)
-		, m_output(out)
 		, m_state(State::SOLD_OUT)
+		, m_output(out)
 	{
 		if (m_count > 0)
 		{
@@ -104,6 +103,33 @@ public:
 			break;
 		}
 		Dispense();
+	}
+
+	void Refill(unsigned numBalls)
+	{
+		switch (m_state)
+		{
+		case State::SOLD:
+			m_output << "Can't refill while delivering a gumball\n";
+			break;
+		case State::SOLD_OUT:
+			m_count = numBalls;
+			m_output << "Machine refilled with " << numBalls << " gumball" << (numBalls != 1 ? "s" : "") << "\n";
+			if (m_quarters > 0)
+			{
+				m_state = State::HAS_QUARTER;
+			}
+			else
+			{
+				m_state = State::NO_QUARTER;
+			}
+			break;
+		case State::NO_QUARTER:
+		case State::HAS_QUARTER:
+			m_count = numBalls;
+			m_output << "Machine refilled with " << numBalls << " gumball" << (numBalls != 1 ? "s" : "") << "\n";
+			break;
+		}
 	}
 
 	std::string ToString() const

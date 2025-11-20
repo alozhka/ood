@@ -3,33 +3,24 @@
 #include "gtest/gtest.h"
 #include <sstream>
 
-// Сравнительные тесты - проверяем что обе реализации ведут себя одинаково
-class MultiGumballMachineComparisonTests : public testing::Test
+class GumballMachineTests : public testing::Test
 {
 protected:
-	void SetUp() override
-	{
-		naiveOutput = std::make_unique<std::ostringstream>();
-		stateOutput = std::make_unique<std::ostringstream>();
-		naiveMachine = std::make_unique<NaiveMultiGumballMachine>(3, *naiveOutput);
-		stateMachine = std::make_unique<MultiGumballMachine>(3, *stateOutput);
-	}
-
 	void ClearOutputs()
 	{
-		naiveOutput->str("");
-		stateOutput->str("");
+		naiveOutput.str("");
+		stateOutput.str("");
 	}
 
-	std::unique_ptr<std::ostringstream> naiveOutput, stateOutput;
-	std::unique_ptr<NaiveMultiGumballMachine> naiveMachine;
-	std::unique_ptr<MultiGumballMachine> stateMachine;
+	std::ostringstream naiveOutput{}, stateOutput{};
+	NaiveMultiGumballMachine naiveMachine{3, naiveOutput};
+	MultiGumballMachine stateMachine{3, stateOutput};
 };
 
-TEST_F(MultiGumballMachineComparisonTests, InitialState)
+TEST_F(GumballMachineTests, InitialState)
 {
-	std::string naiveString = naiveMachine->ToString();
-	std::string stateString = stateMachine->ToString();
+	std::string naiveString = naiveMachine.ToString();
+	std::string stateString = stateMachine.ToString();
 
 	EXPECT_EQ(naiveString, stateString);
 	EXPECT_EQ(naiveString,
@@ -40,16 +31,16 @@ TEST_F(MultiGumballMachineComparisonTests, InitialState)
 		"Machine is waiting for quarter");
 }
 
-TEST_F(MultiGumballMachineComparisonTests, InsertSingleQuarter)
+TEST_F(GumballMachineTests, InsertSingleQuarter)
 {
-	naiveMachine->InsertQuarter();
-	stateMachine->InsertQuarter();
+	naiveMachine.InsertQuarter();
+	stateMachine.InsertQuarter();
 
-	EXPECT_EQ(naiveOutput->str(), stateOutput->str());
-	EXPECT_EQ(naiveOutput->str(), "You inserted a quarter\n");
+	EXPECT_EQ(naiveOutput.str(), stateOutput.str());
+	EXPECT_EQ("You inserted a quarter\n", naiveOutput.str());
 
-	std::string naiveString = naiveMachine->ToString();
-	std::string stateString = stateMachine->ToString();
+	std::string naiveString = naiveMachine.ToString();
+	std::string stateString = stateMachine.ToString();
 	EXPECT_EQ(naiveString, stateString);
 	EXPECT_EQ(naiveString,
 		"Mighty Gumball, Inc.\n"
@@ -59,21 +50,21 @@ TEST_F(MultiGumballMachineComparisonTests, InsertSingleQuarter)
 		"Machine is waiting for turn of crank");
 }
 
-TEST_F(MultiGumballMachineComparisonTests, InsertMultipleQuarters)
+TEST_F(GumballMachineTests, InsertMultipleQuarters)
 {
-	naiveMachine->InsertQuarter();
-	stateMachine->InsertQuarter();
+	naiveMachine.InsertQuarter();
+	stateMachine.InsertQuarter();
 
 	ClearOutputs();
 
-	naiveMachine->InsertQuarter();
-	stateMachine->InsertQuarter();
+	naiveMachine.InsertQuarter();
+	stateMachine.InsertQuarter();
 
-	EXPECT_EQ(naiveOutput->str(), stateOutput->str());
-	EXPECT_EQ(naiveOutput->str(), "You inserted another quarter\n");
+	EXPECT_EQ(naiveOutput.str(), stateOutput.str());
+	EXPECT_EQ("You inserted another quarter\n", naiveOutput.str());
 
-	std::string naiveString = naiveMachine->ToString();
-	std::string stateString = stateMachine->ToString();
+	std::string naiveString = naiveMachine.ToString();
+	std::string stateString = stateMachine.ToString();
 	EXPECT_EQ(naiveString, stateString);
 	EXPECT_EQ(naiveString,
 		"Mighty Gumball, Inc.\n"
@@ -83,16 +74,16 @@ TEST_F(MultiGumballMachineComparisonTests, InsertMultipleQuarters)
 		"Machine is waiting for turn of crank");
 }
 
-TEST_F(MultiGumballMachineComparisonTests, HasMaxQuarterLimit)
+TEST_F(GumballMachineTests, HasMaxQuarterLimit)
 {
 	for (int i = 0; i < 5; ++i)
 	{
-		naiveMachine->InsertQuarter();
-		stateMachine->InsertQuarter();
+		naiveMachine.InsertQuarter();
+		stateMachine.InsertQuarter();
 	}
 
-	std::string naiveString = naiveMachine->ToString();
-	std::string stateString = stateMachine->ToString();
+	std::string naiveString = naiveMachine.ToString();
+	std::string stateString = stateMachine.ToString();
 	EXPECT_EQ(naiveString, stateString);
 	EXPECT_EQ(naiveString,
 		"Mighty Gumball, Inc.\n"
@@ -102,29 +93,29 @@ TEST_F(MultiGumballMachineComparisonTests, HasMaxQuarterLimit)
 		"Machine is waiting for turn of crank");
 
 	ClearOutputs();
-	naiveMachine->InsertQuarter();
-	stateMachine->InsertQuarter();
+	naiveMachine.InsertQuarter();
+	stateMachine.InsertQuarter();
 
-	EXPECT_EQ(naiveOutput->str(), stateOutput->str());
-	EXPECT_EQ(naiveOutput->str(), "You can't insert another quarter, the machine is full\n");
+	EXPECT_EQ(naiveOutput.str(), stateOutput.str());
+	EXPECT_EQ("You can't insert another quarter, the machine is full\n", naiveOutput.str());
 }
 
-TEST_F(MultiGumballMachineComparisonTests, ReturnsLeftMoney)
+TEST_F(GumballMachineTests, ReturnsLeftMoney)
 {
-	naiveMachine->InsertQuarter();
-	stateMachine->InsertQuarter();
-	naiveMachine->InsertQuarter();
-	stateMachine->InsertQuarter();
+	naiveMachine.InsertQuarter();
+	stateMachine.InsertQuarter();
+	naiveMachine.InsertQuarter();
+	stateMachine.InsertQuarter();
 
 	ClearOutputs();
-	naiveMachine->EjectQuarter();
-	stateMachine->EjectQuarter();
+	naiveMachine.EjectQuarter();
+	stateMachine.EjectQuarter();
 
-	EXPECT_EQ(naiveOutput->str(), stateOutput->str());
-	EXPECT_EQ(naiveOutput->str(), "Returning 2 quarters\n");
+	EXPECT_EQ(naiveOutput.str(), stateOutput.str());
+	EXPECT_EQ("Returning 2 quarters\n", naiveOutput.str());
 
-	std::string naiveString = naiveMachine->ToString();
-	std::string stateString = stateMachine->ToString();
+	std::string naiveString = naiveMachine.ToString();
+	std::string stateString = stateMachine.ToString();
 	EXPECT_EQ(naiveString, stateString);
 	EXPECT_EQ(naiveString,
 		"Mighty Gumball, Inc.\n"
@@ -134,22 +125,23 @@ TEST_F(MultiGumballMachineComparisonTests, ReturnsLeftMoney)
 		"Machine is waiting for quarter");
 }
 
-TEST_F(MultiGumballMachineComparisonTests, TurnCrankWithQuarters)
+TEST_F(GumballMachineTests, TurnCrankWithQuarters)
 {
-	naiveMachine->InsertQuarter();
-	stateMachine->InsertQuarter();
+	naiveMachine.InsertQuarter();
+	stateMachine.InsertQuarter();
 
 	ClearOutputs();
-	naiveMachine->TurnCrank();
-	stateMachine->TurnCrank();
+	naiveMachine.TurnCrank();
+	stateMachine.TurnCrank();
 
-	EXPECT_EQ(naiveOutput->str(), stateOutput->str());
-	EXPECT_EQ(naiveOutput->str(),
+	EXPECT_EQ(naiveOutput.str(), stateOutput.str());
+	EXPECT_EQ(
 		"You turned...\n"
-		"A gumball comes rolling out the slot...\n");
+		"A gumball comes rolling out the slot...\n",
+		naiveOutput.str());
 
-	std::string naiveString = naiveMachine->ToString();
-	std::string stateString = stateMachine->ToString();
+	std::string naiveString = naiveMachine.ToString();
+	std::string stateString = stateMachine.ToString();
 	EXPECT_EQ(naiveString, stateString);
 	EXPECT_EQ(naiveString,
 		"Mighty Gumball, Inc.\n"
@@ -159,30 +151,31 @@ TEST_F(MultiGumballMachineComparisonTests, TurnCrankWithQuarters)
 		"Machine is waiting for quarter");
 }
 
-TEST_F(MultiGumballMachineComparisonTests, MultipleTurnsWithMultipleQuarters)
+TEST_F(GumballMachineTests, MultipleTurnsWithMultipleQuarters)
 {
-	naiveMachine->InsertQuarter();
-	naiveMachine->InsertQuarter();
-	naiveMachine->InsertQuarter();
-	stateMachine->InsertQuarter();
-	stateMachine->InsertQuarter();
-	stateMachine->InsertQuarter();
+	naiveMachine.InsertQuarter();
+	naiveMachine.InsertQuarter();
+	naiveMachine.InsertQuarter();
+	stateMachine.InsertQuarter();
+	stateMachine.InsertQuarter();
+	stateMachine.InsertQuarter();
 	ClearOutputs();
 
-	naiveMachine->TurnCrank();
-	stateMachine->TurnCrank();
-	naiveMachine->TurnCrank();
-	stateMachine->TurnCrank();
+	naiveMachine.TurnCrank();
+	stateMachine.TurnCrank();
+	naiveMachine.TurnCrank();
+	stateMachine.TurnCrank();
 
-	EXPECT_EQ(naiveOutput->str(), stateOutput->str());
-	EXPECT_EQ(naiveOutput->str(),
+	EXPECT_EQ(naiveOutput.str(), stateOutput.str());
+	EXPECT_EQ(
 		"You turned...\n"
 		"A gumball comes rolling out the slot...\n"
 		"You turned...\n"
-		"A gumball comes rolling out the slot...\n");
+		"A gumball comes rolling out the slot...\n",
+		naiveOutput.str());
 
-	std::string naiveString = naiveMachine->ToString();
-	std::string stateString = stateMachine->ToString();
+	std::string naiveString = naiveMachine.ToString();
+	std::string stateString = stateMachine.ToString();
 	EXPECT_EQ(naiveString, stateString);
 	EXPECT_EQ(naiveString,
 		"Mighty Gumball, Inc.\n"
@@ -192,37 +185,38 @@ TEST_F(MultiGumballMachineComparisonTests, MultipleTurnsWithMultipleQuarters)
 		"Machine is waiting for turn of crank");
 }
 
-TEST_F(MultiGumballMachineComparisonTests, MoreQuartersThanGumballs)
+TEST_F(GumballMachineTests, MoreQuartersThanGumballs)
 {
-	naiveMachine->InsertQuarter();
-	stateMachine->InsertQuarter();
-	naiveMachine->InsertQuarter();
-	stateMachine->InsertQuarter();
-	naiveMachine->InsertQuarter();
-	stateMachine->InsertQuarter();
-	naiveMachine->InsertQuarter();
-	stateMachine->InsertQuarter();
+	naiveMachine.InsertQuarter();
+	stateMachine.InsertQuarter();
+	naiveMachine.InsertQuarter();
+	stateMachine.InsertQuarter();
+	naiveMachine.InsertQuarter();
+	stateMachine.InsertQuarter();
+	naiveMachine.InsertQuarter();
+	stateMachine.InsertQuarter();
 
 	ClearOutputs();
-	naiveMachine->TurnCrank();
-	naiveMachine->TurnCrank();
-	naiveMachine->TurnCrank();
-	stateMachine->TurnCrank();
-	stateMachine->TurnCrank();
-	stateMachine->TurnCrank();
+	naiveMachine.TurnCrank();
+	naiveMachine.TurnCrank();
+	naiveMachine.TurnCrank();
+	stateMachine.TurnCrank();
+	stateMachine.TurnCrank();
+	stateMachine.TurnCrank();
 
-	EXPECT_EQ(naiveOutput->str(), stateOutput->str());
-	EXPECT_EQ(naiveOutput->str(),
+	EXPECT_EQ(naiveOutput.str(), stateOutput.str());
+	EXPECT_EQ(
 		"You turned...\n"
 		"A gumball comes rolling out the slot...\n"
 		"You turned...\n"
 		"A gumball comes rolling out the slot...\n"
 		"You turned...\n"
 		"A gumball comes rolling out the slot...\n"
-		"Oops, out of gumballs\n");
+		"Oops, out of gumballs\n",
+		naiveOutput.str());
 
-	std::string naiveString = naiveMachine->ToString();
-	std::string stateString = stateMachine->ToString();
+	std::string naiveString = naiveMachine.ToString();
+	std::string stateString = stateMachine.ToString();
 	EXPECT_EQ(naiveString, stateString);
 	EXPECT_EQ(naiveString,
 		"Mighty Gumball, Inc.\n"
@@ -232,23 +226,20 @@ TEST_F(MultiGumballMachineComparisonTests, MoreQuartersThanGumballs)
 		"Machine is sold out");
 
 	ClearOutputs();
-	naiveMachine->EjectQuarter();
-	stateMachine->EjectQuarter();
+	naiveMachine.EjectQuarter();
+	stateMachine.EjectQuarter();
 
-	EXPECT_EQ(naiveOutput->str(), stateOutput->str());
-	EXPECT_EQ(naiveOutput->str(), "Returning 1 quarter\n");
+	EXPECT_EQ(naiveOutput.str(), stateOutput.str());
+	EXPECT_EQ("Returning 1 quarter\n", naiveOutput.str());
 }
 
-TEST_F(MultiGumballMachineComparisonTests, SoldOutState)
+TEST_F(GumballMachineTests, SoldOutState)
 {
 	std::ostringstream naiveEmptyOutput, stateEmptyOutput;
 	NaiveMultiGumballMachine naiveEmpty(0, naiveEmptyOutput);
 	MultiGumballMachine stateEmpty(0, stateEmptyOutput);
-
-	std::string naiveString = naiveEmpty.ToString();
-	std::string stateString = stateEmpty.ToString();
-	EXPECT_EQ(naiveString, stateString);
-	EXPECT_EQ(naiveString,
+	EXPECT_EQ(naiveEmpty.ToString(), stateEmpty.ToString());
+	EXPECT_EQ(naiveEmpty.ToString(),
 		"Mighty Gumball, Inc.\n"
 		"C++-enabled Standing Gumball Model #2016 (Multi-Quarter)\n"
 		"Inventory: 0 gumballs\n"
@@ -264,7 +255,7 @@ TEST_F(MultiGumballMachineComparisonTests, SoldOutState)
 	EXPECT_EQ(naiveEmptyOutput.str(), "You can't insert a quarter, the machine is sold out\n");
 }
 
-TEST_F(MultiGumballMachineComparisonTests, EjectFromSoldOutWithQuarters)
+TEST_F(GumballMachineTests, EjectFromSoldOutWithQuarters)
 {
 	std::ostringstream naiveSpecialOutput, stateSpecialOutput;
 	NaiveMultiGumballMachine naiveSpecial(1, naiveSpecialOutput);
@@ -298,57 +289,59 @@ TEST_F(MultiGumballMachineComparisonTests, EjectFromSoldOutWithQuarters)
 	EXPECT_EQ(naiveSpecialOutput.str(), "Returning 2 quarters\n");
 }
 
-TEST_F(MultiGumballMachineComparisonTests, TurnCrankWithoutQuarters)
+TEST_F(GumballMachineTests, TurnCrankWithoutQuarters)
 {
 	ClearOutputs();
-	naiveMachine->TurnCrank();
-	stateMachine->TurnCrank();
+	naiveMachine.TurnCrank();
+	stateMachine.TurnCrank();
 
-	EXPECT_EQ(naiveOutput->str(), stateOutput->str());
-	EXPECT_EQ(naiveOutput->str(), "You turned but there's no quarter\nYou need to pay first\n");
+	EXPECT_EQ(naiveOutput.str(), stateOutput.str());
+	EXPECT_EQ("You turned but there's no quarter\nYou need to pay first\n", naiveOutput.str());
 }
 
-TEST_F(MultiGumballMachineComparisonTests, EjectWithoutQuarters)
+TEST_F(GumballMachineTests, EjectWithoutQuarters)
 {
 	ClearOutputs();
-	naiveMachine->EjectQuarter();
-	stateMachine->EjectQuarter();
+	naiveMachine.EjectQuarter();
+	stateMachine.EjectQuarter();
 
-	EXPECT_EQ(naiveOutput->str(), stateOutput->str());
-	EXPECT_EQ(naiveOutput->str(), "You haven't inserted a quarter\n");
+	EXPECT_EQ(naiveOutput.str(), stateOutput.str());
+	EXPECT_EQ("You haven't inserted a quarter\n", naiveOutput.str());
 }
 
-TEST_F(MultiGumballMachineComparisonTests, ComplexUsageScenarioFullOutput)
+TEST_F(GumballMachineTests, ComplexUsageScenarioFullOutput)
 {
-	naiveMachine->InsertQuarter();
-	naiveMachine->InsertQuarter();
-	naiveMachine->InsertQuarter();
-	stateMachine->InsertQuarter();
-	stateMachine->InsertQuarter();
-	stateMachine->InsertQuarter();
+	naiveMachine.InsertQuarter();
+	naiveMachine.InsertQuarter();
+	naiveMachine.InsertQuarter();
+	stateMachine.InsertQuarter();
+	stateMachine.InsertQuarter();
+	stateMachine.InsertQuarter();
 
-	EXPECT_EQ(naiveOutput->str(), stateOutput->str());
-	EXPECT_EQ(naiveOutput->str(),
+	EXPECT_EQ(naiveOutput.str(), stateOutput.str());
+	EXPECT_EQ(
 		"You inserted a quarter\n"
 		"You inserted another quarter\n"
-		"You inserted another quarter\n");
+		"You inserted another quarter\n",
+		naiveOutput.str());
 
 	ClearOutputs();
 
-	naiveMachine->TurnCrank();
-	naiveMachine->TurnCrank();
-	stateMachine->TurnCrank();
-	stateMachine->TurnCrank();
+	naiveMachine.TurnCrank();
+	naiveMachine.TurnCrank();
+	stateMachine.TurnCrank();
+	stateMachine.TurnCrank();
 
-	EXPECT_EQ(naiveOutput->str(), stateOutput->str());
-	EXPECT_EQ(naiveOutput->str(),
+	EXPECT_EQ(naiveOutput.str(), stateOutput.str());
+	EXPECT_EQ(
 		"You turned...\n"
 		"A gumball comes rolling out the slot...\n"
 		"You turned...\n"
-		"A gumball comes rolling out the slot...\n");
+		"A gumball comes rolling out the slot...\n",
+		naiveOutput.str());
 
-	std::string naiveString = naiveMachine->ToString();
-	std::string stateString = stateMachine->ToString();
+	std::string naiveString = naiveMachine.ToString();
+	std::string stateString = stateMachine.ToString();
 	EXPECT_EQ(naiveString, stateString);
 	EXPECT_EQ(naiveString,
 		"Mighty Gumball, Inc.\n"

@@ -1,4 +1,5 @@
 #include "../src/GumballMachine.h"
+#include "TestGumballMachine.h"
 
 #include "gtest/gtest.h"
 class GumballMachineTests : public testing::Test
@@ -104,5 +105,23 @@ TEST_F(GumballMachineTests, CanBecomeSoldOut)
 		"C++-enabled Standing Gumball Model #2016\n"
 		"Inventory: 0 gumballs\n"
 		"Machine is sold out\n",
+		output.str());
+}
+
+TEST_F(GumballMachineTests, TestSoldOutState)
+{
+	TestGumballMachine gumballMachine{ 2, output };
+	gumballMachine.SetState(gumballMachine.GetSoldState());
+
+	gumballMachine.EjectQuarter();
+	gumballMachine.InsertQuarter();
+	gumballMachine.TurnCrank();
+	output << gumballMachine.ToString() << std::endl;
+
+	EXPECT_EQ(
+		"Sorry you already turned the crank\n"
+		"Please wait, we're already giving you a gumball\n"
+		"Turning twice doesn't get you another gumball\n"
+		"delivering a gumball\n",
 		output.str());
 }

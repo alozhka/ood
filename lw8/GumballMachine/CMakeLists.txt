@@ -19,7 +19,8 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 enable_testing()
 
-add_executable(GumballMachineTests tests/GumballMachineTests.cpp)
+add_executable(GumballMachineTests tests/GumballMachineTests.cpp
+        tests/TestGumballMachine.h)
 
 target_link_libraries(GumballMachineTests
         gtest_main

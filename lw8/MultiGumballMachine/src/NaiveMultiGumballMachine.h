@@ -177,14 +177,12 @@ private:
 				m_state = State::SOLD_OUT;
 			}
 			break;
+		case State::HAS_QUARTER:
 		case State::SOLD_OUT:
 			m_output << "No gumball dispensed\n";
 			break;
 		case State::NO_QUARTER:
 			m_output << "You need to pay first\n";
-			break;
-		case State::HAS_QUARTER:
-			m_output << "No gumball dispensed\n";
 			break;
 		}
 	}

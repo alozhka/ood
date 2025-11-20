@@ -305,7 +305,7 @@ TEST_F(MultiGumballMachineComparisonTests, TurnCrankWithoutQuarters)
 	stateMachine->TurnCrank();
 
 	EXPECT_EQ(naiveOutput->str(), stateOutput->str());
-	EXPECT_EQ(naiveOutput->str(), "You turned but there's no quarter\n");
+	EXPECT_EQ(naiveOutput->str(), "You turned but there's no quarter\nYou need to pay first\n");
 }
 
 TEST_F(MultiGumballMachineComparisonTests, EjectWithoutQuarters)

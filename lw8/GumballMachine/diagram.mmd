@@ -1,0 +1,95 @@
+classDiagram
+    class IState {
+        <<interface>>
+        +InsertQuarter() void
+        +EjectQuarter() void
+        +TurnCrank() void
+        +Dispense() void
+        +ToString() string
+    }
+
+    class IGumballMachine {
+        <<interface>>
+        +ReleaseBall() void
+        +GetBallCount() unsigned
+        +SetSoldOutState() void
+        +SetNoQuarterState() void
+        +SetSoldState() void
+        +SetHasQuarterState() void
+    }
+
+    class SoldState {
+        -IGumballMachine& m_gumballMachine
+        -ostream& out
+        +InsertQuarter() void
+        +EjectQuarter() void
+        +TurnCrank() void
+        +Dispense() void
+        +ToString() string
+    }
+
+    class SoldOutState {
+        -IGumballMachine& m_gumballMachine
+        -ostream& out
+        +InsertQuarter() void
+        +EjectQuarter() void
+        +TurnCrank() void
+        +Dispense() void
+        +ToString() string
+    }
+
+    class HasQuarterState {
+        -IGumballMachine& m_gumballMachine
+        -ostream& out
+        +InsertQuarter() void
+        +EjectQuarter() void
+        +TurnCrank() void
+        +Dispense() void
+        +ToString() string
+    }
+
+    class NoQuarterState {
+        -IGumballMachine& m_gumballMachine
+        -ostream& out
+        +InsertQuarter() void
+        +EjectQuarter() void
+        +TurnCrank() void
+        +Dispense() void
+        +ToString() string
+    }
+
+    class GumballMachine {
+        -unsigned m_count
+        -SoldState m_soldState
+        -SoldOutState m_soldOutState
+        -NoQuarterState m_noQuarterState
+        -HasQuarterState m_hasQuarterState
+        -IState* m_state
+        -ostream& m_output
+        +GumballMachine(numBalls, out)
+        +InsertQuarter() void
+        +EjectQuarter() void
+        +TurnCrank() void
+        +ToString() string
+        -GetBallCount() unsigned
+        -ReleaseBall() void
+        -SetSoldOutState() void
+        -SetNoQuarterState() void
+        -SetSoldState() void
+        -SetHasQuarterState() void
+    }
+
+    IState <|.. SoldState
+    IState <|.. SoldOutState
+    IState <|.. HasQuarterState
+    IState <|.. NoQuarterState
+    IGumballMachine <|.. GumballMachine: private
+    GumballMachine o-- IState
+    GumballMachine *-- SoldState
+    GumballMachine *-- SoldOutState
+    GumballMachine *-- HasQuarterState
+    GumballMachine *-- NoQuarterState
+    SoldState o-- IGumballMachine
+    SoldOutState o-- IGumballMachine
+    HasQuarterState o-- IGumballMachine
+    NoQuarterState o-- IGumballMachine

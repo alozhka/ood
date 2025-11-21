@@ -107,6 +107,12 @@ public:
 
 	void Refill(unsigned numBalls)
 	{
+		if (numBalls == 0)
+		{
+			m_output << "Cannot refill 0 balls\n";
+			return;
+		}
+
 		switch (m_state)
 		{
 		case State::SOLD:

@@ -98,13 +98,13 @@ class SoldOutState : public IState
 public:
 	SoldOutState(IMultiGumballMachine& gumballMachine, std::ostream& out)
 		: m_gumballMachine(gumballMachine)
-		, out(out)
+		, m_out(out)
 	{
 	}
 
 	void InsertQuarter() override
 	{
-		out << "You can't insert a quarter, the machine is sold out\n";
+		m_out << "You can't insert a quarter, the machine is sold out\n";
 	}
 
 	void EjectQuarter() override
@@ -115,24 +115,24 @@ public:
 		}
 		else
 		{
-			out << "You can't eject, you haven't inserted a quarter yet\n";
+			m_out << "You can't eject, you haven't inserted a quarter yet\n";
 		}
 	}
 
 	void TurnCrank() override
 	{
-		out << "You turned but there's no gumballs\n";
+		m_out << "You turned but there's no gumballs\n";
 	}
 
 	void Dispense() override
 	{
-		out << "No gumball dispensed\n";
+		m_out << "No gumball dispensed\n";
 	}
 
 	void Refill(unsigned numBalls) override
 	{
 		m_gumballMachine.SetBallCount(numBalls);
-		out << "Machine refilled with " << numBalls << " gumball" << (numBalls != 1 ? "s" : "") << "\n";
+		m_out << "Machine refilled with " << numBalls << " gumball" << (numBalls != 1 ? "s" : "") << "\n";
 		if (m_gumballMachine.HasQuarters())
 		{
 			m_gumballMachine.SetHasQuarterState();
@@ -150,7 +150,7 @@ public:
 
 private:
 	IMultiGumballMachine& m_gumballMachine;
-	std::ostream& out;
+	std::ostream& m_out;
 };
 
 class HasQuarterState : public IState
@@ -275,6 +275,9 @@ public:
 		}
 	}
 
+	MultiGumballMachine(const MultiGumballMachine&) = delete;
+	MultiGumballMachine& operator=(const MultiGumballMachine&) = delete;
+
 	void EjectQuarter()
 	{
 		m_state->EjectQuarter();
@@ -293,6 +296,11 @@ public:
 
 	void Refill(unsigned numBalls)
 	{
+		if (numBalls == 0)
+		{
+			m_output << "Cannot refill 0 balls\n";
+			return;
+		}
 		m_state->Refill(numBalls);
 	}
 

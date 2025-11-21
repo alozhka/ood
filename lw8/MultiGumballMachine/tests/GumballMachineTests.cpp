@@ -246,13 +246,20 @@ TEST_F(GumballMachineTests, SoldOutState)
 		"Quarters inserted: 0/5\n"
 		"Machine is sold out");
 
-	naiveEmptyOutput.str("");
-	stateEmptyOutput.str("");
+	ClearOutputs();
 	naiveEmpty.InsertQuarter();
 	stateEmpty.InsertQuarter();
 
 	EXPECT_EQ(naiveEmptyOutput.str(), stateEmptyOutput.str());
 	EXPECT_EQ(naiveEmptyOutput.str(), "You can't insert a quarter, the machine is sold out\n");
+
+	naiveEmptyOutput.str("");
+	stateEmptyOutput.str("");
+	naiveEmpty.EjectQuarter();
+	stateEmpty.EjectQuarter();
+
+	EXPECT_EQ(naiveEmptyOutput.str(), stateEmptyOutput.str());
+	EXPECT_EQ("You can't eject, you haven't inserted a quarter yet\n", stateEmptyOutput.str());
 }
 
 TEST_F(GumballMachineTests, EjectFromSoldOutWithQuarters)
@@ -457,4 +464,49 @@ TEST_F(GumballMachineTests, RefillInSoldOutStateWithQuarters)
 		"Inventory: 4 gumballs\n"
 		"Quarters inserted: 1/5\n"
 		"Machine is waiting for turn of crank");
+}
+
+TEST_F(GumballMachineTests, CannotRefillZeroBalls)
+{
+	naiveMachine.Refill(0);
+	stateMachine.Refill(0);
+
+	EXPECT_EQ(naiveOutput.str(), stateOutput.str());
+	EXPECT_EQ("Cannot refill 0 balls\n", naiveOutput.str());
+
+	naiveMachine.InsertQuarter();
+	stateMachine.InsertQuarter();
+	ClearOutputs();
+	naiveMachine.Refill(0);
+	stateMachine.Refill(0);
+
+	EXPECT_EQ(naiveOutput.str(), stateOutput.str());
+	EXPECT_EQ("Cannot refill 0 balls\n", naiveOutput.str());
+
+	ClearOutputs();
+	naiveMachine.InsertQuarter();
+	naiveMachine.InsertQuarter();
+	stateMachine.InsertQuarter();
+	stateMachine.InsertQuarter();
+	naiveMachine.TurnCrank();
+	naiveMachine.TurnCrank();
+	naiveMachine.TurnCrank();
+	stateMachine.TurnCrank();
+	stateMachine.TurnCrank();
+	stateMachine.TurnCrank();
+
+	EXPECT_EQ(naiveMachine.ToString(), stateMachine.ToString());
+	EXPECT_EQ(naiveMachine.ToString(),
+		"Mighty Gumball, Inc.\n"
+		"C++-enabled Standing Gumball Model #2016 (Multi-Quarter)\n"
+		"Inventory: 0 gumballs\n"
+		"Quarters inserted: 0/5\n"
+		"Machine is sold out");
+
+	ClearOutputs();
+	naiveMachine.Refill(0);
+	stateMachine.Refill(0);
+
+	EXPECT_EQ(naiveOutput.str(), stateOutput.str());
+	EXPECT_EQ("Cannot refill 0 balls\n", naiveOutput.str());
 }

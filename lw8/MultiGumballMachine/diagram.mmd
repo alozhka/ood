@@ -1,0 +1,172 @@
+classDiagram
+    class IMultiGumballMachine {
+        <<interface>>
+        +ReleaseBall()
+        +GetBallCount() unsigned
+        +GetQuarterCount() unsigned
+        +AddQuarter()
+        +ReturnQuarters()
+        +RemoveQuarter() unsigned
+        +HasQuarters() bool
+        +IsFullOfQuarters() bool
+        +SetBallCount(unsigned)
+        +SetSoldOutState()
+        +SetNoQuarterState()
+        +SetSoldState()
+        +SetHasQuarterState()
+    }
+
+    class IState {
+        <<interface>>
+        +InsertQuarter()
+        +EjectQuarter()
+        +TurnCrank()
+        +Dispense()
+        +Refill(unsigned)
+        +ToString() string
+    }
+
+    class MultiGumballMachine {
+        -MAX_QUARTERS: unsigned
+        -m_count: unsigned
+        -m_quarters: unsigned
+        -m_soldState: SoldState
+        -m_soldOutState: SoldOutState
+        -m_noQuarterState: NoQuarterState
+        -m_hasQuarterState: HasQuarterState
+        -m_state: IState*
+        -m_output: ostream&
+        +MultiGumballMachine(unsigned, ostream&)
+        +InsertQuarter()
+        +EjectQuarter()
+        +TurnCrank()
+        +Refill(unsigned)
+        +ToString() string
+        -GetBallCount() unsigned
+        -GetQuarterCount() unsigned
+        -AddQuarter()
+        -ReturnQuarters()
+        -RemoveQuarter() unsigned
+        -HasQuarters() bool
+        -IsFullOfQuarters() bool
+        -ReleaseBall()
+        -SetSoldOutState()
+        -SetNoQuarterState()
+        -SetSoldState()
+        -SetHasQuarterState()
+        -SetBallCount(unsigned)
+    }
+
+    class NaiveMultiGumballMachine {
+        -MAX_QUARTERS: unsigned
+        -m_count: unsigned
+        -m_quarters: unsigned
+        -m_state: State
+        -m_output: ostream&
+        +NaiveMultiGumballMachine(unsigned, ostream&)
+        +InsertQuarter()
+        +EjectQuarter()
+        +TurnCrank()
+        +Refill(unsigned)
+        +ToString() string
+        -Dispense()
+        -State: enum
+    }
+
+    class SoldState {
+        -m_gumballMachine: IMultiGumballMachine&
+        -out: ostream&
+        +SoldState(IMultiGumballMachine&, ostream&)
+        +InsertQuarter()
+        +EjectQuarter()
+        +TurnCrank()
+        +Dispense()
+        +Refill(unsigned)
+        +ToString() string
+    }
+
+    class SoldOutState {
+        -m_gumballMachine: IMultiGumballMachine&
+        -out: ostream&
+        +SoldOutState(IMultiGumballMachine&, ostream&)
+        +InsertQuarter()
+        +EjectQuarter()
+        +TurnCrank()
+        +Dispense()
+        +Refill(unsigned)
+        +ToString() string
+    }
+
+    class HasQuarterState {
+        -m_gumballMachine: IMultiGumballMachine&
+        -out: ostream&
+        +HasQuarterState(IMultiGumballMachine&, ostream&)
+        +InsertQuarter()
+        +EjectQuarter()
+        +TurnCrank()
+        +Dispense()
+        +Refill(unsigned)
+        +ToString() string
+    }
+
+    class NoQuarterState {
+        -m_gumballMachine: IMultiGumballMachine&
+        -out: ostream&
+        +NoQuarterState(IMultiGumballMachine&, ostream&)
+        +InsertQuarter()
+        +EjectQuarter()
+        +TurnCrank()
+        +Dispense()
+        +Refill(unsigned)
+        +ToString() string
+    }
+
+    class Menu {
+        -m_items: vector~Item~
+        -m_exit: bool
+        -m_input: istream&
+        -m_output: ostream&
+        +Menu(istream&, ostream&)
+        +AddItem(string, string, Command)
+        +Run()
+        +ShowInstructions()
+        +Exit()
+        -ExecuteCommand(string)
+        -Item: struct
+    }
+
+    class CommandController {
+        -m_menu: Menu
+        -m_gumballMachine: MultiGumballMachine&
+        -m_output: ostream&
+        +CommandController(MultiGumballMachine&, istream&, ostream&)
+        +Run()
+        -PrintHelp()
+        -InsertQuarter()
+        -TurnCrank()
+        -ReturnQuarters()
+        -Refill(istream&)
+        -ShowInfo()
+        -Exit()
+    }
+
+    IMultiGumballMachine <|.. MultiGumballMachine
+    IState <|.. SoldState
+    IState <|.. SoldOutState
+    IState <|.. HasQuarterState
+    IState <|.. NoQuarterState
+
+    MultiGumballMachine o-- IState : contains
+    MultiGumballMachine *-- SoldState : creates
+    MultiGumballMachine *-- SoldOutState : creates
+    MultiGumballMachine *-- HasQuarterState : creates
+    MultiGumballMachine *-- NoQuarterState : creates
+
+    SoldState o-- IMultiGumballMachine : uses
+    SoldOutState o-- IMultiGumballMachine : uses
+    HasQuarterState o-- IMultiGumballMachine : uses
+    NoQuarterState o-- IMultiGumballMachine : uses
+
+    CommandController --> MultiGumballMachine : uses
+    CommandController --> Menu : creates
+    Menu --> Command : uses

@@ -21,7 +21,8 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 enable_testing()
 
-add_executable(TileImageTests tests/TileImageTests.cpp)
+add_executable(TileImageTests tests/TileImageTests.cpp
+        src/drawer/drawer.cpp)
 
 target_link_libraries(TileImageTests
         gtest_main

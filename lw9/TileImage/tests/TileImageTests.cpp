@@ -1,7 +1,10 @@
 #include "../src/Geom.h"
 #include "../src/Tile.h"
 #include "../src/image/Image.h"
+#include "../src/drawer/Drawer.h"
+#include "../src/image/ImageService.h"
 #include "gtest/gtest.h"
+#include <sstream>
 
 class ImageTests : public testing::Test
 {
@@ -235,4 +238,34 @@ TEST_F(ImageTests, CopyOnWriteOptimization)
 	EXPECT_EQ(image1.GetPixel({ 0, 0 }), '@');
 	// Второе изображение должно содержать изменения
 	EXPECT_EQ(image2.GetPixel({ 0, 0 }), 'X');
+}
+
+TEST_F(ImageTests, DrawCircleRadius4)
+{
+	// Создаем изображение 11x11 для окружности радиуса 4
+	Size size{ 11, 11 };
+	Image image(size);
+
+	// Рисуем окружность радиуса 4 с центром в (5, 5)
+	Drawer::DrawCircle(image, { 5, 5 }, 4, '#');
+
+	// Выводим изображение в строковый поток
+	std::ostringstream output;
+	ImageService::Print(image, output);
+
+	// Ожидаемый результат для правильной окружности радиуса 4
+	std::string expected =
+		"           \n"
+		"    ###    \n"
+		"   #   #   \n"
+		"  #     #  \n"
+		" #       # \n"
+		" #       # \n"
+		" #       # \n"
+		"  #     #  \n"
+		"   #   #   \n"
+		"    ###    \n"
+		"           \n";
+
+	EXPECT_EQ(expected, output.str());
 }

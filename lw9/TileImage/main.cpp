@@ -26,4 +26,13 @@ int main()
 
 		ImageService::Print(img, std::cout);
 	}
+
+	{
+		Image img{ { 11, 11 }, ' ' };
+
+		// Рисуем окружность радиуса 4 с центром в (5, 5)
+		Drawer::DrawCircle(img, { 5, 5 }, 4, '@');
+
+		ImageService::Print(img, std::cout);
+	}
 }

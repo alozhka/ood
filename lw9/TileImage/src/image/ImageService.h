@@ -31,7 +31,7 @@ public:
 		std::string line;
 		while (std::getline(s, line))
 		{
-			size.width = std::max(size.width, static_cast<int>(line.length()));
+			size.width = std::max(size.width, static_cast<unsigned int>(line.length()));
 			++size.height;
 		}
 

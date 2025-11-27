@@ -100,3 +100,50 @@ void Drawer::DrawLine(Image& image, Point from, Point to, char color)
 		DrawSlopeLine(image, from, to, color);
 	}
 }
+
+void Drawer::DrawCircle(Image& image, Point center, int radius, char color)
+{
+	if (radius <= 0)
+	{
+		return;
+	}
+
+	int x = 0;
+	int y = radius;
+	int error = 3 - 2 * radius;
+
+	// Рисуем начальные точки
+	image.SetPixel({ center.x + x, center.y + y }, color);
+	image.SetPixel({ center.x - x, center.y + y }, color);
+	image.SetPixel({ center.x + x, center.y - y }, color);
+	image.SetPixel({ center.x - x, center.y - y }, color);
+	image.SetPixel({ center.x + y, center.y + x }, color);
+	image.SetPixel({ center.x - y, center.y + x }, color);
+	image.SetPixel({ center.x + y, center.y - x }, color);
+	image.SetPixel({ center.x - y, center.y - x }, color);
+
+	while (y >= x)
+	{
+		x++;
+
+		if (error > 0)
+		{
+			y--;
+			error = error + 4 * (x - y) + 10;
+		}
+		else
+		{
+			error = error + 4 * x + 6;
+		}
+
+		// Рисуем 8 симметричных точек окружности
+		image.SetPixel({ center.x + x, center.y + y }, color);
+		image.SetPixel({ center.x - x, center.y + y }, color);
+		image.SetPixel({ center.x + x, center.y - y }, color);
+		image.SetPixel({ center.x - x, center.y - y }, color);
+		image.SetPixel({ center.x + y, center.y + x }, color);
+		image.SetPixel({ center.x - y, center.y + x }, color);
+		image.SetPixel({ center.x + y, center.y - x }, color);
+		image.SetPixel({ center.x - y, center.y - x }, color);
+	}
+}

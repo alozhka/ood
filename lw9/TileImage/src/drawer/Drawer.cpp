@@ -147,3 +147,38 @@ void Drawer::DrawCircle(Image& image, Point center, int radius, char color)
 		image.SetPixel({ center.x - y, center.y - x }, color);
 	}
 }
+
+void Drawer::FillCircle(Image& image, Point center, int radius, char color)
+{
+	if (radius <= 0)
+	{
+		return;
+	}
+
+	int x = 0;
+	int y = radius;
+	int error = 3 - 2 * radius;
+
+	// Закрашиваем начальную горизонтальную линию
+	DrawLine(image, { center.x - y, center.y }, { center.x + y, center.y }, color);
+
+	while (y >= x)
+	{
+		x++;
+
+		if (error > 0)
+		{
+			y--;
+			error = error + 4 * (x - y) + 10;
+		}
+		else
+		{
+			error = error + 4 * x + 6;
+		}
+
+		DrawLine(image, { center.x - x, center.y + y }, { center.x + x, center.y + y }, color);
+		DrawLine(image, { center.x - x, center.y - y }, { center.x + x, center.y - y }, color);
+		DrawLine(image, { center.x - y, center.y + x }, { center.x + y, center.y + x }, color);
+		DrawLine(image, { center.x - y, center.y - x }, { center.x + y, center.y - x }, color);
+	}
+}

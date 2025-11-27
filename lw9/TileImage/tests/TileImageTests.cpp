@@ -269,3 +269,33 @@ TEST_F(ImageTests, DrawCircleRadius4)
 
 	EXPECT_EQ(expected, output.str());
 }
+
+TEST_F(ImageTests, FillCircleRadius4)
+{
+	// Создаем изображение 11x11 для закрашенного круга радиуса 4
+	Size size{ 11, 11 };
+	Image image(size);
+
+	// Рисуем закрашенный круг радиуса 4 с центром в (5, 5)
+	Drawer::FillCircle(image, { 5, 5 }, 4, '#');
+
+	// Выводим изображение в строковый поток
+	std::ostringstream output;
+	ImageService::Print(image, output);
+
+	// Ожидаемый результат для закрашенного круга радиуса 4
+	std::string expected =
+		"           \n"
+		"    ###    \n"
+		"   #####   \n"
+		"  #######  \n"
+		" ######### \n"
+		" ######### \n"
+		" ######### \n"
+		"  #######  \n"
+		"   #####   \n"
+		"    ###    \n"
+		"           \n";
+
+	EXPECT_EQ(expected, output.str());
+}

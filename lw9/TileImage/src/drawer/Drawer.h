@@ -18,4 +18,11 @@ void DrawLine(Image& image, Point from, Point to, char color);
  * Для рисования используется алгоритм Брезенхэма для окружностей.
  */
 void DrawCircle(Image& image, Point center, int radius, char color);
+
+/**
+ * Рисует закрашенный круг с центром в точке center и радиусом radius цветом color на изображении Image.
+ *
+ * Границы круга вычисляются с помощью алгоритма Брезенхэма, внутренняя область закрашивается горизонтальными отрезками.
+ */
+void FillCircle(Image& image, Point center, int radius, char color);
 } // namespace Drawer

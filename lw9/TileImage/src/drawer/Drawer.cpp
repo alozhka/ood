@@ -13,7 +13,7 @@ int Sign(int value)
 /**
  * ( |to.y - from.x| >= |to.x - from.x|).
  */
-void DrawSteepLine(Image& image, Point from, Point to, char color)
+void DrawSteepLine(Image& image, Point from, Point to, uint32_t color)
 {
 	const int deltaX = std::abs(to.x - from.x);
 	const int deltaY = std::abs(to.y - from.y);
@@ -49,7 +49,7 @@ void DrawSteepLine(Image& image, Point from, Point to, char color)
 /**
  * (|to.y - from.x| >= |to.y - from.y|).
  */
-void DrawSlopeLine(Image& image, Point from, Point to, char color)
+void DrawSlopeLine(Image& image, Point from, Point to, uint32_t color)
 {
 	const int deltaX = std::abs(to.x - from.x);
 	const int deltaY = std::abs(to.y - from.y);
@@ -84,7 +84,7 @@ void DrawSlopeLine(Image& image, Point from, Point to, char color)
 
 } // namespace
 
-void Drawer::DrawLine(Image& image, Point from, Point to, char color)
+void Drawer::DrawLine(Image& image, Point from, Point to, uint32_t color)
 {
 	const int deltaX = std::abs(to.x - from.x);
 	const int deltaY = std::abs(to.y - from.y);
@@ -101,7 +101,7 @@ void Drawer::DrawLine(Image& image, Point from, Point to, char color)
 	}
 }
 
-void Drawer::DrawCircle(Image& image, Point center, int radius, char color)
+void Drawer::DrawCircle(Image& image, Point center, int radius, uint32_t color)
 {
 	if (radius <= 0)
 	{
@@ -148,7 +148,7 @@ void Drawer::DrawCircle(Image& image, Point center, int radius, char color)
 	}
 }
 
-void Drawer::FillCircle(Image& image, Point center, int radius, char color)
+void Drawer::FillCircle(Image& image, Point center, int radius, uint32_t color)
 {
 	if (radius <= 0)
 	{

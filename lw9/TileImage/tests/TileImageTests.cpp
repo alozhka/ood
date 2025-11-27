@@ -1,7 +1,7 @@
 #include "../src/Geom.h"
 #include "../src/Tile.h"
-#include "../src/image/Image.h"
 #include "../src/drawer/Drawer.h"
+#include "../src/image/Image.h"
 #include "../src/image/ImageService.h"
 #include "gtest/gtest.h"
 #include <sstream>
@@ -254,18 +254,17 @@ TEST_F(ImageTests, DrawCircleRadius4)
 	ImageService::Print(image, output);
 
 	// Ожидаемый результат для правильной окружности радиуса 4
-	std::string expected =
-		"           \n"
-		"    ###    \n"
-		"   #   #   \n"
-		"  #     #  \n"
-		" #       # \n"
-		" #       # \n"
-		" #       # \n"
-		"  #     #  \n"
-		"   #   #   \n"
-		"    ###    \n"
-		"           \n";
+	std::string expected = "           \n"
+						   "    ###    \n"
+						   "   #   #   \n"
+						   "  #     #  \n"
+						   " #       # \n"
+						   " #       # \n"
+						   " #       # \n"
+						   "  #     #  \n"
+						   "   #   #   \n"
+						   "    ###    \n"
+						   "           \n";
 
 	EXPECT_EQ(expected, output.str());
 }
@@ -284,18 +283,39 @@ TEST_F(ImageTests, FillCircleRadius4)
 	ImageService::Print(image, output);
 
 	// Ожидаемый результат для закрашенного круга радиуса 4
-	std::string expected =
-		"           \n"
-		"    ###    \n"
-		"   #####   \n"
-		"  #######  \n"
-		" ######### \n"
-		" ######### \n"
-		" ######### \n"
-		"  #######  \n"
-		"   #####   \n"
-		"    ###    \n"
-		"           \n";
+	std::string expected = "           \n"
+						   "    ###    \n"
+						   "   #####   \n"
+						   "  #######  \n"
+						   " ######### \n"
+						   " ######### \n"
+						   " ######### \n"
+						   "  #######  \n"
+						   "   #####   \n"
+						   "    ###    \n"
+						   "           \n";
 
 	EXPECT_EQ(expected, output.str());
+}
+
+TEST_F(ImageTests, SaveToPPMFormat)
+{
+	Size size{ 2, 2 };
+	Image image(size, 0xFFFFFF);
+
+	image.SetPixel({ 0, 0 }, 0xFF0000);
+	image.SetPixel({ 1, 0 }, 0x00FF00);
+	image.SetPixel({ 0, 1 }, 0x0000FF);
+	image.SetPixel({ 1, 1 }, 0xFFFFFF);
+
+	std::ostringstream ppmStream;
+	ImageService::SaveToPPM(image, ppmStream);
+
+	std::string expectedPPM = "P3\n"
+							  "2 2\n"
+							  "255\n"
+							  "255 0 0 0 255 0\n"
+							  "0 0 255 255 255 255\n";
+
+	EXPECT_EQ(expectedPPM, ppmStream.str());
 }

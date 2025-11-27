@@ -10,19 +10,19 @@ namespace Drawer
  * Для рисования используется алгоритм Брезенхэма.
  * (https://ru.wikipedia.org/wiki/Алгоритм_Брезенхэма)
  */
-void DrawLine(Image& image, Point from, Point to, char color);
+void DrawLine(Image& image, Point from, Point to, uint32_t color);
 
 /**
  * Рисует окружность с центром в точке center и радиусом radius цветом color на изображении Image.
  *
  * Для рисования используется алгоритм Брезенхэма для окружностей.
  */
-void DrawCircle(Image& image, Point center, int radius, char color);
+void DrawCircle(Image& image, Point center, int radius, uint32_t color);
 
 /**
  * Рисует закрашенный круг с центром в точке center и радиусом radius цветом color на изображении Image.
  *
  * Границы круга вычисляются с помощью алгоритма Брезенхэма, внутренняя область закрашивается горизонтальными отрезками.
  */
-void FillCircle(Image& image, Point center, int radius, char color);
+void FillCircle(Image& image, Point center, int radius, uint32_t color);
 } // namespace Drawer

@@ -13,7 +13,7 @@ public:
 	 * Конструирует изображение заданного размера. Если размеры не являются положительными,
 	 * выбрасывает исключение std::out_of_range.
 	 */
-	explicit Image(Size size, char color = ' ')
+	explicit Image(Size size, uint32_t color =  ' ')
 		: m_size(size)
 		, m_color(color)
 		, m_tiles(size.width, std::vector(size.height, CoW(Tile(color))))
@@ -27,14 +27,14 @@ public:
 	}
 
 	/**
-	 * Возвращает «цвет» пикселя в указанных координатах. Если координаты выходят за пределы
-	 * изображения, возвращает «пробел».
+	 * Возвращает цвет пикселя в указанных координатах. Если координаты выходят за пределы
+	 * изображения, возвращает 0 (черный).
 	 */
-	char GetPixel(Point p) const noexcept
+	uint32_t GetPixel(Point p) const noexcept
 	{
 		if (!p.IsInSize(m_size))
 		{
-			return ' ';
+			return  ' ';
 		}
 
 		int tileX = p.x / Tile::SIZE;
@@ -46,10 +46,10 @@ public:
 	}
 
 	/**
-	 * Задаёт «цвет» пикселя в указанных координатах. Если координаты выходят за пределы изображения
+	 * Задаёт цвет пикселя в указанных координатах. Если координаты выходят за пределы изображения
 	 * действие игнорируется.
 	 */
-	void SetPixel(Point p, char color)
+	void SetPixel(Point p, uint32_t color)
 	{
 		if (!p.IsInSize(m_size))
 		{
@@ -68,6 +68,6 @@ public:
 
 private:
 	Size m_size;
-	char m_color;
+	uint32_t m_color;
 	std::vector<std::vector<CoW<Tile>>> m_tiles;
 };

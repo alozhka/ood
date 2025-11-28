@@ -13,11 +13,14 @@ public:
 	 * Конструирует изображение заданного размера. Если размеры не являются положительными,
 	 * выбрасывает исключение std::out_of_range.
 	 */
-	explicit Image(Size size, uint32_t color =  ' ')
+	explicit Image(Size size, uint32_t color = ' ')
 		: m_size(size)
 		, m_color(color)
-		, m_tiles(size.width, std::vector(size.height, CoW(Tile(color))))
 	{
+		unsigned int xTilesSize = (size.width + Tile::SIZE - 1) / Tile::SIZE;
+		unsigned int yTilesSize = (size.height + Tile::SIZE - 1) / Tile::SIZE;
+
+		m_tiles = std::vector(xTilesSize, std::vector(yTilesSize, CoW(Tile(color))));
 	}
 
 	// Возвращает размер изображения в пикселях.
@@ -34,7 +37,7 @@ public:
 	{
 		if (!p.IsInSize(m_size))
 		{
-			return  ' ';
+			return ' ';
 		}
 
 		int tileX = p.x / Tile::SIZE;

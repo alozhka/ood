@@ -1,0 +1,78 @@
+classDiagram
+%% Структуры данных
+    class Size {
+        +unsigned int width
+        +unsigned int height
+    }
+
+    class Point {
+        +int x
+        +int y
+        +bool IsInSize(Size size)
+    }
+
+%% Шаблонный класс Copy-on-Write
+    class CoW~Value~ {
+        -shared_ptr~Value~ value_
+        +CoW()
+        +explicit CoW(Value&& value)
+        +explicit CoW(const Value& value)
+        +const Value& operator*()
+        +const Value* operator->()
+        +Write(ModifierFn&& modify)
+        +WriteProxy Write()
+        +Value& WriteBad()
+        -EnsureUnique()
+    }
+
+    class WriteProxy {
+        -Value* value_ptr_
+        +Value& operator*()
+        +Value* operator->()
+    }
+
+%% Класс Tile
+    class Tile {
+        -constexpr static int SIZE = 8
+        -array~array~ uint32_t, SIZE~, SIZE~ m_pixels
+        -inline static int m_instanceCount = 0
+        +explicit Tile(uint32_t color = ' ')
+        +Tile(const Tile& other)
+        +~ Tile()
+        +void SetPixel(Point p, uint32_t color)
+        +uint32_t GetPixel(Point p)
+        +static int GetInstanceCount()
+        -static bool IsInRange(Point p)
+    }
+
+%% Класс Image
+    class Image {
+        -Size m_size
+        -uint32_t m_color
+        -vector~vector~CoW~Tile~~ m_tiles
+        +explicit Image(Size size, uint32_t color = ' ')
+        +Size GetSize()
+        +uint32_t GetPixel(Point p)
+        +void SetPixel(Point p, uint32_t color)
+    }
+%% Класс ImageService
+    class ImageService {
+        +static void Print(const Image& img, ostream& out)
+        +static Image LoadImage(const string& pixels)
+        +static void SaveToPPM(const Image& img, ostream& out)
+    }
+
+%% Namespace Drawer
+    class Drawer {
+        +void DrawLine(Image& image, Point from, Point to, uint32_t color)
+        +void DrawCircle(Image& image, Point center, int radius, uint32_t color)
+        +void FillCircle(Image& image, Point center, int radius, uint32_t color)
+    }
+
+    ImageService --> Image
+    Image *-- Size
+    Image *-- CoW~Tile~
+    CoW~Tile~ o-- Tile
+    CoW~Value~ ..> WriteProxy
+    Drawer --> Image
+    Point ..> Size

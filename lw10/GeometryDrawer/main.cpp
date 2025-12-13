@@ -1,20 +1,14 @@
-#include "src/view-model/GeometryViewModel.h"
+#include "src/view/MainWindow.h"
 
-#include <QGuiApplication>
-#include <QQmlApplicationEngine>
-#include <QQmlContext>
+#include <QApplication>
 
 int main(int argc, char* argv[])
 {
-    QGuiApplication app(argc, argv);
-    QQmlApplicationEngine engine;
+	QApplication app(argc, argv);
 
-    // Создаем и регистрируем ViewModel
-    GeometryViewModel geometryViewModel;
-    engine.rootContext()->setContextProperty("geometryViewModel", &geometryViewModel);
+	MainWindow mainWindow;
+	mainWindow.resize(1000, 700);
+	mainWindow.show();
 
-    // Загружаем главный QML файл
-    engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
-
-    return app.exec();
+	return QApplication::exec();
 }

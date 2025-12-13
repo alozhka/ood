@@ -14,17 +14,12 @@ find_package(Qt6 COMPONENTS
         REQUIRED)
 
 add_executable(GeometryDrawer main.cpp
-        src/view-model/GeometryViewModel.h)
-
-qt_add_resources(GeometryDrawer "qml"
-    PREFIX "/"
-    FILES
-    main.qml
-    src/view/MenuBar.qml
-    src/view/ToolBar.qml
-    src/view/GeometryCanvas.qml
-    src/view/LayersPanel.qml
-    src/view/StatusBar.qml
+        src/view/MainWindow.h
+        src/view/MainWindow.cpp
+        src/presenter/DocumentPresenter.cpp
+        src/presenter/DocumentPresenter.h
+        src/presenter/CanvasPresenter.cpp
+        src/presenter/CanvasPresenter.h
 )
 
 target_link_libraries(GeometryDrawer

@@ -1,6 +1,7 @@
 #pragma once
 #include <QObject>
 #include <QRectF>
+#include <QUuid>
 
 class Shape : public QObject
 {
@@ -15,17 +16,23 @@ public:
 
 	explicit Shape(Type type, const QRectF& rect, QObject* parent = nullptr)
 		: QObject(parent)
+		, m_id(QUuid::createUuid())
 		, m_rect(rect)
 		, m_type(type)
 	{
 	}
 
-	[[nodiscard]] QRectF GetRect() const
+	QUuid GetId() const
+	{
+		return m_id;
+	}
+
+	QRectF GetRect() const
 	{
 		return m_rect;
 	}
 
-	[[nodiscard]] Type GetType() const
+	Type GetType() const
 	{
 		return m_type;
 	}
@@ -39,6 +46,7 @@ signals:
 	void GeometryChanged(const QRectF& rect);
 
 private:
+	QUuid m_id;
 	QRectF m_rect;
 	Type m_type;
 };

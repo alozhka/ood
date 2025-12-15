@@ -17,12 +17,31 @@ public:
 		, m_scene(scene)
 	{
 		connect(m_document, &Document::ShapeAdded, this, &DocumentPresenter::OnShapeAdded);
+		connect(m_document, &Document::ShapesRemoved, this, &DocumentPresenter::OnShapesRemoved);
 	}
 
 	void AddShape(Shape::Type type)
 	{
 		auto* shape = new Shape(type, QRectF(0, 0, 100, 100));
 		m_document->AddShape(shape);
+	}
+
+	void RemoveSelectedShapes()
+	{
+		QList<QUuid> shapeIdsToRemove;
+		for (QGraphicsItem* item : m_scene->selectedItems())
+		{
+			QVariant data = item->data(ITEM_ID_KEY);
+
+			if (!data.isValid())
+			{
+				continue;
+			}
+
+			shapeIdsToRemove.append(data.toUuid());
+		}
+
+		m_document->RemoveShapes(shapeIdsToRemove);
 	}
 
 private slots:
@@ -44,12 +63,25 @@ private slots:
 			throw std::runtime_error("Unknown shape type");
 		}
 
+		shapeView->setData(ITEM_ID_KEY, shape->GetId());
 		m_scene->addItem(shapeView);
-		m_views.insert(shape, shapeView);
+		m_views.insert(shape->GetId(), shapeView);
+	}
+
+	void OnShapesRemoved(const QList<QUuid>& ids)
+	{
+		for (const QUuid& id : ids)
+		{
+			auto shapeView = m_views.take(id);
+			m_scene->removeItem(shapeView);
+			delete shapeView;
+		}
 	}
 
 private:
+	static constexpr int ITEM_ID_KEY = 0;
+
 	Document* m_document;
 	QGraphicsScene* m_scene;
-	QMap<Shape*, ShapeView*> m_views;
+	QMap<QUuid, ShapeView*> m_views;
 };

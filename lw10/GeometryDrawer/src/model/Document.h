@@ -1,6 +1,7 @@
 #pragma once
 #include "Shape.h"
 
+#include <QHash>
 #include <QObject>
 
 class Document : public QObject
@@ -16,23 +17,35 @@ public:
 	{
 		shape->setParent(this);
 		m_shapes.append(shape);
+		m_shapesMap.insert(shape->GetId(), shape);
 		emit ShapeAdded(shape);
 	}
 
-	void DeleteShape(Shape* shape)
+	void RemoveShapes(const QList<QUuid>& ids)
 	{
-		if (m_shapes.removeOne(shape))
+		QList<QUuid> removedShapeIds;
+
+		for (const QUuid& id : ids)
 		{
-			shape->setParent(nullptr);
-			emit ShapeRemoved(shape);
-			delete shape;
+			auto it = m_shapesMap.find(id);
+			if (it != m_shapesMap.end())
+			{
+				removedShapeIds.append(it.key());
+				m_shapesMap.erase(it);
+			}
+		}
+
+		if (!removedShapeIds.isEmpty())
+		{
+			emit ShapesRemoved(removedShapeIds);
 		}
 	}
 
 signals:
 	void ShapeAdded(Shape* shape);
-	void ShapeRemoved(Shape* shape);
+	void ShapesRemoved(const QList<QUuid>& ids);
 
 private:
 	QList<Shape*> m_shapes;
+	QHash<QUuid, Shape*> m_shapesMap;
 };

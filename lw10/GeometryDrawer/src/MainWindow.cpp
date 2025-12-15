@@ -12,9 +12,6 @@ MainWindow::MainWindow()
 {
 	setWindowTitle("Geometry Drawer");
 
-	CreateMenu();
-	CreateToolbar();
-
 	m_scene = new QGraphicsScene(this);
 	m_scene->setBackgroundBrush(Qt::white);
 	QRectF sceneRect(0, 0, 800, 600);
@@ -30,6 +27,9 @@ MainWindow::MainWindow()
 
 	auto* shapesDocument = new Document();
 	m_documentPresenter = new DocumentPresenter(shapesDocument, m_scene, this);
+
+	CreateMenu();
+	CreateToolbar();
 }
 
 void MainWindow::OnSelectRectangle()
@@ -88,4 +88,12 @@ void MainWindow::CreateToolbar()
 	triangleBtn->setText("△ Triangle");
 	connect(triangleBtn, &QToolButton::clicked, this, &MainWindow::OnSelectTriangle);
 	m_toolbar->addWidget(triangleBtn);
+
+	m_toolbar->addSeparator();
+
+	QToolButton* deleteBtn = new QToolButton(this);
+	deleteBtn->setText("Delete selected");
+	deleteBtn->setShortcut(QKeySequence::Delete);
+	connect(deleteBtn, &QToolButton::clicked, m_documentPresenter, &DocumentPresenter::RemoveSelectedShapes);
+	m_toolbar->addWidget(deleteBtn);
 }

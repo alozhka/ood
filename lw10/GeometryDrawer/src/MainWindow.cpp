@@ -1,4 +1,7 @@
 #include "MainWindow.h"
+
+#include "presenter/DocumentPresenter.h"
+
 #include <QAction>
 #include <QFileDialog>
 #include <QMenuBar>
@@ -14,27 +17,32 @@ MainWindow::MainWindow()
 
 	m_scene = new QGraphicsScene(this);
 	m_scene->setBackgroundBrush(Qt::white);
+	QRectF sceneRect(0, 0, 800, 600);
+	m_scene->setSceneRect(sceneRect);
+
 	m_view = new QGraphicsView(m_scene, this);
+	m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	m_view->setRenderHint(QPainter::Antialiasing);
-	m_view->setDragMode(QGraphicsView::RubberBandDrag);
+	m_view->setDragMode(QGraphicsView::NoDrag);
+
 	setCentralWidget(m_view);
-	m_canvasPresenter = std::make_unique<CanvasPresenter>(m_scene, this);
+
+	auto* shapesDocument = new Document();
+	m_documentPresenter = new DocumentPresenter(shapesDocument, m_scene, this);
 }
 
 void MainWindow::OnSelectRectangle()
 {
-	m_canvasPresenter->AddRectangle();
-	// TODO: добавить в модель
+	m_documentPresenter->AddShape(Shape::Type::Rectangle);
 }
 void MainWindow::OnSelectTriangle()
 {
-	m_canvasPresenter->AddTriangle();
-	// TODO: добавить в модель
+	m_documentPresenter->AddShape(Shape::Type::Triangle);
 }
 void MainWindow::OnSelectEllipse()
 {
-	m_canvasPresenter->AddEllipse();
-	// TODO: добавить в модель
+	m_documentPresenter->AddShape(Shape::Type::Ellipse);
 }
 
 void MainWindow::OnOpenFile()

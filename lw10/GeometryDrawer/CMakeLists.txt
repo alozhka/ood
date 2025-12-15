@@ -10,16 +10,19 @@ find_package(Qt6 COMPONENTS
         Core
         Gui
         Widgets
-        Qml
         REQUIRED)
 
 add_executable(GeometryDrawer main.cpp
-        src/view/MainWindow.h
-        src/view/MainWindow.cpp
-        src/presenter/DocumentPresenter.cpp
+        src/MainWindow.h
+        src/MainWindow.cpp
         src/presenter/DocumentPresenter.h
-        src/presenter/CanvasPresenter.cpp
-        src/presenter/CanvasPresenter.h
+        src/view/ShapeView.h
+        src/view/RectangleView.h
+        src/model/Document.h
+        src/model/Shape.h
+        src/view/TriangleView.h
+        src/view/EllipseView.h
+        src/view/IResizable.h
 )
 
 target_link_libraries(GeometryDrawer
@@ -27,6 +30,5 @@ target_link_libraries(GeometryDrawer
         Qt::Core
         Qt::Gui
         Qt::Widgets
-        Qt::Qml
 )
 

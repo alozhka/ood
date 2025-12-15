@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../presenter/CanvasPresenter.h"
+#include "presenter/DocumentPresenter.h"
 
 #include <QGraphicsView>
 #include <QMainWindow>
@@ -30,5 +30,5 @@ private:
 	QGraphicsView* m_view;
 	QGraphicsScene* m_scene;
 
-	std::unique_ptr<CanvasPresenter> m_canvasPresenter;
+	DocumentPresenter* m_documentPresenter;
 };

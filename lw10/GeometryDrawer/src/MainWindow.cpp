@@ -14,8 +14,7 @@ MainWindow::MainWindow()
 
 	m_scene = new QGraphicsScene(this);
 	m_scene->setBackgroundBrush(Qt::white);
-	QRectF sceneRect(0, 0, 800, 600);
-	m_scene->setSceneRect(sceneRect);
+	m_scene->setSceneRect(QRectF(0, 0, 800, 600));
 
 	m_view = new QGraphicsView(m_scene, this);
 	m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);

@@ -3,6 +3,7 @@
 
 #include <QHash>
 #include <QObject>
+#include <QDebug>
 
 class Document : public QObject
 {
@@ -60,6 +61,7 @@ private:
 		{
 			Shape* shape = it.value();
 			shape->SetPosition(pos);
+			qDebug() << "Updated " << shape->GetId().toString() << " to position " << pos;
 		}
 	}
 

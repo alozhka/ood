@@ -63,7 +63,9 @@ private slots:
 			throw std::runtime_error("Unknown shape type");
 		}
 		connect(shapeView, &ShapeView::MovementFinished, this, &DocumentPresenter::OnMovementFinished);
-
+		shapeView->SetMovementHandler([this](ShapeView* shapeView, const QPointF& delta) {
+			MoveShapeWithBounds(shapeView, delta);
+		});
 		shapeView->setData(ITEM_ID_KEY, shape->GetId());
 		m_scene->addItem(shapeView);
 		m_views.insert(shape->GetId(), shapeView);
@@ -80,6 +82,24 @@ private slots:
 				m_views.erase(it);
 			}
 		}
+	}
+
+	void MoveShapeWithBounds(ShapeView* shapeView, const QPointF& delta)
+	{
+		QPointF targetPos = shapeView->pos() + delta;
+
+		QRectF sceneRect = m_scene->sceneRect();
+		QRectF itemRect = shapeView->boundingRect();
+
+		qreal minX = sceneRect.left() - itemRect.left();
+		qreal maxX = sceneRect.right() - itemRect.right();
+		qreal minY = sceneRect.top() - itemRect.top();
+		qreal maxY = sceneRect.bottom() - itemRect.bottom();
+
+		qreal clampedX = qBound(minX, targetPos.x(), maxX);
+		qreal clampedY = qBound(minY, targetPos.y(), maxY);
+
+		shapeView->setPos(clampedX, clampedY);
 	}
 
 	void OnMovementFinished()
@@ -102,7 +122,7 @@ private slots:
 	}
 
 private:
-	static constexpr int ITEM_ID_KEY = 0;
+	static constexpr int ITEM_ID_KEY = Qt::UserRole + 1;
 
 	Document* m_document;
 	QGraphicsScene* m_scene;

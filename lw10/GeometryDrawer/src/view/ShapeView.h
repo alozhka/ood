@@ -1,22 +1,25 @@
 #pragma once
 #include "IResizable.h"
 
+#include <QCursor>
 #include <QGraphicsItem>
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
-#include <QCursor>
 
 class ShapeView : public QGraphicsObject
 	, public IResizable
 {
 	Q_OBJECT
 public:
+	using MovementHandler = std::function<void(ShapeView*, const QPointF& mousePos)>;
+
 	explicit ShapeView(const QRectF& rect, QGraphicsItem* parent = nullptr)
 		: QGraphicsObject(parent)
 		, m_rect(rect)
 		, m_color(Qt::lightGray)
+		, m_capturedPos(0, 0)
 	{
-		setFlags(ItemIsSelectable | ItemIsMovable | ItemSendsGeometryChanges);
+		setFlags(ItemIsSelectable | ItemSendsGeometryChanges);
 	}
 
 	QRectF boundingRect() const override
@@ -34,6 +37,11 @@ public:
 		m_rect = rect;
 	}
 
+	void SetMovementHandler(const MovementHandler& handler)
+	{
+		m_movementHandler = handler;
+	}
+
 	void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override
 	{
 		painter->setBrush(m_color);
@@ -49,23 +57,29 @@ public:
 	}
 
 signals:
+	void MovementRequested();
 	void MovementFinished();
 
 protected:
 	void mousePressEvent(QGraphicsSceneMouseEvent* event) override
 	{
-		m_isMoving = false;
-
 		QGraphicsObject::mousePressEvent(event);
+
+		m_isMoving = false;
+		m_capturedPos = event->pos();
 		setCursor(QCursor(Qt::ClosedHandCursor));
 	}
 
 	void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override
 	{
 		QGraphicsObject::mouseMoveEvent(event);
+
 		if (event->buttons() & Qt::LeftButton)
 		{
 			m_isMoving = true;
+			QPointF currentMousePos = event->pos();
+			QPointF delta = currentMousePos - m_capturedPos;
+			m_movementHandler(this, delta);
 		}
 	}
 	void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override
@@ -84,4 +98,6 @@ protected:
 	QRectF m_rect;
 	QColor m_color;
 	bool m_isMoving = false;
+	QPointF m_capturedPos;
+	MovementHandler m_movementHandler;
 };

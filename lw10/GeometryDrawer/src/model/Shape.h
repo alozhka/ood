@@ -37,9 +37,9 @@ public:
 		return m_type;
 	}
 
-	void SetRect(const QRectF& rect)
+	void SetPosition(const QPointF& p)
 	{
-		m_rect = rect;
+		m_rect.setTopLeft(p);
 	}
 
 signals:

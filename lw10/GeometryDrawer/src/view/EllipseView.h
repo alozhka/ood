@@ -3,6 +3,7 @@
 
 class EllipseView final : public ShapeView
 {
+	Q_OBJECT
 public:
 	explicit EllipseView(const QRectF& rect, QGraphicsItem* parent = nullptr)
 		: ShapeView(rect, parent)

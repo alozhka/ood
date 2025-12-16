@@ -16,7 +16,6 @@ public:
 	void AddShape(Shape* shape)
 	{
 		shape->setParent(this);
-		m_shapes.append(shape);
 		m_shapesMap.insert(shape->GetId(), shape);
 		emit ShapeAdded(shape);
 	}
@@ -41,11 +40,28 @@ public:
 		}
 	}
 
+	void UpdateShapePositions(const QHash<QUuid, QPointF>& positions)
+	{
+		for (auto posIt = positions.begin(); posIt != positions.end(); ++posIt)
+		{
+			UpdateShapePosition(posIt.key(), posIt.value());
+		}
+	}
+
 signals:
 	void ShapeAdded(Shape* shape);
 	void ShapesRemoved(const QList<QUuid>& ids);
 
 private:
-	QList<Shape*> m_shapes;
+	void UpdateShapePosition(const QUuid& id, QPointF pos)
+	{
+		auto it = m_shapesMap.find(id);
+		if (it != m_shapesMap.end())
+		{
+			Shape* shape = it.value();
+			shape->SetPosition(pos);
+		}
+	}
+
 	QHash<QUuid, Shape*> m_shapesMap;
 };

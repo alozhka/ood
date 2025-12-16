@@ -4,6 +4,7 @@
 
 class RectangleView final : public ShapeView
 {
+	Q_OBJECT
 public:
 	explicit RectangleView(const QRectF& rect, QGraphicsItem* parent = nullptr)
 		: ShapeView(rect, parent)

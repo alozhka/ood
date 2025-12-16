@@ -62,6 +62,7 @@ private slots:
 		default:
 			throw std::runtime_error("Unknown shape type");
 		}
+		connect(shapeView, &ShapeView::MovementFinished, this, &DocumentPresenter::OnMovementFinished);
 
 		shapeView->setData(ITEM_ID_KEY, shape->GetId());
 		m_scene->addItem(shapeView);
@@ -72,10 +73,32 @@ private slots:
 	{
 		for (const QUuid& id : ids)
 		{
-			auto shapeView = m_views.take(id);
-			m_scene->removeItem(shapeView);
-			delete shapeView;
+			auto it = m_views.find(id);
+			if (it != m_views.end())
+			{
+				m_scene->removeItem(it.value());
+				m_views.erase(it);
+			}
 		}
+	}
+
+	void OnMovementFinished()
+	{
+		QHash<QUuid, QPointF> shapesPositions;
+
+		for (QGraphicsItem* item : m_scene->selectedItems())
+		{
+			QVariant data = item->data(ITEM_ID_KEY);
+
+			if (!data.isValid())
+			{
+				continue;
+			}
+
+			shapesPositions.insert(data.toUuid(), item->pos());
+		}
+
+		m_document->UpdateShapePositions(shapesPositions);
 	}
 
 private:

@@ -24,7 +24,6 @@ QGraphicsView* CreateView(QGraphicsScene* scene, QWidget* parent)
 	view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	view->setRenderHint(QPainter::Antialiasing);
 	view->setDragMode(QGraphicsView::NoDrag);
-	view->setStyleSheet("background-color: #F2C94C;");
 	return view;
 }
 } // namespace
@@ -50,6 +49,7 @@ void MainWindow::OnOpenFile()
 	QFileDialog::getOpenFileName(this, "Open composition", "", "JSON files (*.json);; All files (*)");
 	// TODO: реализовать
 }
+
 void MainWindow::OnSaveFile()
 {
 	// Программировать, не приходя в сознание

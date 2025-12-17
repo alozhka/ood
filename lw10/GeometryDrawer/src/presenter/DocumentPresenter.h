@@ -2,6 +2,7 @@
 #include "../model/Document.h"
 #include "../view/EllipseView.h"
 #include "../view/RectangleView.h"
+#include "../view/ResizeHandle.h"
 #include "../view/ShapeView.h"
 #include "../view/TriangleView.h"
 
@@ -129,6 +130,79 @@ private slots:
 		}
 
 		m_document->UpdateShapePositions(shapesPositions);
+	}
+
+	void ResizeShapeWithBounds(ShapeView* shapeView, HandleType type, const QPointF& mousePos)
+	{
+		// 1. Текущие абсолютные координаты фигуры
+		QRectF currentRect = shapeView->mapRectToScene(shapeView->boundingRect());
+
+		// 2. Копии для модификации
+		qreal left = currentRect.left();
+		qreal right = currentRect.right();
+		qreal top = currentRect.top();
+		qreal bottom = currentRect.bottom();
+
+		// 3. Изменяем стороны в зависимости от того, какую ручку тянем
+		// Тут мы подменяем одну из координат на mousePos
+
+		switch (type)
+		{
+		case HandleType::Left:
+			left = mousePos.x();
+			break;
+		case HandleType::Right:
+			right = mousePos.x();
+			break;
+		case HandleType::Top:
+			top = mousePos.y();
+			break;
+		case HandleType::Bottom:
+			bottom = mousePos.y();
+			break;
+		case HandleType::TopLeft:
+			left = mousePos.x();
+			top = mousePos.y();
+			break;
+		case HandleType::TopRight:
+			right = mousePos.x();
+			top = mousePos.y();
+			break;
+		case HandleType::BottomLeft:
+			left = mousePos.x();
+			bottom = mousePos.y();
+			break;
+		case HandleType::BottomRight:
+			right = mousePos.x();
+			bottom = mousePos.y();
+			break;
+		}
+
+		// 4. Нормализация (чтобы left не стал больше right)
+		if (left > right)
+			std::swap(left, right);
+		if (top > bottom)
+			std::swap(top, bottom);
+
+		// 5. Проверка минимального размера (например 10px)
+		if (right - left < 10)
+			return;
+		if (bottom - top < 10)
+			return;
+
+		// 6. Проверка границ сцены (можно переиспользовать qBound как в movement)
+		QRectF sceneRect = m_scene->sceneRect();
+		// ... код проверки, чтобы left >= sceneRect.left() и т.д. ...
+
+		// 7. Применение изменений
+		// Важно: Resizing меняет И позицию (pos), И размер (rect)
+		// Самый простой способ обновить View:
+		QRectF newRect(left, top, right - left, bottom - top);
+
+		// setPos ставит левый верхний угол
+		shapeView->setPos(newRect.topLeft());
+		// setRect задает внутренние размеры (от 0,0 до w,h)
+		shapeView->SetRect(QRectF(0, 0, newRect.width(), newRect.height()));
 	}
 
 private:

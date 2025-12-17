@@ -1,5 +1,6 @@
 #pragma once
 #include "IResizable.h"
+#include "ResizeHandle.h"
 
 #include <QCursor>
 #include <QGraphicsItem>
@@ -11,7 +12,8 @@ class ShapeView : public QGraphicsObject
 {
 	Q_OBJECT
 public:
-	using MovementHandler = std::function<void(ShapeView*, const QPointF& mousePos)>;
+	using MovementHandler = std::function<void(ShapeView*, const QPointF&)>;
+	using ResizeHandler = std::function<void(ShapeView*, HandleType, const QPointF&)>;
 
 	explicit ShapeView(const QRectF& rect, QGraphicsItem* parent = nullptr)
 		: QGraphicsObject(parent)
@@ -20,6 +22,9 @@ public:
 		, m_capturedPos(0, 0)
 	{
 		setFlags(ItemIsSelectable | ItemSendsGeometryChanges);
+		CreateHandles();
+		UpdateHandlesPosition();
+		ShowHandles(false);
 	}
 
 	QRectF boundingRect() const override
@@ -42,6 +47,11 @@ public:
 		m_movementHandler = handler;
 	}
 
+	void SetResizeHandler(const ResizeHandler& handler)
+	{
+		m_resizeHandler = handler;
+	}
+
 	void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override
 	{
 		painter->setBrush(m_color);
@@ -53,11 +63,15 @@ public:
 			painter->setBrush(Qt::NoBrush);
 			painter->setPen(QPen(Qt::black, 1, Qt::DashDotDotLine));
 			painter->drawRect(m_rect);
+			ShowHandles(true);
+		}
+		else
+		{
+			ShowHandles(false);
 		}
 	}
 
 signals:
-	void MovementRequested();
 	void MovementFinished();
 
 protected:
@@ -97,7 +111,62 @@ protected:
 
 	QRectF m_rect;
 	QColor m_color;
+
+private:
+	void UpdateHandlesPosition()
+	{
+		GetHandle(HandleType::TopLeft)->setPos(m_rect.left(), m_rect.top());
+		GetHandle(HandleType::Left)->setPos(m_rect.left(), m_rect.center().y());
+		GetHandle(HandleType::BottomLeft)->setPos(m_rect.left(), m_rect.bottom());
+		GetHandle(HandleType::Bottom)->setPos(m_rect.center().x(), m_rect.bottom());
+		GetHandle(HandleType::BottomRight)->setPos(m_rect.right(), m_rect.bottom());
+		GetHandle(HandleType::Right)->setPos(m_rect.right(), m_rect.center().y());
+		GetHandle(HandleType::TopRight)->setPos(m_rect.right(), m_rect.top());
+		GetHandle(HandleType::Top)->setPos(m_rect.center().x(), m_rect.top());
+	}
+
+	void ShowHandles(bool show)
+	{
+		for (ResizeHandle* h : m_resizeHandles)
+		{
+			h->setVisible(show);
+		}
+	}
+
+	ResizeHandle* GetHandle(HandleType t)
+	{
+		for (auto handle : m_resizeHandles)
+		{
+			if (handle->GetType() == t)
+			{
+				return handle;
+			}
+		}
+
+		return nullptr;
+	}
+
+	void CreateHandles()
+	{
+		const QList handleTypes = {
+			HandleType::TopLeft, HandleType::Left, HandleType::BottomLeft, HandleType::Bottom,
+			HandleType::BottomRight, HandleType::Right, HandleType::TopRight, HandleType::Top
+		};
+
+		for (auto type : handleTypes)
+		{
+			ResizeHandle* resizeHandle = new ResizeHandle(type, this);
+			resizeHandle->SetDragHandler([this](ResizeHandle* handle, const QPointF& pos) {
+				m_resizeHandler(this, handle->GetType(), pos);
+			});
+			m_resizeHandles.append(resizeHandle);
+		}
+	}
+
 	bool m_isMoving = false;
 	QPointF m_capturedPos;
+	QList<ResizeHandle*> m_resizeHandles;
+
 	MovementHandler m_movementHandler;
+	ResizeHandler m_resizeHandler;
 };

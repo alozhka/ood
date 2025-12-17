@@ -6,6 +6,7 @@
 #include "../view/TriangleView.h"
 
 #include <QGraphicsScene>
+#include <QToolButton>
 
 class DocumentPresenter : public QObject
 {
@@ -20,10 +21,19 @@ public:
 		connect(m_document, &Document::ShapesRemoved, this, &DocumentPresenter::OnShapesRemoved);
 	}
 
-	void AddShape(Shape::Type type)
+	void AddRectangle()
 	{
-		auto* shape = new Shape(type, QRectF(0, 0, 100, 100));
-		m_document->AddShape(shape);
+		AddShape(Shape::Type::Rectangle);
+	}
+
+	void AddTriangle()
+	{
+		AddShape(Shape::Type::Triangle);
+	}
+
+	void AddEllipse()
+	{
+		AddShape(Shape::Type::Ellipse);
 	}
 
 	void RemoveSelectedShapes()
@@ -122,7 +132,14 @@ private slots:
 	}
 
 private:
+	void AddShape(Shape::Type type)
+	{
+		auto* shape = new Shape(type, DEFAULT_SHAPE_RECT);
+		m_document->AddShape(shape);
+	}
+
 	static constexpr int ITEM_ID_KEY = Qt::UserRole + 1;
+	static constexpr QRectF DEFAULT_SHAPE_RECT = QRectF(100, 100, 100, 100);
 
 	Document* m_document;
 	QGraphicsScene* m_scene;

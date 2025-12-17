@@ -14,10 +14,6 @@ public:
 	~MainWindow() = default;
 
 private slots:
-	void OnSelectRectangle();
-	void OnSelectTriangle();
-	void OnSelectEllipse();
-
 	void OnOpenFile();
 	void OnSaveFile();
 

@@ -31,19 +31,6 @@ MainWindow::MainWindow()
 	CreateToolbar();
 }
 
-void MainWindow::OnSelectRectangle()
-{
-	m_documentPresenter->AddShape(Shape::Type::Rectangle);
-}
-void MainWindow::OnSelectTriangle()
-{
-	m_documentPresenter->AddShape(Shape::Type::Triangle);
-}
-void MainWindow::OnSelectEllipse()
-{
-	m_documentPresenter->AddShape(Shape::Type::Ellipse);
-}
-
 void MainWindow::OnOpenFile()
 {
 	QFileDialog::getOpenFileName(this, "Open composition", "", "JSON files (*.json);; All files (*)");
@@ -75,17 +62,17 @@ void MainWindow::CreateToolbar()
 
 	QToolButton* rectBtn = new QToolButton(this);
 	rectBtn->setText("□ Rectangle");
-	connect(rectBtn, &QToolButton::clicked, this, &MainWindow::OnSelectRectangle);
+	connect(rectBtn, &QToolButton::clicked, m_documentPresenter, &DocumentPresenter::AddRectangle);
 	m_toolbar->addWidget(rectBtn);
 
 	QToolButton* ellipseBtn = new QToolButton(this);
 	ellipseBtn->setText("○ Ellipse");
-	connect(ellipseBtn, &QToolButton::clicked, this, &MainWindow::OnSelectEllipse);
+	connect(ellipseBtn, &QToolButton::clicked, m_documentPresenter, &DocumentPresenter::AddEllipse);
 	m_toolbar->addWidget(ellipseBtn);
 
 	QToolButton* triangleBtn = new QToolButton(this);
 	triangleBtn->setText("△ Triangle");
-	connect(triangleBtn, &QToolButton::clicked, this, &MainWindow::OnSelectTriangle);
+	connect(triangleBtn, &QToolButton::clicked, m_documentPresenter, &DocumentPresenter::AddTriangle);
 	m_toolbar->addWidget(triangleBtn);
 
 	m_toolbar->addSeparator();

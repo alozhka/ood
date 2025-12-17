@@ -8,19 +8,33 @@
 #include <QToolBar>
 #include <QToolButton>
 
+namespace
+{
+QGraphicsScene* CreateScene(QObject* parent)
+{
+	auto* scene = new QGraphicsScene(parent);
+	scene->setBackgroundBrush(Qt::white);
+	scene->setSceneRect(QRectF(0, 0, 800, 600));
+	return scene;
+}
+QGraphicsView* CreateView(QGraphicsScene* scene, QWidget* parent)
+{
+	auto* view = new QGraphicsView(scene, parent);
+	view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	view->setRenderHint(QPainter::Antialiasing);
+	view->setDragMode(QGraphicsView::NoDrag);
+	view->setStyleSheet("background-color: #F2C94C;");
+	return view;
+}
+} // namespace
+
 MainWindow::MainWindow()
 {
 	setWindowTitle("Geometry Drawer");
 
-	m_scene = new QGraphicsScene(this);
-	m_scene->setBackgroundBrush(Qt::white);
-	m_scene->setSceneRect(QRectF(0, 0, 800, 600));
-
-	m_view = new QGraphicsView(m_scene, this);
-	m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	m_view->setRenderHint(QPainter::Antialiasing);
-	m_view->setDragMode(QGraphicsView::NoDrag);
+	m_scene = CreateScene(this);
+	m_view = CreateView(m_scene, this);
 
 	setCentralWidget(m_view);
 

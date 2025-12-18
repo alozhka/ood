@@ -21,10 +21,12 @@ class ResizeHandle : public QGraphicsRectItem
 {
 public:
 	using DragHandler = std::function<void(ResizeHandle*, const QPointF&)>;
+	using ReleaseHandler = std::function<void(ResizeHandle*)>;
 
-	explicit ResizeHandle(HandleType type, const DragHandler& dragHandler, QGraphicsItem* parent = nullptr)
+	explicit ResizeHandle(HandleType type, const DragHandler& dragHandler, const ReleaseHandler& releaseHandler, QGraphicsItem* parent = nullptr)
 		: QGraphicsRectItem(-4, -4, 8, 8, parent)
 		, m_dragHandler(dragHandler)
+		, m_releaseHandler(releaseHandler)
 		, m_type(type)
 	{
 		setZValue(100);
@@ -52,12 +54,23 @@ protected:
 
 	void mousePressEvent(QGraphicsSceneMouseEvent* event) override
 	{
+		m_dragging = false;
 		event->accept();
 	}
 
 	void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override
 	{
+		m_dragging = true;
 		m_dragHandler(this, mapToParent(event->pos()));
+	}
+
+	void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override
+	{
+		if (m_dragging)
+		{
+			m_dragging = false;
+			m_releaseHandler(this);
+		}
 	}
 
 private:
@@ -83,5 +96,7 @@ private:
 	}
 
 	DragHandler m_dragHandler;
+	ReleaseHandler m_releaseHandler;
 	HandleType m_type;
+	bool m_dragging = false;
 };

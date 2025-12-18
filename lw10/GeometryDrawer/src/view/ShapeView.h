@@ -70,7 +70,7 @@ public:
 	}
 
 signals:
-	void MovementFinished();
+	void InteractionFinished();
 
 protected:
 	void mousePressEvent(QGraphicsSceneMouseEvent* event) override
@@ -102,7 +102,7 @@ protected:
 		if (m_isMoving)
 		{
 			m_isMoving = false;
-			emit MovementFinished();
+			emit InteractionFinished();
 		}
 	}
 
@@ -163,10 +163,17 @@ private:
 
 		for (auto type : handleTypes)
 		{
-			auto dragHandler = [this](ResizeHandle* handle, const QPointF& pos) {
+			auto resizeHandler = [this](ResizeHandle* handle, const QPointF& pos) {
 				m_resizeHandler(this, handle->GetType(), pos);
 			};
-			ResizeHandle* resizeHandle = new ResizeHandle(type, dragHandler, this);
+			auto resizeFinishedHandler = [this](ResizeHandle*) {
+				emit InteractionFinished();
+			};
+			ResizeHandle* resizeHandle = new ResizeHandle(
+				type,
+				resizeHandler,
+				resizeFinishedHandler,
+				this);
 			m_resizeHandles.append(resizeHandle);
 		}
 	}

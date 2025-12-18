@@ -41,11 +41,11 @@ public:
 		}
 	}
 
-	void UpdateShapePositions(const QHash<QUuid, QPointF>& positions)
+	void UpdateShapesGeometry(const QHash<QUuid, QRectF>& rects)
 	{
-		for (auto posIt = positions.begin(); posIt != positions.end(); ++posIt)
+		for (auto posIt = rects.begin(); posIt != rects.end(); ++posIt)
 		{
-			UpdateShapePosition(posIt.key(), posIt.value());
+			UpdateShapeGeometry(posIt.key(), posIt.value());
 		}
 	}
 
@@ -54,14 +54,14 @@ signals:
 	void ShapesRemoved(const QList<QUuid>& ids);
 
 private:
-	void UpdateShapePosition(const QUuid& id, QPointF pos)
+	void UpdateShapeGeometry(const QUuid& id, const QRectF& rect)
 	{
 		auto it = m_shapesMap.find(id);
 		if (it != m_shapesMap.end())
 		{
 			Shape* shape = it.value();
-			shape->SetPosition(pos);
-			qDebug() << "Updated " << shape->GetId().toString() << " to position " << pos;
+			shape->SetGeometry(rect);
+			qDebug() << "Updated " << shape->GetId().toString() << " to position and geometry " << rect;
 		}
 	}
 

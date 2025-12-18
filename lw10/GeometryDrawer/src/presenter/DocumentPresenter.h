@@ -77,7 +77,7 @@ private slots:
 	void OnShapeAdded(Shape* shape)
 	{
 		ShapeView* shapeView = ShapeViewFormShape(shape);
-		connect(shapeView, &ShapeView::MovementFinished, this, &DocumentPresenter::OnMovementFinished);
+		connect(shapeView, &ShapeView::InteractionFinished, this, &DocumentPresenter::OnInteractionFinished);
 		shapeView->setData(ITEM_ID_KEY, shape->GetId());
 		m_scene->addItem(shapeView);
 		m_views.insert(shape->GetId(), shapeView);
@@ -156,9 +156,9 @@ private slots:
 		shapeView->SetRect(QRectF(newLeft, newTop, newRight - newLeft, newBottom - newTop));
 	}
 
-	void OnMovementFinished()
+	void OnInteractionFinished()
 	{
-		QHash<QUuid, QPointF> shapesPositions;
+		QHash<QUuid, QRectF> shapesGeometry;
 
 		for (QGraphicsItem* item : m_scene->selectedItems())
 		{
@@ -169,10 +169,10 @@ private slots:
 				continue;
 			}
 
-			shapesPositions.insert(data.toUuid(), item->pos());
+			shapesGeometry.insert(data.toUuid(), item->mapRectToScene(item->boundingRect()));
 		}
 
-		m_document->UpdateShapePositions(shapesPositions);
+		m_document->UpdateShapesGeometry(shapesGeometry);
 	}
 
 private:

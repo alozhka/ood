@@ -77,6 +77,9 @@ private slots:
 		shapeView->SetMovementHandler([this](ShapeView* shapeView, const QPointF& delta) {
 			MoveShapeWithBounds(shapeView, delta);
 		});
+		shapeView->SetResizeHandler([this](ShapeView* shapeView, HandleType type, const QPointF& delta) {
+			ResizeShapeWithBounds(shapeView, type, delta);
+		});
 		shapeView->setData(ITEM_ID_KEY, shape->GetId());
 		m_scene->addItem(shapeView);
 		m_views.insert(shape->GetId(), shapeView);
@@ -113,6 +116,59 @@ private slots:
 		shapeView->setPos(clampedX, clampedY);
 	}
 
+	void ResizeShapeWithBounds(ShapeView* shapeView, HandleType type, const QPointF& mousePos)
+	{
+		QRectF rect = shapeView->GetRect();
+
+		qreal l = rect.left();
+		qreal r = rect.right();
+		qreal t = rect.top();
+		qreal b = rect.bottom();
+
+		switch (type)
+		{
+		case HandleType::Left:
+			l = mousePos.x();
+			break;
+		case HandleType::Right:
+			r = mousePos.x();
+			break;
+		case HandleType::Top:
+			t = mousePos.y();
+			break;
+		case HandleType::Bottom:
+			b = mousePos.y();
+			break;
+
+		case HandleType::TopLeft:
+			l = mousePos.x();
+			t = mousePos.y();
+			break;
+		case HandleType::TopRight:
+			r = mousePos.x();
+			t = mousePos.y();
+			break;
+		case HandleType::BottomLeft:
+			l = mousePos.x();
+			b = mousePos.y();
+			break;
+		case HandleType::BottomRight:
+			r = mousePos.x();
+			b = mousePos.y();
+			break;
+		}
+
+		QRectF newRect;
+		newRect.setCoords(l, t, r, b);
+		newRect = newRect.normalized(); // Позволяет "выворачивать" фигуру наизнанку без багов
+		if (newRect.width() < 10 || newRect.height() < 10)
+		{
+			return;
+		}
+
+		shapeView->SetRect(newRect);
+	}
+
 	void OnMovementFinished()
 	{
 		QHash<QUuid, QPointF> shapesPositions;
@@ -130,79 +186,6 @@ private slots:
 		}
 
 		m_document->UpdateShapePositions(shapesPositions);
-	}
-
-	void ResizeShapeWithBounds(ShapeView* shapeView, HandleType type, const QPointF& mousePos)
-	{
-		// 1. Текущие абсолютные координаты фигуры
-		QRectF currentRect = shapeView->mapRectToScene(shapeView->boundingRect());
-
-		// 2. Копии для модификации
-		qreal left = currentRect.left();
-		qreal right = currentRect.right();
-		qreal top = currentRect.top();
-		qreal bottom = currentRect.bottom();
-
-		// 3. Изменяем стороны в зависимости от того, какую ручку тянем
-		// Тут мы подменяем одну из координат на mousePos
-
-		switch (type)
-		{
-		case HandleType::Left:
-			left = mousePos.x();
-			break;
-		case HandleType::Right:
-			right = mousePos.x();
-			break;
-		case HandleType::Top:
-			top = mousePos.y();
-			break;
-		case HandleType::Bottom:
-			bottom = mousePos.y();
-			break;
-		case HandleType::TopLeft:
-			left = mousePos.x();
-			top = mousePos.y();
-			break;
-		case HandleType::TopRight:
-			right = mousePos.x();
-			top = mousePos.y();
-			break;
-		case HandleType::BottomLeft:
-			left = mousePos.x();
-			bottom = mousePos.y();
-			break;
-		case HandleType::BottomRight:
-			right = mousePos.x();
-			bottom = mousePos.y();
-			break;
-		}
-
-		// 4. Нормализация (чтобы left не стал больше right)
-		if (left > right)
-			std::swap(left, right);
-		if (top > bottom)
-			std::swap(top, bottom);
-
-		// 5. Проверка минимального размера (например 10px)
-		if (right - left < 10)
-			return;
-		if (bottom - top < 10)
-			return;
-
-		// 6. Проверка границ сцены (можно переиспользовать qBound как в movement)
-		QRectF sceneRect = m_scene->sceneRect();
-		// ... код проверки, чтобы left >= sceneRect.left() и т.д. ...
-
-		// 7. Применение изменений
-		// Важно: Resizing меняет И позицию (pos), И размер (rect)
-		// Самый простой способ обновить View:
-		QRectF newRect(left, top, right - left, bottom - top);
-
-		// setPos ставит левый верхний угол
-		shapeView->setPos(newRect.topLeft());
-		// setRect задает внутренние размеры (от 0,0 до w,h)
-		shapeView->SetRect(QRectF(0, 0, newRect.width(), newRect.height()));
 	}
 
 private:

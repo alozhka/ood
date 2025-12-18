@@ -39,7 +39,14 @@ public:
 
 	void SetRect(const QRectF& rect) override
 	{
+		if (m_rect == rect)
+		{
+			return;
+		}
+		prepareGeometryChange();
 		m_rect = rect;
+		UpdateHandlesPosition();
+		update();
 	}
 
 	void SetMovementHandler(const MovementHandler& handler)
@@ -63,11 +70,6 @@ public:
 			painter->setBrush(Qt::NoBrush);
 			painter->setPen(QPen(Qt::black, 1, Qt::DashDotDotLine));
 			painter->drawRect(m_rect);
-			ShowHandles(true);
-		}
-		else
-		{
-			ShowHandles(false);
 		}
 	}
 
@@ -96,6 +98,7 @@ protected:
 			m_movementHandler(this, delta);
 		}
 	}
+
 	void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override
 	{
 		QGraphicsObject::mouseReleaseEvent(event);
@@ -105,6 +108,15 @@ protected:
 			m_isMoving = false;
 			emit MovementFinished();
 		}
+	}
+
+	QVariant itemChange(GraphicsItemChange change, const QVariant& value) override
+	{
+		if (change == ItemSelectedChange)
+		{
+			ShowHandles(value.toBool());
+		}
+		return QGraphicsObject::itemChange(change, value);
 	}
 
 	virtual void PaintShape(QPainter* painter) = 0;

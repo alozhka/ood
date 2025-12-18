@@ -7,7 +7,7 @@
 #include "../view/TriangleView.h"
 
 #include <QGraphicsScene>
-#include <QToolButton>
+#include <QKeyEvent>
 
 class DocumentPresenter : public QObject
 {
@@ -20,6 +20,7 @@ public:
 	{
 		connect(m_document, &Document::ShapeAdded, this, &DocumentPresenter::OnShapeAdded);
 		connect(m_document, &Document::ShapesRemoved, this, &DocumentPresenter::OnShapesRemoved);
+		m_scene->installEventFilter(this);
 	}
 
 	void AddRectangle()
@@ -53,6 +54,23 @@ public:
 		}
 
 		m_document->RemoveShapes(shapeIdsToRemove);
+	}
+
+protected:
+	bool eventFilter(QObject* object, QEvent* event) override
+	{
+		if (object == m_scene && event->type() == QEvent::KeyPress)
+		{
+			QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
+
+			if (keyEvent->key() == Qt::Key_Delete || keyEvent->key() == Qt::Key_Backspace)
+			{
+				RemoveSelectedShapes();
+				return true;
+			}
+		}
+
+		return QObject::eventFilter(object, event);
 	}
 
 private slots:

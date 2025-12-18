@@ -1,9 +1,9 @@
 #pragma once
 #include "Shape.h"
 
+#include <QDebug>
 #include <QHash>
 #include <QObject>
-#include <QDebug>
 
 class Document : public QObject
 {

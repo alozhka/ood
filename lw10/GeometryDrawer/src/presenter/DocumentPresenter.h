@@ -118,55 +118,44 @@ private slots:
 
 	void ResizeShapeWithBounds(ShapeView* shapeView, HandleType type, const QPointF& mousePos)
 	{
-		QRectF rect = shapeView->GetRect();
+		QPointF sceneMousePos = shapeView->mapToScene(mousePos);
 
-		qreal l = rect.left();
-		qreal r = rect.right();
-		qreal t = rect.top();
-		qreal b = rect.bottom();
+		QRectF currentGeo = shapeView->mapRectToScene(shapeView->GetRect());
+		QRectF sceneBounds = m_scene->sceneRect();
 
-		switch (type)
+		qreal newLeft = currentGeo.left();
+		qreal newRight = currentGeo.right();
+		qreal newTop = currentGeo.top();
+		qreal newBottom = currentGeo.bottom();
+
+		if (type == HandleType::Left || type == HandleType::TopLeft || type == HandleType::BottomLeft)
 		{
-		case HandleType::Left:
-			l = mousePos.x();
-			break;
-		case HandleType::Right:
-			r = mousePos.x();
-			break;
-		case HandleType::Top:
-			t = mousePos.y();
-			break;
-		case HandleType::Bottom:
-			b = mousePos.y();
-			break;
+			qreal minLimit = sceneBounds.left();
+			qreal maxLimit = currentGeo.right() - MIN_SHAPE_SIZE;
+			newLeft = qBound(minLimit, sceneMousePos.x(), maxLimit);
+		}
+		else if (type == HandleType::Right || type == HandleType::TopRight || type == HandleType::BottomRight)
+		{
+			qreal minLimit = currentGeo.left() + MIN_SHAPE_SIZE;
+			qreal maxLimit = sceneBounds.right();
+			newRight = qBound(minLimit, sceneMousePos.x(), maxLimit);
+		}
+		if (type == HandleType::Top || type == HandleType::TopLeft || type == HandleType::TopRight)
+		{
+			qreal minLimit = sceneBounds.top();
+			qreal maxLimit = currentGeo.bottom() - MIN_SHAPE_SIZE;
 
-		case HandleType::TopLeft:
-			l = mousePos.x();
-			t = mousePos.y();
-			break;
-		case HandleType::TopRight:
-			r = mousePos.x();
-			t = mousePos.y();
-			break;
-		case HandleType::BottomLeft:
-			l = mousePos.x();
-			b = mousePos.y();
-			break;
-		case HandleType::BottomRight:
-			r = mousePos.x();
-			b = mousePos.y();
-			break;
+			newTop = qBound(minLimit, sceneMousePos.y(), maxLimit);
+		}
+		else if (type == HandleType::Bottom || type == HandleType::BottomLeft || type == HandleType::BottomRight)
+		{
+			qreal minLimit = currentGeo.top() + MIN_SHAPE_SIZE;
+			qreal maxLimit = sceneBounds.bottom();
+			newBottom = qBound(minLimit, sceneMousePos.y(), maxLimit);
 		}
 
-		QRectF newRect;
-		newRect.setCoords(l, t, r, b);
-		newRect = newRect.normalized(); // Позволяет "выворачивать" фигуру наизнанку без багов
-		if (newRect.width() < 10 || newRect.height() < 10)
-		{
-			return;
-		}
-
-		shapeView->SetRect(newRect);
+		shapeView->setPos(0, 0);
+		shapeView->SetRect(QRectF(newLeft, newTop, newRight - newLeft, newBottom - newTop));
 	}
 
 	void OnMovementFinished()
@@ -197,6 +186,7 @@ private:
 
 	static constexpr int ITEM_ID_KEY = Qt::UserRole + 1;
 	static constexpr QRectF DEFAULT_SHAPE_RECT = QRectF(100, 100, 100, 100);
+	static constexpr qreal MIN_SHAPE_SIZE = 20;
 
 	Document* m_document;
 	QGraphicsScene* m_scene;

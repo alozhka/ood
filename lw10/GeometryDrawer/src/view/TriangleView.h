@@ -5,8 +5,8 @@ class TriangleView final : public ShapeView
 {
 	Q_OBJECT
 public:
-	explicit TriangleView(const QRectF& rect, QGraphicsItem* parent = nullptr)
-		: ShapeView(rect, parent)
+	TriangleView(const QRectF& rect, const MovementHandler& movementHandler, const ResizeHandler& resizeHandler, QGraphicsItem* parent = nullptr)
+		: ShapeView(rect, movementHandler, resizeHandler, parent)
 	{
 	}
 

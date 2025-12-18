@@ -15,11 +15,17 @@ public:
 	using MovementHandler = std::function<void(ShapeView*, const QPointF&)>;
 	using ResizeHandler = std::function<void(ShapeView*, HandleType, const QPointF&)>;
 
-	explicit ShapeView(const QRectF& rect, QGraphicsItem* parent = nullptr)
+	explicit ShapeView(
+		const QRectF& rect,
+		const MovementHandler& movementHandler,
+		const ResizeHandler& resizeHandler,
+		QGraphicsItem* parent = nullptr)
 		: QGraphicsObject(parent)
 		, m_rect(rect)
 		, m_color(Qt::lightGray)
 		, m_capturedPos(0, 0)
+		, m_movementHandler(movementHandler)
+		, m_resizeHandler(resizeHandler)
 	{
 		setFlags(ItemIsSelectable | ItemSendsGeometryChanges);
 		CreateHandles();
@@ -47,16 +53,6 @@ public:
 		m_rect = rect;
 		UpdateHandlesPosition();
 		update();
-	}
-
-	void SetMovementHandler(const MovementHandler& handler)
-	{
-		m_movementHandler = handler;
-	}
-
-	void SetResizeHandler(const ResizeHandler& handler)
-	{
-		m_resizeHandler = handler;
 	}
 
 	void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override
@@ -167,10 +163,10 @@ private:
 
 		for (auto type : handleTypes)
 		{
-			ResizeHandle* resizeHandle = new ResizeHandle(type, this);
-			resizeHandle->SetDragHandler([this](ResizeHandle* handle, const QPointF& pos) {
+			auto dragHandler = [this](ResizeHandle* handle, const QPointF& pos) {
 				m_resizeHandler(this, handle->GetType(), pos);
-			});
+			};
+			ResizeHandle* resizeHandle = new ResizeHandle(type, dragHandler, this);
 			m_resizeHandles.append(resizeHandle);
 		}
 	}

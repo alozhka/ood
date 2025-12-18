@@ -22,8 +22,9 @@ class ResizeHandle : public QGraphicsRectItem
 public:
 	using DragHandler = std::function<void(ResizeHandle*, const QPointF&)>;
 
-	explicit ResizeHandle(HandleType type, QGraphicsItem* parent = nullptr)
+	explicit ResizeHandle(HandleType type, const DragHandler& dragHandler, QGraphicsItem* parent = nullptr)
 		: QGraphicsRectItem(-4, -4, 8, 8, parent)
+		, m_dragHandler(dragHandler)
 		, m_type(type)
 	{
 		setZValue(100);
@@ -31,11 +32,6 @@ public:
 		setAcceptHoverEvents(true);
 		setBrush(QBrush(Qt::white));
 		setPen(QPen(Qt::black));
-	}
-
-	void SetDragHandler(DragHandler handler)
-	{
-		m_dragHandler = handler;
 	}
 
 	HandleType GetType() const

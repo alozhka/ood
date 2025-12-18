@@ -76,28 +76,8 @@ protected:
 private slots:
 	void OnShapeAdded(Shape* shape)
 	{
-		ShapeView* shapeView = nullptr;
-		switch (shape->GetType())
-		{
-		case Shape::Type::Rectangle:
-			shapeView = new RectangleView(shape->GetRect());
-			break;
-		case Shape::Type::Triangle:
-			shapeView = new TriangleView(shape->GetRect());
-			break;
-		case Shape::Type::Ellipse:
-			shapeView = new EllipseView(shape->GetRect());
-			break;
-		default:
-			throw std::runtime_error("Unknown shape type");
-		}
+		ShapeView* shapeView = ShapeViewFormShape(shape);
 		connect(shapeView, &ShapeView::MovementFinished, this, &DocumentPresenter::OnMovementFinished);
-		shapeView->SetMovementHandler([this](ShapeView* shapeView, const QPointF& delta) {
-			MoveShapeWithBounds(shapeView, delta);
-		});
-		shapeView->SetResizeHandler([this](ShapeView* shapeView, HandleType type, const QPointF& delta) {
-			ResizeShapeWithBounds(shapeView, type, delta);
-		});
 		shapeView->setData(ITEM_ID_KEY, shape->GetId());
 		m_scene->addItem(shapeView);
 		m_views.insert(shape->GetId(), shapeView);
@@ -200,6 +180,35 @@ private:
 	{
 		auto* shape = new Shape(type, DEFAULT_SHAPE_RECT);
 		m_document->AddShape(shape);
+	}
+
+	ShapeView* ShapeViewFormShape(const Shape* shape)
+	{
+		ShapeView* shapeView = nullptr;
+		switch (shape->GetType())
+		{
+		case Shape::Type::Rectangle:
+			shapeView = new RectangleView(
+				shape->GetRect(),
+				std::bind_front(&DocumentPresenter::MoveShapeWithBounds, this),
+				std::bind_front(&DocumentPresenter::ResizeShapeWithBounds, this));
+			break;
+		case Shape::Type::Triangle:
+			shapeView = new TriangleView(
+				shape->GetRect(),
+				std::bind_front(&DocumentPresenter::MoveShapeWithBounds, this),
+				std::bind_front(&DocumentPresenter::ResizeShapeWithBounds, this));
+			break;
+		case Shape::Type::Ellipse:
+			shapeView = new EllipseView(
+				shape->GetRect(),
+				std::bind_front(&DocumentPresenter::MoveShapeWithBounds, this),
+				std::bind_front(&DocumentPresenter::ResizeShapeWithBounds, this));
+			break;
+		default:
+			throw std::runtime_error("Unknown shape type");
+		}
+		return shapeView;
 	}
 
 	static constexpr int ITEM_ID_KEY = Qt::UserRole + 1;

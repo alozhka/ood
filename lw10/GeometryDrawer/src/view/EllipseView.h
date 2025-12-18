@@ -5,8 +5,8 @@ class EllipseView final : public ShapeView
 {
 	Q_OBJECT
 public:
-	explicit EllipseView(const QRectF& rect, QGraphicsItem* parent = nullptr)
-		: ShapeView(rect, parent)
+	EllipseView(const QRectF& rect, const MovementHandler& movementHandler, const ResizeHandler& resizeHandler, QGraphicsItem* parent = nullptr)
+		: ShapeView(rect, movementHandler, resizeHandler, parent)
 	{
 	}
 

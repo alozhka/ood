@@ -117,10 +117,8 @@ private slots:
 	void ResizeShapeWithBounds(ShapeView* shapeView, HandleType type, const QPointF& mousePos)
 	{
 		QPointF sceneMousePos = shapeView->mapToScene(mousePos);
-
 		QRectF currentGeo = shapeView->mapRectToScene(shapeView->GetRect());
 		QRectF sceneBounds = m_scene->sceneRect();
-
 		qreal newLeft = currentGeo.left();
 		qreal newRight = currentGeo.right();
 		qreal newTop = currentGeo.top();
@@ -152,8 +150,8 @@ private slots:
 			newBottom = qBound(minLimit, sceneMousePos.y(), maxLimit);
 		}
 
-		shapeView->setPos(0, 0);
-		shapeView->SetRect(QRectF(newLeft, newTop, newRight - newLeft, newBottom - newTop));
+		shapeView->setPos(newLeft, newTop);
+		shapeView->SetRect(QRectF(0, 0, newRight - newLeft, newBottom - newTop));
 	}
 
 	void OnInteractionFinished()

@@ -7,6 +7,8 @@
 #include <QMenuBar>
 #include <QToolBar>
 #include <QToolButton>
+#include <QVBoxLayout>
+#include <QWidget>
 
 namespace
 {
@@ -31,11 +33,19 @@ QGraphicsView* CreateView(QGraphicsScene* scene, QWidget* parent)
 MainWindow::MainWindow()
 {
 	setWindowTitle("Geometry Drawer");
+	setStyleSheet("QMainWindow { background-color: black; }");
 
 	m_scene = CreateScene(this);
 	m_view = CreateView(m_scene, this);
 
-	setCentralWidget(m_view);
+	auto* centralWidget = new QWidget(this);
+	auto* layout = new QHBoxLayout(centralWidget);
+	layout->addStretch();
+	layout->addWidget(m_view);
+	layout->addStretch();
+	layout->setContentsMargins(50, 50, 50, 50);
+
+	setCentralWidget(centralWidget);
 
 	auto* shapesDocument = new Document();
 	m_documentPresenter = new DocumentPresenter(shapesDocument, m_scene, this);

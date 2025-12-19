@@ -22,7 +22,6 @@ add_executable(GeometryDrawer main.cpp
         src/model/Shape.h
         src/view/TriangleView.h
         src/view/EllipseView.h
-        src/view/IResizable.h
         src/view/ResizeHandle.h
 )
 

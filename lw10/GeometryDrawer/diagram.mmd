@@ -1,0 +1,125 @@
+classDiagram
+%% MVVM Architecture: Model Layer
+    class Document {
+        -QHash~QUuid, Shape*~ m_shapes
+        +AddShape(Shape* shape)
+        +RemoveShapes(QList~QUuid~ ids)
+        +UpdateShapesGeometry(QHash~QUuid, QRectF~ geometry)
+        +ShapeAdded(Shape* shape) signal
+        +ShapesRemoved(QList~QUuid~ ids) signal
+    }
+
+    class ShapeType {
+        <<enumeration>>
+        Rectangle
+        Triangle
+        Ellipse
+    }
+
+    class Shape {
+        -Shape:: Type m_type
+        -QRectF m_rect
+        -QUuid m_id
+        +GetType() Shape:: Type
+        +GetRect() QRectF
+        +GetId() QUuid
+        +SetRect(QRectF rect)
+        +GeometryChanged() signal
+    }
+
+%% MVVM Architecture: View Layer
+    class MainWindow {
+        -QMenu* m_menu
+        -QToolBar* m_toolbar
+        -QGraphicsView* m_view
+        -QGraphicsScene* m_scene
+        -DocumentPresenter* m_documentPresenter
+        +MainWindow()
+        -CreateMenu()
+        -CreateToolbar()
+    }
+
+    class ShapeView {
+        <<abstract>>
+        -QRectF m_rect
+        -QColor m_color
+        -QList~ResizeHandle*~ m_resizeHandles
+        -MovementHandler m_movementHandler
+        -ResizeHandler m_resizeHandler
+        +ShapeView(rect, handler, handler)
+        +GetRect() QRectF
+        +SetRect(QRectF rect)
+        +paint(painter, option, widget)
+        +InteractionFinished() signal
+        #PaintShape(painter) abstract
+        #mousePressEvent(event)
+        #mouseMoveEvent(event)
+        #mouseReleaseEvent(event)
+    }
+
+    class RectangleView {
+        +PaintShape(painter)
+    }
+
+    class EllipseView {
+        +PaintShape(painter)
+    }
+
+    class TriangleView {
+        +PaintShape(painter)
+    }
+
+    class ResizeHandle {
+        <<enumeration>>
+        HandleType
+        -HandleType m_type
+        -MovementHandler m_handler
+        +ResizeHandle(type, handler, finishedHandler, parent)
+        +GetType() HandleType
+        #mousePressEvent(event)
+        #mouseMoveEvent(event)
+    }
+
+%% MVVM Architecture: ViewModel/Presenter Layer
+    class DocumentPresenter {
+        -Document* m_document
+        -QGraphicsScene* m_scene
+        -QMap~QUuid, ShapeView*~ m_views
+        +DocumentPresenter(document, scene)
+        +AddRectangle()
+        +AddTriangle()
+        +AddEllipse()
+        +RemoveSelectedShapes()
+        -OnShapeAdded(Shape* shape)
+        -OnShapesRemoved(QList~QUuid~ ids)
+        -MoveShapeWithBounds(shapeView, delta)
+        -ResizeShapeWithBounds(shapeView, type, mousePos)
+        -ShapeViewFormShape(shape) ShapeView*
+    }
+
+%% Relationships
+
+%% Model Layer Relationships
+    Document *-- Shape: contains
+    Shape -- ShapeType: has type
+%% ViewModel/Presenter Relationships
+    DocumentPresenter o-- Document: aggregates
+    DocumentPresenter o-- QGraphicsScene: manages
+    DocumentPresenter o-- ShapeView: creates and manages
+%% View Layer Relationships
+    MainWindow *-- DocumentPresenter: creates
+    MainWindow *-- QGraphicsView: contains
+    MainWindow *-- QGraphicsScene: contains
+    QGraphicsView *-- QGraphicsScene: displays
+%% Inheritance Relationships
+    ShapeView <|-- RectangleView: inherits
+    ShapeView <|-- EllipseView: inherits
+    ShapeView <|-- TriangleView: inherits
+    QGraphicsObject <|-- ShapeView: extends
+    QGraphicsObject <|-- ResizeHandle: extends
+%% Composition Relationships (strong ownership)
+    ShapeView "1" *-- "8" ResizeHandle: owns handles
+    MainWindow *-- DocumentPresenter: owns presenter
+%% Aggregation Relationships (weak ownership, references)
+    DocumentPresenter o-- ShapeView: manages lifecycle
+    DocumentPresenter o-- Document: observes changes

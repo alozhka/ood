@@ -1,5 +1,4 @@
 #pragma once
-#include "IResizable.h"
 #include "ResizeHandle.h"
 
 #include <QCursor>
@@ -8,7 +7,6 @@
 #include <QPainter>
 
 class ShapeView : public QGraphicsObject
-	, public IResizable
 {
 	Q_OBJECT
 public:
@@ -38,12 +36,12 @@ public:
 		return m_rect;
 	}
 
-	QRectF GetRect() const override
+	QRectF GetRect() const
 	{
 		return m_rect;
 	}
 
-	void SetRect(const QRectF& rect) override
+	void SetRect(const QRectF& rect)
 	{
 		if (m_rect == rect)
 		{

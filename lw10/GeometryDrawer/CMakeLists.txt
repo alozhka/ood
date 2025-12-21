@@ -23,6 +23,8 @@ add_executable(GeometryDrawer main.cpp
         src/view/TriangleView.h
         src/view/EllipseView.h
         src/view/ResizeHandle.h
+        src/presenter/DocumentPresenter.cpp
+        src/model/commands/Commands.h
 )
 
 target_link_libraries(GeometryDrawer

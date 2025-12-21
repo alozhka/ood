@@ -1,9 +1,11 @@
 #pragma once
 #include "Shape.h"
+#include "commands/Commands.h"
 
 #include <QDebug>
 #include <QHash>
 #include <QObject>
+#include <QUndoStack>
 
 class Document : public QObject
 {
@@ -14,10 +16,11 @@ public:
 	{
 	}
 
-	void AddShape(Shape* shape)
+	void AddShape(Shape::Type type)
 	{
-		shape->setParent(this);
-		m_shapesMap.insert(shape->GetId(), shape);
+		Shape* shape = new Shape(type, DEFAULT_SHAPE_RECT, this);
+		AddShapeCommand* command = new AddShapeCommand(m_shapesMap, shape);
+		m_history.push(command);
 		emit ShapeAdded(shape);
 	}
 
@@ -49,6 +52,26 @@ public:
 		}
 	}
 
+	void Undo()
+	{
+		m_history.undo();
+	}
+
+	void Redo()
+	{
+		m_history.redo();
+	}
+
+	bool CanUndo() const
+	{
+		return m_history.canUndo();
+	}
+
+	bool CanRedo() const
+	{
+		return m_history.canRedo();
+	}
+
 signals:
 	void ShapeAdded(Shape* shape);
 	void ShapesRemoved(const QList<QUuid>& ids);
@@ -65,5 +88,8 @@ private:
 		}
 	}
 
+	static constexpr QRectF DEFAULT_SHAPE_RECT{ 100, 100, 100, 100 };
+
 	QHash<QUuid, Shape*> m_shapesMap;
+	QUndoStack m_history;
 };

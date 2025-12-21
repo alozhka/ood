@@ -1,6 +1,5 @@
 #pragma once
 #include "Shape.h"
-#include "commands/Commands.h"
 
 #include <QDebug>
 #include <QHash>
@@ -16,11 +15,11 @@ public:
 	{
 	}
 
-	void AddShape(Shape::Type type)
+	void AddShape(Shape* shape)
 	{
-		Shape* shape = new Shape(type, DEFAULT_SHAPE_RECT, this);
-		AddShapeCommand* command = new AddShapeCommand(m_shapesMap, shape);
-		m_history.push(command);
+		shape->setParent(this);
+		m_shapesMap.insert(shape->GetId(), shape);
+		qDebug() << "Added shape" << shape->GetId();
 		emit ShapeAdded(shape);
 	}
 
@@ -52,26 +51,6 @@ public:
 		}
 	}
 
-	void Undo()
-	{
-		m_history.undo();
-	}
-
-	void Redo()
-	{
-		m_history.redo();
-	}
-
-	bool CanUndo() const
-	{
-		return m_history.canUndo();
-	}
-
-	bool CanRedo() const
-	{
-		return m_history.canRedo();
-	}
-
 signals:
 	void ShapeAdded(Shape* shape);
 	void ShapesRemoved(const QList<QUuid>& ids);
@@ -84,12 +63,9 @@ private:
 		{
 			Shape* shape = it.value();
 			shape->SetGeometry(rect);
-			qDebug() << "Updated " << shape->GetId().toString() << " to position and geometry " << rect;
+			qDebug() << "Updated" << shape->GetId().toString() << "to position and geometry" << rect;
 		}
 	}
 
-	static constexpr QRectF DEFAULT_SHAPE_RECT{ 100, 100, 100, 100 };
-
 	QHash<QUuid, Shape*> m_shapesMap;
-	QUndoStack m_history;
 };

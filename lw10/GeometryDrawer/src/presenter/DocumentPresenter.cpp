@@ -1,8 +1,11 @@
 #include "DocumentPresenter.h"
 
+#include "../model/commands/Commands.h"
+
 DocumentPresenter::DocumentPresenter(Document* document, QGraphicsScene* scene, QObject* parent)
 	: QObject(parent)
 	, m_document(document)
+	, m_history(this)
 	, m_scene(scene)
 {
 	connect(m_document, &Document::ShapeAdded, this, &DocumentPresenter::OnShapeAdded);
@@ -49,9 +52,21 @@ bool DocumentPresenter::eventFilter(QObject* object, QEvent* event)
 	{
 		QKeyEvent* keyEvent = dynamic_cast<QKeyEvent*>(event);
 
-		if (keyEvent->key() == Qt::Key_Delete || keyEvent->key() == Qt::Key_Backspace)
+		if (keyEvent->matches(QKeySequence::Backspace) || keyEvent->matches(QKeySequence::Delete))
 		{
 			RemoveSelectedShapes();
+			return true;
+		}
+
+		if (keyEvent->matches(QKeySequence::Undo))
+		{
+			Undo();
+			return true;
+		}
+
+		if (keyEvent->matches(QKeySequence::Redo))
+		{
+			Redo();
 			return true;
 		}
 	}
@@ -160,7 +175,25 @@ void DocumentPresenter::OnInteractionFinished()
 
 void DocumentPresenter::AddShape(Shape::Type type)
 {
-	m_document->AddShape(type);
+	Shape* shape = new Shape(type, DEFAULT_SHAPE_RECT);
+	AddShapeCommand* command = new AddShapeCommand(m_document, shape);
+	m_history.push(command);
+}
+
+void DocumentPresenter::Undo()
+{
+	if (m_history.canUndo())
+	{
+		m_history.undo();
+	}
+}
+
+void DocumentPresenter::Redo()
+{
+	if (m_history.canRedo())
+	{
+		m_history.redo();
+	}
 }
 
 ShapeView* DocumentPresenter::ShapeViewFormShape(const Shape* shape)

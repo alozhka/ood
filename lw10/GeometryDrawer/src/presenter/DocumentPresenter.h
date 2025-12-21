@@ -32,12 +32,16 @@ private slots:
 
 private:
 	void AddShape(Shape::Type type);
+	void Undo();
+	void Redo();
 	ShapeView* ShapeViewFormShape(const Shape* shape);
 
 	static constexpr int ITEM_ID_KEY = Qt::UserRole + 1;
+	static constexpr QRectF DEFAULT_SHAPE_RECT{ 100, 100, 100, 100 };
 	static constexpr qreal MIN_SHAPE_SIZE = 20;
 
 	Document* m_document;
+	QUndoStack m_history;
 	QGraphicsScene* m_scene;
 	QMap<QUuid, ShapeView*> m_views;
 };

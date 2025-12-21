@@ -6,24 +6,24 @@
 class AddShapeCommand : public QUndoCommand
 {
 public:
-	AddShapeCommand(QHash<QUuid, Shape*>& shapesMap, Shape* shape, QUndoCommand* parent = nullptr)
+	AddShapeCommand(Document* document, Shape* shape, QUndoCommand* parent = nullptr)
 		: QUndoCommand(parent)
-		, m_shapesMap(shapesMap)
+		, m_document(document)
 		, m_shape(shape)
 	{
 	}
 
 	void redo() override
 	{
-		m_shapesMap.insert(m_shape->GetId(), m_shape);
+		m_document->AddShape(m_shape);
 	}
 
 	void undo() override
 	{
-		m_shapesMap.remove(m_shape->GetId());
+		m_document->RemoveShapes({ m_shape->GetId() });
 	}
 
 private:
-	QHash<QUuid, Shape*>& m_shapesMap;
+	Document* m_document;
 	Shape* m_shape;
 };

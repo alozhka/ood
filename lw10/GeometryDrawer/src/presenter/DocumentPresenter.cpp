@@ -1,6 +1,6 @@
 #include "DocumentPresenter.h"
 
-#include "../model/commands/Commands.h"
+#include "Commands.h"
 
 DocumentPresenter::DocumentPresenter(Document* document, QGraphicsScene* scene, QObject* parent)
 	: QObject(parent)
@@ -8,7 +8,7 @@ DocumentPresenter::DocumentPresenter(Document* document, QGraphicsScene* scene, 
 	, m_history(this)
 	, m_scene(scene)
 {
-	connect(m_document, &Document::ShapeAdded, this, &DocumentPresenter::OnShapeAdded);
+	connect(m_document, &Document::ShapesAdded, this, &DocumentPresenter::OnShapesAdded);
 	connect(m_document, &Document::ShapesRemoved, this, &DocumentPresenter::OnShapesRemoved);
 	m_scene->installEventFilter(this);
 }
@@ -43,7 +43,8 @@ void DocumentPresenter::RemoveSelectedShapes()
 		shapeIdsToRemove.append(data.toUuid());
 	}
 
-	m_document->RemoveShapes(shapeIdsToRemove);
+	RemoveShapesCommand* command = new RemoveShapesCommand(m_document, shapeIdsToRemove);
+	m_history.push(command);
 }
 
 bool DocumentPresenter::eventFilter(QObject* object, QEvent* event)
@@ -74,20 +75,25 @@ bool DocumentPresenter::eventFilter(QObject* object, QEvent* event)
 	return QObject::eventFilter(object, event);
 }
 
-void DocumentPresenter::OnShapeAdded(Shape* shape)
+void DocumentPresenter::OnShapesAdded(const QList<Shape*>& shapes)
 {
-	ShapeView* shapeView = ShapeViewFormShape(shape);
-	connect(shapeView, &ShapeView::InteractionFinished, this, &DocumentPresenter::OnInteractionFinished);
-	shapeView->setData(ITEM_ID_KEY, shape->GetId());
-	m_scene->addItem(shapeView);
-	m_views.insert(shape->GetId(), shapeView);
+	m_scene->clearSelection();
+	for (Shape* shape : shapes)
+	{
+		ShapeView* shapeView = ShapeViewFormShape(shape);
+		connect(shapeView, &ShapeView::InteractionFinished, this, &DocumentPresenter::OnInteractionFinished);
+		shapeView->setData(ITEM_ID_KEY, shape->GetId());
+		m_scene->addItem(shapeView);
+		m_views.insert(shape->GetId(), shapeView);
+		shapeView->setSelected(true);
+	}
 }
 
-void DocumentPresenter::OnShapesRemoved(const QList<QUuid>& ids)
+void DocumentPresenter::OnShapesRemoved(const QList<Shape*>& shapes)
 {
-	for (const QUuid& id : ids)
+	for (const Shape* shape : shapes)
 	{
-		auto it = m_views.find(id);
+		auto it = m_views.find(shape->GetId());
 		if (it != m_views.end())
 		{
 			m_scene->removeItem(it.value());

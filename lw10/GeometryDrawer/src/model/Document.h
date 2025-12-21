@@ -15,32 +15,39 @@ public:
 	{
 	}
 
-	void AddShape(Shape* shape)
+	void AddShapes(const QList<Shape*>& shapes)
 	{
-		shape->setParent(this);
-		m_shapesMap.insert(shape->GetId(), shape);
-		qDebug() << "Added shape" << shape->GetId();
-		emit ShapeAdded(shape);
+		for (Shape* shape : shapes)
+		{
+			shape->setParent(this);
+			m_shapesMap.insert(shape->GetId(), shape);
+			qDebug() << "Added shape" << shape->GetId();
+		}
+		emit ShapesAdded(shapes);
 	}
 
-	void RemoveShapes(const QList<QUuid>& ids)
+	QList<Shape*> RemoveShapes(const QList<QUuid>& ids)
 	{
-		QList<QUuid> removedShapeIds;
+		QList<Shape*> removedShapes;
 
 		for (const QUuid& id : ids)
 		{
 			auto it = m_shapesMap.find(id);
 			if (it != m_shapesMap.end())
 			{
-				removedShapeIds.append(it.key());
+				Shape* shape = it.value();
+				shape->setParent(nullptr);
+				removedShapes.append(shape);
 				m_shapesMap.erase(it);
 			}
 		}
 
-		if (!removedShapeIds.isEmpty())
+		if (!removedShapes.isEmpty())
 		{
-			emit ShapesRemoved(removedShapeIds);
+			emit ShapesRemoved(removedShapes);
 		}
+
+		return removedShapes;
 	}
 
 	void UpdateShapesGeometry(const QHash<QUuid, QRectF>& rects)
@@ -52,8 +59,8 @@ public:
 	}
 
 signals:
-	void ShapeAdded(Shape* shape);
-	void ShapesRemoved(const QList<QUuid>& ids);
+	void ShapesAdded(QList<Shape*> shapes);
+	void ShapesRemoved(const QList<Shape*>& shapes);
 
 private:
 	void UpdateShapeGeometry(const QUuid& id, const QRectF& rect)

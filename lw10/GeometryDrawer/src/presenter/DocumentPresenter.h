@@ -24,8 +24,8 @@ protected:
 	bool eventFilter(QObject* object, QEvent* event) override;
 
 private slots:
-	void OnShapeAdded(Shape* shape);
-	void OnShapesRemoved(const QList<QUuid>& ids);
+	void OnShapesAdded(const QList<Shape*>& shape);
+	void OnShapesRemoved(const QList<Shape*>& shapes);
 	void MoveShapeWithBounds(ShapeView* shapeView, const QPointF& delta);
 	void ResizeShapeWithBounds(ShapeView* shapeView, HandleType type, const QPointF& mousePos);
 	void OnInteractionFinished();

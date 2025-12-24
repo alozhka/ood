@@ -1,6 +1,7 @@
 #include "DocumentPresenter.h"
 
 #include "Commands.h"
+#include "ShapeManipulator.h"
 
 namespace
 {
@@ -121,66 +122,19 @@ void DocumentPresenter::OnShapesGeometryChanged(const QHash<QUuid, QRectF>& geom
 			ShapeView* shapeView = viewIt.value();
 			shapeView->setPos(newRect.topLeft());
 			shapeView->SetRect(QRectF(0, 0, newRect.width(), newRect.height()));
+			shapeView->setSelected(true);
 		}
 	}
 }
 
 void DocumentPresenter::MoveShapeWithBounds(ShapeView* shapeView, const QPointF& delta)
 {
-	QPointF targetPos = shapeView->pos() + delta;
-
-	QRectF sceneRect = m_scene->sceneRect();
-	QRectF itemRect = shapeView->boundingRect();
-
-	qreal minX = sceneRect.left() - itemRect.left();
-	qreal maxX = sceneRect.right() - itemRect.right();
-	qreal minY = sceneRect.top() - itemRect.top();
-	qreal maxY = sceneRect.bottom() - itemRect.bottom();
-
-	qreal clampedX = qBound(minX, targetPos.x(), maxX);
-	qreal clampedY = qBound(minY, targetPos.y(), maxY);
-
-	shapeView->setPos(clampedX, clampedY);
+	ShapeManipulator::MoveShapeWithBounds(shapeView, delta, m_scene->sceneRect());
 }
 
 void DocumentPresenter::ResizeShapeWithBounds(ShapeView* shapeView, HandleType type, const QPointF& mousePos)
 {
-	QPointF sceneMousePos = shapeView->mapToScene(mousePos);
-	QRectF currentGeo = shapeView->mapRectToScene(shapeView->GetRect());
-	QRectF sceneBounds = m_scene->sceneRect();
-	qreal newLeft = currentGeo.left();
-	qreal newRight = currentGeo.right();
-	qreal newTop = currentGeo.top();
-	qreal newBottom = currentGeo.bottom();
-
-	if (type == HandleType::Left || type == HandleType::TopLeft || type == HandleType::BottomLeft)
-	{
-		qreal minLimit = sceneBounds.left();
-		qreal maxLimit = currentGeo.right() - MIN_SHAPE_SIZE;
-		newLeft = qBound(minLimit, sceneMousePos.x(), maxLimit);
-	}
-	else if (type == HandleType::Right || type == HandleType::TopRight || type == HandleType::BottomRight)
-	{
-		qreal minLimit = currentGeo.left() + MIN_SHAPE_SIZE;
-		qreal maxLimit = sceneBounds.right();
-		newRight = qBound(minLimit, sceneMousePos.x(), maxLimit);
-	}
-	if (type == HandleType::Top || type == HandleType::TopLeft || type == HandleType::TopRight)
-	{
-		qreal minLimit = sceneBounds.top();
-		qreal maxLimit = currentGeo.bottom() - MIN_SHAPE_SIZE;
-
-		newTop = qBound(minLimit, sceneMousePos.y(), maxLimit);
-	}
-	else if (type == HandleType::Bottom || type == HandleType::BottomLeft || type == HandleType::BottomRight)
-	{
-		qreal minLimit = currentGeo.top() + MIN_SHAPE_SIZE;
-		qreal maxLimit = sceneBounds.bottom();
-		newBottom = qBound(minLimit, sceneMousePos.y(), maxLimit);
-	}
-
-	shapeView->setPos(newLeft, newTop);
-	shapeView->SetRect(QRectF(0, 0, newRight - newLeft, newBottom - newTop));
+	ShapeManipulator::ResizeShapeWithBounds(shapeView, type, mousePos, m_scene->sceneRect(), MIN_SHAPE_SIZE);
 }
 
 void DocumentPresenter::OnInteractionFinished()

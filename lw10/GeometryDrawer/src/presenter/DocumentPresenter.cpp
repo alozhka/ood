@@ -1,6 +1,7 @@
 #include "DocumentPresenter.h"
 
 #include "Commands.h"
+#include "DocumentRepository.h"
 #include "ShapeViewManipulator.h"
 
 namespace
@@ -214,4 +215,31 @@ ShapeView* DocumentPresenter::ShapeViewFormShape(const Shape* shape)
 	}
 	shapeView->setParent(this);
 	return shapeView;
+}
+
+bool DocumentPresenter::SaveToFile(const QString& filePath)
+{
+	return DocumentRepository::SaveToFile(m_document, filePath);
+}
+
+bool DocumentPresenter::LoadFromFile(const QString& filePath)
+{
+	QList<Shape*> shapes = DocumentRepository::LoadFromFile(filePath);
+	if (shapes.isEmpty())
+	{
+		return false;
+	}
+
+	m_history.clear();
+	disconnect(m_document, nullptr, this, nullptr);
+	delete m_document;
+
+	m_document = new Document(this);
+	connect(m_document, &Document::ShapesAdded, this, &DocumentPresenter::OnShapesAdded);
+	connect(m_document, &Document::ShapesRemoved, this, &DocumentPresenter::OnShapesRemoved);
+	connect(m_document, &Document::ShapesGeometryChanged, this, &DocumentPresenter::OnShapesGeometryChanged);
+	m_document->AddShapes(shapes);
+
+	m_scene->clearSelection();
+	return true;
 }

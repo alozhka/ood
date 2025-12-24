@@ -56,13 +56,41 @@ MainWindow::MainWindow()
 
 void MainWindow::OnOpenFile()
 {
-	QFileDialog::getOpenFileName(this, "Open composition", "", "JSON files (*.json);; All files (*)");
-	// TODO: реализовать
+	QString filePath = QFileDialog::getOpenFileName(
+		this,
+		"Open composition",
+		"",
+		"JSON files (*.json);;All files (*)");
+
+	if (filePath.isEmpty())
+	{
+		return;
+	}
+
+	if (!m_documentPresenter->LoadFromFile(filePath))
+	{
+		qWarning() << "Failed to load file:" << filePath;
+	}
 }
 
 void MainWindow::OnSaveFile()
 {
-	// Программировать, не приходя в сознание
+    // Программировать, не приходя в сознание
+	QString filePath = QFileDialog::getSaveFileName(
+		this,
+		"Save composition",
+		"",
+		"JSON files (*.json);;All files (*)");
+
+	if (filePath.isEmpty())
+	{
+		return;
+	}
+
+	if (!m_documentPresenter->SaveToFile(filePath))
+	{
+		qWarning() << "Failed to save file:" << filePath;
+	}
 }
 
 void MainWindow::CreateMenu()

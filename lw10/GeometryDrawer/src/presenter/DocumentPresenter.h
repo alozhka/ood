@@ -20,6 +20,9 @@ public:
 	void AddEllipse();
 	void RemoveSelectedShapes();
 
+	bool SaveToFile(const QString& filePath);
+	bool LoadFromFile(const QString& filePath);
+
 protected:
 	bool eventFilter(QObject* object, QEvent* event) override;
 

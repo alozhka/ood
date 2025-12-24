@@ -73,6 +73,11 @@ public:
 		return geometry;
 	}
 
+	QList<Shape*> GetAllShapes() const
+	{
+		return m_shapesMap.values();
+	}
+
 signals:
 	void ShapesAdded(QList<Shape*> shapes);
 	void ShapesRemoved(const QList<Shape*>& shapes);

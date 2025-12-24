@@ -26,17 +26,18 @@ protected:
 private slots:
 	void OnShapesAdded(const QList<Shape*>& shape);
 	void OnShapesRemoved(const QList<Shape*>& shapes);
-	void MoveShapeWithBounds(ShapeView* shapeView, const QPointF& delta);
-	void ResizeShapeWithBounds(ShapeView* shapeView, HandleType type, const QPointF& mousePos);
+	void OnShapesGeometryChanged(const QHash<QUuid, QRectF>& rects);
 	void OnInteractionFinished();
 
 private:
 	void AddShape(Shape::Type type);
 	void Undo();
 	void Redo();
+	void MoveShapeWithBounds(ShapeView* shapeView, const QPointF& delta);
+	void ResizeShapeWithBounds(ShapeView* shapeView, HandleType type, const QPointF& mousePos);
+
 	ShapeView* ShapeViewFormShape(const Shape* shape);
 
-	static constexpr int ITEM_ID_KEY = Qt::UserRole + 1;
 	static constexpr QRectF DEFAULT_SHAPE_RECT{ 100, 100, 100, 100 };
 	static constexpr qreal MIN_SHAPE_SIZE = 20;
 

@@ -42,9 +42,6 @@ public:
 		m_rect = rect;
 	}
 
-signals:
-	void GeometryChanged(const QRectF& rect);
-
 private:
 	QUuid m_id;
 	QRectF m_rect;

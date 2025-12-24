@@ -54,3 +54,31 @@ private:
 	QList<Shape*> m_removedShapes{};
 	QList<QUuid> m_shapeIdsToRemove;
 };
+
+class UpdateShapesGeometryCommand : public QUndoCommand
+{
+public:
+	UpdateShapesGeometryCommand(Document* document, const QHash<QUuid, QRectF>& oldGeometry, const QHash<QUuid, QRectF>& newGeometry, QUndoCommand* parent = nullptr)
+		: QUndoCommand(parent)
+		, m_document(document)
+		, m_oldGeometry(oldGeometry)
+		, m_newGeometry(newGeometry)
+	{
+		setText("Update Shape Geometry");
+	}
+
+	void redo() override
+	{
+		m_document->UpdateShapesGeometry(m_newGeometry);
+	}
+
+	void undo() override
+	{
+		m_document->UpdateShapesGeometry(m_oldGeometry);
+	}
+
+private:
+	Document* m_document;
+	QHash<QUuid, QRectF> m_oldGeometry;
+	QHash<QUuid, QRectF> m_newGeometry;
+};

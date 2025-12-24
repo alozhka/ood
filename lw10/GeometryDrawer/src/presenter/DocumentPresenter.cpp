@@ -2,6 +2,11 @@
 
 #include "Commands.h"
 
+namespace
+{
+constexpr int ITEM_ID_KEY = Qt::UserRole + 1;
+}
+
 DocumentPresenter::DocumentPresenter(Document* document, QGraphicsScene* scene, QObject* parent)
 	: QObject(parent)
 	, m_document(document)
@@ -10,6 +15,7 @@ DocumentPresenter::DocumentPresenter(Document* document, QGraphicsScene* scene, 
 {
 	connect(m_document, &Document::ShapesAdded, this, &DocumentPresenter::OnShapesAdded);
 	connect(m_document, &Document::ShapesRemoved, this, &DocumentPresenter::OnShapesRemoved);
+	connect(m_document, &Document::ShapesGeometryChanged, this, &DocumentPresenter::OnShapesGeometryChanged);
 	m_scene->installEventFilter(this);
 }
 
@@ -102,6 +108,23 @@ void DocumentPresenter::OnShapesRemoved(const QList<Shape*>& shapes)
 	}
 }
 
+void DocumentPresenter::OnShapesGeometryChanged(const QHash<QUuid, QRectF>& geometry)
+{
+	for (auto it = geometry.begin(); it != geometry.end(); ++it)
+	{
+		const QUuid& id = it.key();
+		const QRectF& newRect = it.value();
+
+		auto viewIt = m_views.find(id);
+		if (viewIt != m_views.end())
+		{
+			ShapeView* shapeView = viewIt.value();
+			shapeView->setPos(newRect.topLeft());
+			shapeView->SetRect(QRectF(0, 0, newRect.width(), newRect.height()));
+		}
+	}
+}
+
 void DocumentPresenter::MoveShapeWithBounds(ShapeView* shapeView, const QPointF& delta)
 {
 	QPointF targetPos = shapeView->pos() + delta;
@@ -176,7 +199,14 @@ void DocumentPresenter::OnInteractionFinished()
 		shapesGeometry.insert(data.toUuid(), item->mapRectToScene(item->boundingRect()));
 	}
 
-	m_document->UpdateShapesGeometry(shapesGeometry);
+	if (shapesGeometry.isEmpty())
+	{
+		return;
+	}
+
+	QHash<QUuid, QRectF> oldGeometry = m_document->GetShapesGeometry(shapesGeometry.keys());
+	UpdateShapesGeometryCommand* command = new UpdateShapesGeometryCommand(m_document, oldGeometry, shapesGeometry);
+	m_history.push(command);
 }
 
 void DocumentPresenter::AddShape(Shape::Type type)

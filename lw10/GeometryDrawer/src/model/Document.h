@@ -56,11 +56,27 @@ public:
 		{
 			UpdateShapeGeometry(posIt.key(), posIt.value());
 		}
+		emit ShapesGeometryChanged(rects);
+	}
+
+	QHash<QUuid, QRectF> GetShapesGeometry(const QList<QUuid>& ids) const
+	{
+		QHash<QUuid, QRectF> geometry;
+		for (const QUuid& id : ids)
+		{
+			auto it = m_shapesMap.find(id);
+			if (it != m_shapesMap.end())
+			{
+				geometry.insert(id, it.value()->GetRect());
+			}
+		}
+		return geometry;
 	}
 
 signals:
 	void ShapesAdded(QList<Shape*> shapes);
 	void ShapesRemoved(const QList<Shape*>& shapes);
+	void ShapesGeometryChanged(const QHash<QUuid, QRectF>& rects);
 
 private:
 	void UpdateShapeGeometry(const QUuid& id, const QRectF& rect)

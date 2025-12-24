@@ -1,7 +1,7 @@
 #include "DocumentPresenter.h"
 
 #include "Commands.h"
-#include "ShapeManipulator.h"
+#include "ShapeViewManipulator.h"
 
 namespace
 {
@@ -129,12 +129,12 @@ void DocumentPresenter::OnShapesGeometryChanged(const QHash<QUuid, QRectF>& geom
 
 void DocumentPresenter::MoveShapeWithBounds(ShapeView* shapeView, const QPointF& delta)
 {
-	ShapeManipulator::MoveShapeWithBounds(shapeView, delta, m_scene->sceneRect());
+	ShapeViewManipulator::MoveShapeWithBounds(shapeView, delta, m_scene->sceneRect());
 }
 
 void DocumentPresenter::ResizeShapeWithBounds(ShapeView* shapeView, HandleType type, const QPointF& mousePos)
 {
-	ShapeManipulator::ResizeShapeWithBounds(shapeView, type, mousePos, m_scene->sceneRect(), MIN_SHAPE_SIZE);
+	ShapeViewManipulator::ResizeShapeWithBounds(shapeView, type, mousePos, m_scene->sceneRect(), MIN_SHAPE_SIZE);
 }
 
 void DocumentPresenter::OnInteractionFinished()

@@ -15,23 +15,31 @@
 class DocumentTests : public QObject
 {
 	Q_OBJECT
+private:
+	Document* m_document = nullptr;
+	QSignalSpy* m_shapesAddedSpy = nullptr;
+	QSignalSpy* m_shapesRemovedSpy = nullptr;
 
 private slots:
 	void init()
 	{
 		m_document = new Document(this);
+		m_shapesAddedSpy = new QSignalSpy(m_document, &Document::ShapesAdded);
+		m_shapesRemovedSpy = new QSignalSpy(m_document, &Document::ShapesRemoved);
 	}
 
 	void cleanup()
 	{
+		delete m_shapesAddedSpy;
+		m_shapesAddedSpy = nullptr;
+		delete m_shapesRemovedSpy;
+		m_shapesRemovedSpy = nullptr;
 		delete m_document;
 		m_document = nullptr;
 	}
 
 	void testAddShapes()
 	{
-		QSignalSpy signal(m_document, &Document::ShapesAdded);
-
 		auto* ellipse = new Shape(Shape::Type::Ellipse, QRectF(50, 50, 80, 80));
 		auto* rect = new Shape(Shape::Type::Rectangle, QRectF(0, 0, 100, 100));
 		auto* triangle = new Shape(Shape::Type::Triangle, QRectF(100, 100, 60, 60));
@@ -42,12 +50,11 @@ private slots:
 		QList<Shape*> shapesList = m_document->GetAllShapes();
 		QSet actual(shapesList.begin(), shapesList.end());
 		QCOMPARE(expected, actual);
-		QCOMPARE(signal.count(), 1);
+		QCOMPARE(m_shapesAddedSpy->count(), 1);
 	}
 
 	void testRemoveShape()
 	{
-		QSignalSpy signal(m_document, &Document::ShapesRemoved);
 		auto* ellipse = new Shape(Shape::Type::Ellipse, QRectF(50, 50, 80, 80));
 		auto* rect = new Shape(Shape::Type::Rectangle, QRectF(0, 0, 100, 100));
 		auto* triangle = new Shape(Shape::Type::Triangle, QRectF(100, 100, 60, 60));
@@ -64,18 +71,18 @@ private slots:
 		}
 		QCOMPARE(expectedIds, actualIds);
 		QCOMPARE(m_document->GetAllShapes().size(), 1);
-		QCOMPARE(signal.count(), 1);
+		QCOMPARE(m_shapesRemovedSpy->count(), 1);
 	}
 
 	void testRemoveNonExistentShape()
 	{
+		QSignalSpy signal(m_document, &Document::ShapesRemoved);
 		QUuid fakeId = QUuid::createUuid();
 		QList<Shape*> removed = m_document->RemoveShapes({ fakeId });
 
 		QCOMPARE(removed.size(), 0);
 	}
 
-	// Тест: обновление геометрии фигуры
 	void testUpdateShapeGeometry()
 	{
 		auto* shape = new Shape(Shape::Type::Rectangle, QRectF(0, 0, 100, 100));
@@ -90,7 +97,6 @@ private slots:
 		QCOMPARE(shape->GetRect(), newRect);
 	}
 
-	// Тест: проверка сигнала ShapesGeometryChanged
 	void testShapesGeometryChangedSignal()
 	{
 		auto* shape = new Shape(Shape::Type::Rectangle, QRectF(0, 0, 100, 100));
@@ -105,7 +111,6 @@ private slots:
 		QCOMPARE(spy.count(), 1);
 	}
 
-	// Тест: очистка документа
 	void testClearDocument()
 	{
 		auto* shape1 = new Shape(Shape::Type::Rectangle, QRectF(0, 0, 100, 100));
@@ -120,7 +125,6 @@ private slots:
 		QCOMPARE(spy.count(), 1);
 	}
 
-	// Тест: получение геометрии фигур
 	void testGetShapesGeometry()
 	{
 		auto* shape1 = new Shape(Shape::Type::Rectangle, QRectF(10, 20, 100, 50));
@@ -133,9 +137,6 @@ private slots:
 		QCOMPARE(geometry[shape1->GetId()], QRectF(10, 20, 100, 50));
 		QCOMPARE(geometry[shape2->GetId()], QRectF(30, 40, 80, 60));
 	}
-
-private:
-	Document* m_document = nullptr;
 };
 
 // ============================================================================
@@ -144,6 +145,10 @@ private:
 class CommandsIntegrationTests : public QObject
 {
 	Q_OBJECT
+
+private:
+	Document* m_document = nullptr;
+	QUndoStack* m_undoStack = nullptr;
 
 private slots:
 	void init()
@@ -347,18 +352,13 @@ private slots:
 		m_undoStack->redo();
 		QCOMPARE(addSpy.count(), 2);
 	}
-
-private:
-	Document* m_document = nullptr;
-	QUndoStack* m_undoStack = nullptr;
 };
 
-// ============================================================================
-// Тесты для DocumentRepository (сохранение/загрузка)
-// ============================================================================
 class DocumentRepositoryTests : public QObject
 {
 	Q_OBJECT
+private:
+	Document* m_document = nullptr;
 
 private slots:
 	void init()
@@ -372,7 +372,6 @@ private slots:
 		m_document = nullptr;
 	}
 
-	// Тест: сохранение пустого документа
 	void testSaveEmptyDocument()
 	{
 		QTemporaryFile file;
@@ -385,14 +384,11 @@ private slots:
 		QVERIFY(QFile::exists(filePath));
 	}
 
-	// Тест: сохранение и загрузка одной фигуры
 	void testSaveAndLoadSingleShape()
 	{
-		// Создаем документ с фигурой
 		auto* originalShape = new Shape(Shape::Type::Rectangle, QRectF(10, 20, 100, 50), 3);
 		m_document->AddShapes({ originalShape });
 
-		// Сохраняем
 		QTemporaryFile file;
 		QVERIFY(file.open());
 		QString filePath = file.fileName();
@@ -400,7 +396,6 @@ private slots:
 		bool saveResult = DocumentRepository::SaveToFile(m_document, filePath);
 		QVERIFY(saveResult);
 
-		// Загружаем
 		QList<Shape*> loadedShapes = DocumentRepository::LoadFromFile(filePath);
 
 		QCOMPARE(loadedShapes.size(), 1);
@@ -408,11 +403,9 @@ private slots:
 		QCOMPARE(loadedShapes[0]->GetRect(), QRectF(10, 20, 100, 50));
 		QCOMPARE(loadedShapes[0]->GetLayer(), 3);
 
-		// Очистка
 		qDeleteAll(loadedShapes);
 	}
 
-	// Тест: сохранение и загрузка нескольких фигур разных типов
 	void testSaveAndLoadMultipleShapes()
 	{
 		auto* rect = new Shape(Shape::Type::Rectangle, QRectF(0, 0, 100, 100), 1);
@@ -430,7 +423,6 @@ private slots:
 
 		QCOMPARE(loadedShapes.size(), 3);
 
-		// Проверяем все фигуры
 		bool hasRect = false, hasEllipse = false, hasTriangle = false;
 
 		for (Shape* shape : loadedShapes)
@@ -491,7 +483,6 @@ private slots:
 
 		DocumentRepository::SaveToFile(m_document, filePath);
 
-		// Читаем JSON напрямую
 		QFile jsonFile(filePath);
 		QVERIFY(jsonFile.open(QIODevice::ReadOnly));
 
@@ -516,9 +507,6 @@ private slots:
 		QCOMPARE(shapeObj["height"].toDouble(), 40.0);
 		QCOMPARE(shapeObj["layer"].toInt(), 5);
 	}
-
-private:
-	Document* m_document = nullptr;
 };
 
 int main(int argc, char* argv[])

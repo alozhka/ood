@@ -9,9 +9,6 @@
 #include "../src/presenter/Commands.h"
 #include "../src/presenter/JsonDocumentRepository.h"
 
-// ============================================================================
-// Тесты для класса Document
-// ============================================================================
 class DocumentTests : public QObject
 {
 	Q_OBJECT
@@ -154,9 +151,6 @@ private slots:
 	}
 };
 
-// ============================================================================
-// Интеграционные тесты для Commands + Document + QUndoStack
-// ============================================================================
 class CommandsIntegrationTests : public QObject
 {
 	Q_OBJECT

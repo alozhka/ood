@@ -18,6 +18,7 @@ DocumentPresenter::DocumentPresenter(Document* document, QGraphicsScene* scene, 
 	connect(m_document, &Document::ShapesAdded, this, &DocumentPresenter::OnShapesAdded);
 	connect(m_document, &Document::ShapesRemoved, this, &DocumentPresenter::OnShapesRemoved);
 	connect(m_document, &Document::ShapesGeometryChanged, this, &DocumentPresenter::OnShapesGeometryChanged);
+	connect(m_document, &Document::Cleared, this, &DocumentPresenter::OnDocumentCleared);
 	m_scene->installEventFilter(this);
 }
 
@@ -128,6 +129,13 @@ void DocumentPresenter::OnShapesGeometryChanged(const QHash<QUuid, QRectF>& geom
 	}
 }
 
+void DocumentPresenter::OnDocumentCleared()
+{
+	m_scene->clear();
+	m_views.clear();
+	m_history.clear();
+}
+
 void DocumentPresenter::MoveShapeWithBounds(ShapeView* shapeView, const QPointF& delta)
 {
 	ShapeViewManipulator::MoveShapeWithBounds(shapeView, delta, m_scene->sceneRect());
@@ -230,16 +238,9 @@ bool DocumentPresenter::LoadFromFile(const QString& filePath)
 		return false;
 	}
 
-	m_history.clear();
-	disconnect(m_document, nullptr, this, nullptr);
-	delete m_document;
-
-	m_document = new Document(this);
-	connect(m_document, &Document::ShapesAdded, this, &DocumentPresenter::OnShapesAdded);
-	connect(m_document, &Document::ShapesRemoved, this, &DocumentPresenter::OnShapesRemoved);
-	connect(m_document, &Document::ShapesGeometryChanged, this, &DocumentPresenter::OnShapesGeometryChanged);
+	m_document->Clear();
 	m_document->AddShapes(shapes);
-
 	m_scene->clearSelection();
+
 	return true;
 }

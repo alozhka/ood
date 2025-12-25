@@ -30,6 +30,7 @@ private slots:
 	void OnShapesAdded(const QList<Shape*>& shape);
 	void OnShapesRemoved(const QList<Shape*>& shapes);
 	void OnShapesGeometryChanged(const QHash<QUuid, QRectF>& rects);
+	void OnDocumentCleared();
 	void OnInteractionFinished();
 
 private:

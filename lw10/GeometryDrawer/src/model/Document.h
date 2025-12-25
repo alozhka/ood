@@ -59,6 +59,12 @@ public:
 		emit ShapesGeometryChanged(rects);
 	}
 
+	void Clear()
+	{
+		m_shapesMap.clear();
+		emit Cleared();
+	}
+
 	QHash<QUuid, QRectF> GetShapesGeometry(const QList<QUuid>& ids) const
 	{
 		QHash<QUuid, QRectF> geometry;
@@ -82,6 +88,7 @@ signals:
 	void ShapesAdded(QList<Shape*> shapes);
 	void ShapesRemoved(const QList<Shape*>& shapes);
 	void ShapesGeometryChanged(const QHash<QUuid, QRectF>& rects);
+	void Cleared();
 
 private:
 	void UpdateShapeGeometry(const QUuid& id, const QRectF& rect)

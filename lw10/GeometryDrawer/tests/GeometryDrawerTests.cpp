@@ -137,6 +137,21 @@ private slots:
 		QCOMPARE(geometry[shape1->GetId()], QRectF(10, 20, 100, 50));
 		QCOMPARE(geometry[shape2->GetId()], QRectF(30, 40, 80, 60));
 	}
+
+	void testImageShapePath()
+	{
+		QString testPath = "/path/to/test/image.png";
+		auto* imageShape = new Shape(Shape::Type::Image, QRectF(0, 0, 100, 100));
+		imageShape->SetImagePath(testPath);
+		m_document->AddShapes({ imageShape });
+
+		QCOMPARE(imageShape->GetType(), Shape::Type::Image);
+		QCOMPARE(imageShape->GetImagePath(), testPath);
+
+		Shape* retrievedShape = m_document->GetAllShapes()[0];
+		QCOMPARE(retrievedShape->GetType(), Shape::Type::Image);
+		QCOMPARE(retrievedShape->GetImagePath(), testPath);
+	}
 };
 
 // ============================================================================

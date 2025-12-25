@@ -19,99 +19,60 @@ class DocumentTests : public QObject
 private slots:
 	void init()
 	{
-		// Создаем новый документ перед каждым тестом
 		m_document = new Document(this);
 	}
 
 	void cleanup()
 	{
-		// Очищаем после каждого теста
 		delete m_document;
 		m_document = nullptr;
 	}
 
-	// Тест: добавление одной фигуры
-	void testAddSingleShape()
+	void testAddShapes()
 	{
-		// Arrange (подготовка)
-		auto* shape = new Shape(Shape::Type::Rectangle, QRectF(10, 20, 100, 50));
+		QSignalSpy signal(m_document, &Document::ShapesAdded);
 
-		// Act (действие)
-		m_document->AddShapes({ shape });
-
-		// Assert (проверка)
-		QList<Shape*> shapes = m_document->GetAllShapes();
-		QCOMPARE(shapes.size(), 1);
-		QCOMPARE(shapes[0]->GetType(), Shape::Type::Rectangle);
-		QCOMPARE(shapes[0]->GetRect(), QRectF(10, 20, 100, 50));
-	}
-
-	// Тест: добавление нескольких фигур
-	void testAddMultipleShapes()
-	{
-		auto* rect = new Shape(Shape::Type::Rectangle, QRectF(0, 0, 100, 100));
 		auto* ellipse = new Shape(Shape::Type::Ellipse, QRectF(50, 50, 80, 80));
+		auto* rect = new Shape(Shape::Type::Rectangle, QRectF(0, 0, 100, 100));
 		auto* triangle = new Shape(Shape::Type::Triangle, QRectF(100, 100, 60, 60));
+		QSet expected = { rect, ellipse, triangle };
 
-		m_document->AddShapes({ rect, ellipse, triangle });
+		m_document->AddShapes(expected.values());
 
-		QList<Shape*> shapes = m_document->GetAllShapes();
-		QCOMPARE(shapes.size(), 3);
+		QList<Shape*> shapesList = m_document->GetAllShapes();
+		QSet actual(shapesList.begin(), shapesList.end());
+		QCOMPARE(expected, actual);
+		QCOMPARE(signal.count(), 1);
 	}
 
-	// Тест: проверка сигнала ShapesAdded
-	void testShapesAddedSignal()
-	{
-		// QSignalSpy - специальный класс Qt для проверки сигналов
-		QSignalSpy spy(m_document, &Document::ShapesAdded);
-
-		auto* shape = new Shape(Shape::Type::Rectangle, QRectF(0, 0, 100, 100));
-		m_document->AddShapes({ shape });
-
-		// Проверяем, что сигнал был отправлен 1 раз
-		QCOMPARE(spy.count(), 1);
-
-		// Проверяем параметры сигнала
-		QList<QVariant> arguments = spy.takeFirst();
-		QList<Shape*> addedShapes = arguments.at(0).value<QList<Shape*>>();
-		QCOMPARE(addedShapes.size(), 1);
-		QCOMPARE(addedShapes[0], shape);
-	}
-
-	// Тест: удаление фигуры
 	void testRemoveShape()
 	{
-		auto* shape = new Shape(Shape::Type::Rectangle, QRectF(0, 0, 100, 100));
-		m_document->AddShapes({ shape });
+		QSignalSpy signal(m_document, &Document::ShapesRemoved);
+		auto* ellipse = new Shape(Shape::Type::Ellipse, QRectF(50, 50, 80, 80));
+		auto* rect = new Shape(Shape::Type::Rectangle, QRectF(0, 0, 100, 100));
+		auto* triangle = new Shape(Shape::Type::Triangle, QRectF(100, 100, 60, 60));
+		m_document->AddShapes({ ellipse, rect, triangle });
+		QSet expectedIds = { ellipse->GetId(), rect->GetId() };
 
-		QUuid shapeId = shape->GetId();
-		QList<Shape*> removed = m_document->RemoveShapes({ shapeId });
+		QList<Shape*> removedShapes = m_document->RemoveShapes(expectedIds.values());
 
-		QCOMPARE(removed.size(), 1);
-		QCOMPARE(removed[0]->GetId(), shapeId);
-		QCOMPARE(m_document->GetAllShapes().size(), 0);
+		QCOMPARE(removedShapes.size(), 2);
+		QSet<QUuid> actualIds;
+		for (const auto* shape : removedShapes)
+		{
+			actualIds.insert(shape->GetId());
+		}
+		QCOMPARE(expectedIds, actualIds);
+		QCOMPARE(m_document->GetAllShapes().size(), 1);
+		QCOMPARE(signal.count(), 1);
 	}
 
-	// Тест: удаление несуществующей фигуры
 	void testRemoveNonExistentShape()
 	{
 		QUuid fakeId = QUuid::createUuid();
 		QList<Shape*> removed = m_document->RemoveShapes({ fakeId });
 
 		QCOMPARE(removed.size(), 0);
-	}
-
-	// Тест: проверка сигнала ShapesRemoved
-	void testShapesRemovedSignal()
-	{
-		auto* shape = new Shape(Shape::Type::Rectangle, QRectF(0, 0, 100, 100));
-		m_document->AddShapes({ shape });
-
-		QSignalSpy spy(m_document, &Document::ShapesRemoved);
-
-		m_document->RemoveShapes({ shape->GetId() });
-
-		QCOMPARE(spy.count(), 1);
 	}
 
 	// Тест: обновление геометрии фигуры

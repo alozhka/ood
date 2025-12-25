@@ -34,3 +34,5 @@ target_link_libraries(GeometryDrawer
         Qt::Widgets
 )
 
+enable_testing()
+add_subdirectory(tests)

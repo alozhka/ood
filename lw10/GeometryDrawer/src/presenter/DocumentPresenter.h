@@ -34,7 +34,7 @@ private:
 	void AddShape(Shape::Type type);
 	void Undo();
 	void Redo();
-	void MoveShapeWithBounds(ShapeView* shapeView, const QPointF& delta);
+	void MoveShapeWithBounds(const QPointF& delta);
 	void ResizeShapeWithBounds(ShapeView* shapeView, HandleType type, const QPointF& mousePos);
 
 	ShapeView* ShapeViewFormShape(const Shape* shape);

@@ -153,9 +153,13 @@ void DocumentPresenter::OnDocumentCleared()
 	m_history.clear();
 }
 
-void DocumentPresenter::MoveShapeWithBounds(ShapeView* shapeView, const QPointF& delta)
+void DocumentPresenter::MoveShapeWithBounds(const QPointF& delta)
 {
-	ShapeViewManipulator::MoveShapeWithBounds(shapeView, delta, m_scene->sceneRect());
+	for (auto item : m_scene->selectedItems())
+	{
+		ShapeView* shapeView = m_views.value(item->data(ITEM_ID_KEY).toUuid());
+		ShapeViewManipulator::MoveShapeWithBounds(shapeView, delta, m_scene->sceneRect());
+	}
 }
 
 void DocumentPresenter::ResizeShapeWithBounds(ShapeView* shapeView, HandleType type, const QPointF& mousePos)

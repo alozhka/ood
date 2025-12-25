@@ -10,7 +10,7 @@ class ShapeView : public QGraphicsObject
 {
 	Q_OBJECT
 public:
-	using MovementHandler = std::function<void(ShapeView*, const QPointF&)>;
+	using MovementHandler = std::function<void(const QPointF&)>;
 	using ResizeHandler = std::function<void(ShapeView*, HandleType, const QPointF&)>;
 
 	explicit ShapeView(
@@ -89,7 +89,7 @@ protected:
 			m_isMoving = true;
 			QPointF currentMousePos = event->pos();
 			QPointF delta = currentMousePos - m_capturedPos;
-			m_movementHandler(this, delta);
+			m_movementHandler(delta);
 		}
 	}
 

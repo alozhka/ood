@@ -4,6 +4,7 @@
 #include <QTest>
 
 #include "../src/model/Document.h"
+#include "../src/model/ImageStorage.h"
 #include "../src/model/Shape.h"
 #include "../src/presenter/Commands.h"
 #include "../src/presenter/JsonDocumentRepository.h"
@@ -39,14 +40,14 @@ private slots:
 
 	void testAddShapes()
 	{
-		auto* ellipse = new Shape(Shape::Type::Ellipse, QRectF(50, 50, 80, 80));
-		auto* rect = new Shape(Shape::Type::Rectangle, QRectF(0, 0, 100, 100));
-		auto* triangle = new Shape(Shape::Type::Triangle, QRectF(100, 100, 60, 60));
+		auto ellipse = QSharedPointer<Shape>::create(Shape::Type::Ellipse, QRectF(50, 50, 80, 80));
+		auto rect = QSharedPointer<Shape>::create(Shape::Type::Rectangle, QRectF(0, 0, 100, 100));
+		auto triangle = QSharedPointer<Shape>::create(Shape::Type::Triangle, QRectF(100, 100, 60, 60));
 		QSet expected = { rect, ellipse, triangle };
 
 		m_document->AddShapes(expected.values());
 
-		QList<Shape*> shapesList = m_document->GetAllShapes();
+		QList<QSharedPointer<Shape>> shapesList = m_document->ListShapes();
 		QSet actual(shapesList.begin(), shapesList.end());
 		QCOMPARE(expected, actual);
 		QCOMPARE(m_shapesAddedSpy->count(), 1);
@@ -54,22 +55,22 @@ private slots:
 
 	void testRemoveShape()
 	{
-		auto* ellipse = new Shape(Shape::Type::Ellipse, QRectF(50, 50, 80, 80));
-		auto* rect = new Shape(Shape::Type::Rectangle, QRectF(0, 0, 100, 100));
-		auto* triangle = new Shape(Shape::Type::Triangle, QRectF(100, 100, 60, 60));
+		auto ellipse = QSharedPointer<Shape>::create(Shape::Type::Ellipse, QRectF(50, 50, 80, 80));
+		auto rect = QSharedPointer<Shape>::create(Shape::Type::Rectangle, QRectF(0, 0, 100, 100));
+		auto triangle = QSharedPointer<Shape>::create(Shape::Type::Triangle, QRectF(100, 100, 60, 60));
 		m_document->AddShapes({ ellipse, rect, triangle });
 		QSet expectedIds = { ellipse->GetId(), rect->GetId() };
 
-		QList<Shape*> removedShapes = m_document->RemoveShapes(expectedIds.values());
+		QList<QSharedPointer<Shape>> removedShapes = m_document->RemoveShapes(expectedIds.values());
 
 		QCOMPARE(removedShapes.size(), 2);
 		QSet<QUuid> actualIds;
-		for (const auto* shape : removedShapes)
+		for (const auto& shape : removedShapes)
 		{
 			actualIds.insert(shape->GetId());
 		}
 		QCOMPARE(expectedIds, actualIds);
-		QCOMPARE(m_document->GetAllShapes().size(), 1);
+		QCOMPARE(m_document->ListShapes().size(), 1);
 		QCOMPARE(m_shapesRemovedSpy->count(), 1);
 	}
 
@@ -77,14 +78,14 @@ private slots:
 	{
 		QSignalSpy signal(m_document, &Document::ShapesRemoved);
 		QUuid fakeId = QUuid::createUuid();
-		QList<Shape*> removed = m_document->RemoveShapes({ fakeId });
+		QList<QSharedPointer<Shape>> removed = m_document->RemoveShapes({ fakeId });
 
 		QCOMPARE(removed.size(), 0);
 	}
 
 	void testUpdateShapeGeometry()
 	{
-		auto* shape = new Shape(Shape::Type::Rectangle, QRectF(0, 0, 100, 100));
+		auto shape = QSharedPointer<Shape>::create(Shape::Type::Rectangle, QRectF(0, 0, 100, 100));
 		m_document->AddShapes({ shape });
 
 		QRectF newRect(50, 50, 200, 150);
@@ -98,7 +99,7 @@ private slots:
 
 	void testShapesGeometryChangedSignal()
 	{
-		auto* shape = new Shape(Shape::Type::Rectangle, QRectF(0, 0, 100, 100));
+		auto shape = QSharedPointer<Shape>::create(Shape::Type::Rectangle, QRectF(0, 0, 100, 100));
 		m_document->AddShapes({ shape });
 
 		QSignalSpy spy(m_document, &Document::ShapesGeometryChanged);
@@ -112,22 +113,22 @@ private slots:
 
 	void testClearDocument()
 	{
-		auto* shape1 = new Shape(Shape::Type::Rectangle, QRectF(0, 0, 100, 100));
-		auto* shape2 = new Shape(Shape::Type::Ellipse, QRectF(50, 50, 80, 80));
+		auto shape1 = QSharedPointer<Shape>::create(Shape::Type::Rectangle, QRectF(0, 0, 100, 100));
+		auto shape2 = QSharedPointer<Shape>::create(Shape::Type::Ellipse, QRectF(50, 50, 80, 80));
 		m_document->AddShapes({ shape1, shape2 });
 
 		QSignalSpy spy(m_document, &Document::Cleared);
 
 		m_document->Clear();
 
-		QCOMPARE(m_document->GetAllShapes().size(), 0);
+		QCOMPARE(m_document->ListShapes().size(), 0);
 		QCOMPARE(spy.count(), 1);
 	}
 
 	void testGetShapesGeometry()
 	{
-		auto* shape1 = new Shape(Shape::Type::Rectangle, QRectF(10, 20, 100, 50));
-		auto* shape2 = new Shape(Shape::Type::Ellipse, QRectF(30, 40, 80, 60));
+		auto shape1 = QSharedPointer<Shape>::create(Shape::Type::Rectangle, QRectF(10, 20, 100, 50));
+		auto shape2 = QSharedPointer<Shape>::create(Shape::Type::Ellipse, QRectF(30, 40, 80, 60));
 		m_document->AddShapes({ shape1, shape2 });
 
 		QHash<QUuid, QRectF> geometry = m_document->GetShapesGeometry({ shape1->GetId(), shape2->GetId() });
@@ -140,14 +141,14 @@ private slots:
 	void testImageShapePath()
 	{
 		QString testPath = "/path/to/test/image.png";
-		auto* imageShape = new Shape(Shape::Type::Image, QRectF(0, 0, 100, 100));
+		auto imageShape = QSharedPointer<Shape>::create(Shape::Type::Image, QRectF(0, 0, 100, 100));
 		imageShape->SetImagePath(testPath);
 		m_document->AddShapes({ imageShape });
 
 		QCOMPARE(imageShape->GetType(), Shape::Type::Image);
 		QCOMPARE(imageShape->GetImagePath(), testPath);
 
-		Shape* retrievedShape = m_document->GetAllShapes()[0];
+		auto retrievedShape = m_document->ListShapes()[0];
 		QCOMPARE(retrievedShape->GetType(), Shape::Type::Image);
 		QCOMPARE(retrievedShape->GetImagePath(), testPath);
 	}
@@ -182,72 +183,72 @@ private slots:
 	// Тест: добавление фигуры через команду
 	void testAddShapeCommand()
 	{
-		auto* shape = new Shape(Shape::Type::Rectangle, QRectF(0, 0, 100, 100));
+		auto shape = QSharedPointer<Shape>::create(Shape::Type::Rectangle, QRectF(0, 0, 100, 100));
 		auto* command = new AddShapeCommand(m_document, shape);
 
 		m_undoStack->push(command);
 
-		QCOMPARE(m_document->GetAllShapes().size(), 1);
-		QCOMPARE(m_document->GetAllShapes()[0], shape);
+		QCOMPARE(m_document->ListShapes().size(), 1);
+		QCOMPARE(m_document->ListShapes()[0], shape);
 	}
 
 	// Тест: Undo добавления фигуры
 	void testAddShapeCommandUndo()
 	{
-		auto* shape = new Shape(Shape::Type::Rectangle, QRectF(0, 0, 100, 100));
+		auto shape = QSharedPointer<Shape>::create(Shape::Type::Rectangle, QRectF(0, 0, 100, 100));
 		auto* command = new AddShapeCommand(m_document, shape);
 
 		m_undoStack->push(command);
-		QCOMPARE(m_document->GetAllShapes().size(), 1);
+		QCOMPARE(m_document->ListShapes().size(), 1);
 
 		m_undoStack->undo();
-		QCOMPARE(m_document->GetAllShapes().size(), 0);
+		QCOMPARE(m_document->ListShapes().size(), 0);
 	}
 
 	// Тест: Redo добавления фигуры
 	void testAddShapeCommandRedo()
 	{
-		auto* shape = new Shape(Shape::Type::Rectangle, QRectF(0, 0, 100, 100));
+		auto shape = QSharedPointer<Shape>::create(Shape::Type::Rectangle, QRectF(0, 0, 100, 100));
 		auto* command = new AddShapeCommand(m_document, shape);
 
 		m_undoStack->push(command);
 		m_undoStack->undo();
-		QCOMPARE(m_document->GetAllShapes().size(), 0);
+		QCOMPARE(m_document->ListShapes().size(), 0);
 
 		m_undoStack->redo();
-		QCOMPARE(m_document->GetAllShapes().size(), 1);
-		QCOMPARE(m_document->GetAllShapes()[0], shape);
+		QCOMPARE(m_document->ListShapes().size(), 1);
+		QCOMPARE(m_document->ListShapes()[0], shape);
 	}
 
 	// Тест: удаление фигуры через команду
 	void testRemoveShapeCommand()
 	{
-		auto* shape = new Shape(Shape::Type::Rectangle, QRectF(0, 0, 100, 100));
+		auto shape = QSharedPointer<Shape>::create(Shape::Type::Rectangle, QRectF(0, 0, 100, 100));
 		m_document->AddShapes({ shape });
 
 		auto* command = new RemoveShapesCommand(m_document, { shape->GetId() });
 		m_undoStack->push(command);
 
-		QCOMPARE(m_document->GetAllShapes().size(), 0);
+		QCOMPARE(m_document->ListShapes().size(), 0);
 	}
 
 	// Тест: Undo удаления фигуры (восстановление)
 	void testRemoveShapeCommandUndo()
 	{
-		auto* shape = new Shape(Shape::Type::Rectangle, QRectF(0, 0, 100, 100), 5);
+		auto shape = QSharedPointer<Shape>::create(Shape::Type::Rectangle, QRectF(0, 0, 100, 100), 5);
 		m_document->AddShapes({ shape });
 		QUuid shapeId = shape->GetId();
 
 		auto* command = new RemoveShapesCommand(m_document, { shapeId });
 		m_undoStack->push(command);
-		QCOMPARE(m_document->GetAllShapes().size(), 0);
+		QCOMPARE(m_document->ListShapes().size(), 0);
 
 		// Undo - фигура должна восстановиться
 		m_undoStack->undo();
-		QCOMPARE(m_document->GetAllShapes().size(), 1);
+		QCOMPARE(m_document->ListShapes().size(), 1);
 
 		// Проверяем, что восстановлена та же фигура с тем же ID и слоем
-		Shape* restoredShape = m_document->GetAllShapes()[0];
+		auto restoredShape = m_document->ListShapes()[0];
 		QCOMPARE(restoredShape->GetId(), shapeId);
 		QCOMPARE(restoredShape->GetLayer(), 5);
 		QCOMPARE(restoredShape->GetRect(), QRectF(0, 0, 100, 100));
@@ -256,7 +257,7 @@ private slots:
 	// Тест: изменение геометрии через команду
 	void testUpdateGeometryCommand()
 	{
-		auto* shape = new Shape(Shape::Type::Rectangle, QRectF(0, 0, 100, 100));
+		auto shape = QSharedPointer<Shape>::create(Shape::Type::Rectangle, QRectF(0, 0, 100, 100));
 		m_document->AddShapes({ shape });
 
 		QHash<QUuid, QRectF> oldGeometry;
@@ -274,7 +275,7 @@ private slots:
 	// Тест: Undo изменения геометрии
 	void testUpdateGeometryCommandUndo()
 	{
-		auto* shape = new Shape(Shape::Type::Rectangle, QRectF(0, 0, 100, 100));
+		auto shape = QSharedPointer<Shape>::create(Shape::Type::Rectangle, QRectF(0, 0, 100, 100));
 		m_document->AddShapes({ shape });
 
 		QHash<QUuid, QRectF> oldGeometry;
@@ -293,34 +294,34 @@ private slots:
 	// Тест: множественный Undo/Redo
 	void testMultipleUndoRedo()
 	{
-		auto* shape1 = new Shape(Shape::Type::Rectangle, QRectF(0, 0, 100, 100));
-		auto* shape2 = new Shape(Shape::Type::Ellipse, QRectF(50, 50, 80, 80));
+		auto shape1 = QSharedPointer<Shape>::create(Shape::Type::Rectangle, QRectF(0, 0, 100, 100));
+		auto shape2 = QSharedPointer<Shape>::create(Shape::Type::Ellipse, QRectF(50, 50, 80, 80));
 
 		m_undoStack->push(new AddShapeCommand(m_document, shape1));
 		m_undoStack->push(new AddShapeCommand(m_document, shape2));
 
-		QCOMPARE(m_document->GetAllShapes().size(), 2);
+		QCOMPARE(m_document->ListShapes().size(), 2);
 
 		m_undoStack->undo();
-		QCOMPARE(m_document->GetAllShapes().size(), 1);
+		QCOMPARE(m_document->ListShapes().size(), 1);
 
 		m_undoStack->undo();
-		QCOMPARE(m_document->GetAllShapes().size(), 0);
+		QCOMPARE(m_document->ListShapes().size(), 0);
 
 		m_undoStack->redo();
-		QCOMPARE(m_document->GetAllShapes().size(), 1);
+		QCOMPARE(m_document->ListShapes().size(), 1);
 
 		m_undoStack->redo();
-		QCOMPARE(m_document->GetAllShapes().size(), 2);
+		QCOMPARE(m_document->ListShapes().size(), 2);
 	}
 
 	// Тест: цепочка операций (добавление -> изменение -> удаление -> undo)
 	void testComplexOperationChain()
 	{
 		// Добавляем фигуру
-		auto* shape = new Shape(Shape::Type::Rectangle, QRectF(0, 0, 100, 100));
+		auto shape = QSharedPointer<Shape>::create(Shape::Type::Rectangle, QRectF(0, 0, 100, 100));
 		m_undoStack->push(new AddShapeCommand(m_document, shape));
-		QCOMPARE(m_document->GetAllShapes().size(), 1);
+		QCOMPARE(m_document->ListShapes().size(), 1);
 
 		// Изменяем геометрию
 		QHash<QUuid, QRectF> oldGeometry;
@@ -333,20 +334,20 @@ private slots:
 
 		// Удаляем фигуру
 		m_undoStack->push(new RemoveShapesCommand(m_document, { shape->GetId() }));
-		QCOMPARE(m_document->GetAllShapes().size(), 0);
+		QCOMPARE(m_document->ListShapes().size(), 0);
 
 		// Отменяем удаление
 		m_undoStack->undo();
-		QCOMPARE(m_document->GetAllShapes().size(), 1);
-		QCOMPARE(m_document->GetAllShapes()[0]->GetRect(), QRectF(50, 50, 150, 150));
+		QCOMPARE(m_document->ListShapes().size(), 1);
+		QCOMPARE(m_document->ListShapes()[0]->GetRect(), QRectF(50, 50, 150, 150));
 
 		// Отменяем изменение геометрии
 		m_undoStack->undo();
-		QCOMPARE(m_document->GetAllShapes()[0]->GetRect(), QRectF(0, 0, 100, 100));
+		QCOMPARE(m_document->ListShapes()[0]->GetRect(), QRectF(0, 0, 100, 100));
 
 		// Отменяем добавление
 		m_undoStack->undo();
-		QCOMPARE(m_document->GetAllShapes().size(), 0);
+		QCOMPARE(m_document->ListShapes().size(), 0);
 	}
 
 	// Тест: проверка сигналов при Undo/Redo
@@ -355,7 +356,7 @@ private slots:
 		QSignalSpy addSpy(m_document, &Document::ShapesAdded);
 		QSignalSpy removeSpy(m_document, &Document::ShapesRemoved);
 
-		auto* shape = new Shape(Shape::Type::Rectangle, QRectF(0, 0, 100, 100));
+		auto shape = QSharedPointer<Shape>::create(Shape::Type::Rectangle, QRectF(0, 0, 100, 100));
 		m_undoStack->push(new AddShapeCommand(m_document, shape));
 
 		QCOMPARE(addSpy.count(), 1);
@@ -399,7 +400,7 @@ private slots:
 
 	void testSaveAndLoadSingleShape()
 	{
-		auto* originalShape = new Shape(Shape::Type::Rectangle, QRectF(10, 20, 100, 50), 3);
+		auto originalShape = QSharedPointer<Shape>::create(Shape::Type::Rectangle, QRectF(10, 20, 100, 50), 3);
 		m_document->AddShapes({ originalShape });
 
 		QTemporaryFile file;
@@ -408,21 +409,19 @@ private slots:
 
 		JsonDocumentRepository::SaveToFile(m_document, filePath);
 
-		QList<Shape*> loadedShapes = JsonDocumentRepository::LoadFromFile(filePath);
+		QList<QSharedPointer<Shape>> loadedShapes = JsonDocumentRepository::LoadFromFile(filePath);
 
 		QCOMPARE(loadedShapes.size(), 1);
 		QCOMPARE(loadedShapes[0]->GetType(), Shape::Type::Rectangle);
 		QCOMPARE(loadedShapes[0]->GetRect(), QRectF(10, 20, 100, 50));
 		QCOMPARE(loadedShapes[0]->GetLayer(), 3);
-
-		qDeleteAll(loadedShapes);
 	}
 
 	void testSaveAndLoadMultipleShapes()
 	{
-		auto* rect = new Shape(Shape::Type::Rectangle, QRectF(0, 0, 100, 100), 1);
-		auto* ellipse = new Shape(Shape::Type::Ellipse, QRectF(50, 50, 80, 80), 2);
-		auto* triangle = new Shape(Shape::Type::Triangle, QRectF(100, 100, 60, 60), 3);
+		auto rect = QSharedPointer<Shape>::create(Shape::Type::Rectangle, QRectF(0, 0, 100, 100), 1);
+		auto ellipse = QSharedPointer<Shape>::create(Shape::Type::Ellipse, QRectF(50, 50, 80, 80), 2);
+		auto triangle = QSharedPointer<Shape>::create(Shape::Type::Triangle, QRectF(100, 100, 60, 60), 3);
 
 		m_document->AddShapes({ rect, ellipse, triangle });
 
@@ -431,13 +430,13 @@ private slots:
 		QString filePath = file.fileName();
 
 		JsonDocumentRepository::SaveToFile(m_document, filePath);
-		QList<Shape*> loadedShapes = JsonDocumentRepository::LoadFromFile(filePath);
+		QList<QSharedPointer<Shape>> loadedShapes = JsonDocumentRepository::LoadFromFile(filePath);
 
 		QCOMPARE(loadedShapes.size(), 3);
 
 		bool hasRect = false, hasEllipse = false, hasTriangle = false;
 
-		for (Shape* shape : loadedShapes)
+		for (const auto& shape : loadedShapes)
 		{
 			if (shape->GetType() == Shape::Type::Rectangle)
 			{
@@ -460,8 +459,6 @@ private slots:
 		}
 
 		QVERIFY(hasRect && hasEllipse && hasTriangle);
-
-		qDeleteAll(loadedShapes);
 	}
 
 	void testLoadFromNonExistentFile()
@@ -486,7 +483,7 @@ private slots:
 
 	void testJsonFormat()
 	{
-		auto* shape = new Shape(Shape::Type::Ellipse, QRectF(10, 20, 30, 40), 5);
+		auto shape = QSharedPointer<Shape>::create(Shape::Type::Ellipse, QRectF(10, 20, 30, 40), 5);
 		m_document->AddShapes({ shape });
 
 		QTemporaryFile file;
@@ -524,10 +521,10 @@ private slots:
 		QImage testImage(100, 100, QImage::Format_RGB32);
 		testImage.fill(Qt::red);
 		QVERIFY(testImage.save(originalImagePath, "PNG"));
-		QString tempStoragePath = ImageRepository::SaveTemporary(originalImagePath);
+		QString tempStoragePath = ImageStorage::SaveTemporary(originalImagePath);
 		QFile::remove(originalImagePath);
 
-		auto* imageShape = new Shape(Shape::Type::Image, QRectF(10, 20, 150, 120), 2);
+		auto imageShape = QSharedPointer<Shape>::create(Shape::Type::Image, QRectF(10, 20, 150, 120), 2);
 		imageShape->SetImagePath(tempStoragePath);
 		m_document->AddShapes({ imageShape });
 
@@ -549,7 +546,7 @@ private slots:
 		QStringList imageFiles = imagesDirObj.entryList(QDir::Files);
 		QCOMPARE(imageFiles.size(), 1);
 
-		QList<Shape*> loadedShapes = JsonDocumentRepository::LoadFromFile(docFilePath);
+		QList<QSharedPointer<Shape>> loadedShapes = JsonDocumentRepository::LoadFromFile(docFilePath);
 
 		QCOMPARE(loadedShapes.size(), 1);
 		QCOMPARE(loadedShapes[0]->GetType(), Shape::Type::Image);
@@ -564,7 +561,6 @@ private slots:
 		QVERIFY(!loadedImage.isNull());
 		QCOMPARE(loadedImage.size(), QSize(100, 100));
 
-		qDeleteAll(loadedShapes);
 		QFile::remove(docFilePath);
 		QDir(imagesDir).removeRecursively();
 	}

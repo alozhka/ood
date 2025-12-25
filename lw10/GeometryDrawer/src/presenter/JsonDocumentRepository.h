@@ -1,6 +1,6 @@
 #pragma once
 #include "../model/Document.h"
-#include "ImageRepository.h"
+#include "../model/ImageStorage.h"
 
 #include <QFile>
 #include <QFileInfo>
@@ -15,7 +15,7 @@ class JsonDocumentRepository
 public:
 	static void SaveToFile(const Document* document, const QString& filePath)
 	{
-		QJsonArray shapesArray = ShapesToJson(document->GetAllShapes(), filePath);
+		QJsonArray shapesArray = ShapesToJson(document->ListShapes(), filePath);
 		QJsonObject rootObj;
 		rootObj["shapes"] = shapesArray;
 		QJsonDocument doc(rootObj);
@@ -30,7 +30,7 @@ public:
 		file.close();
 	}
 
-	static QList<Shape*> LoadFromFile(const QString& filePath)
+	static QList<QSharedPointer<Shape>> LoadFromFile(const QString& filePath)
 	{
 		QFile file(filePath);
 		if (!file.open(QIODevice::ReadOnly))
@@ -55,7 +55,7 @@ public:
 	}
 
 private:
-	static QJsonArray ShapesToJson(const QList<Shape*>& shapes, const QString& filePath)
+	static QJsonArray ShapesToJson(const QList<QSharedPointer<Shape>>& shapes, const QString& filePath)
 	{
         QFileInfo fileInfo(filePath);
 		QString documentDir = fileInfo.absolutePath();
@@ -64,7 +64,7 @@ private:
 
 		QJsonArray shapesArray;
 
-		for (const Shape* shape : shapes)
+		for (const auto& shape : shapes)
 		{
 			QJsonObject shapeObj;
 			shapeObj["type"] = static_cast<int>(shape->GetType());
@@ -78,7 +78,7 @@ private:
 
 			if (shape->GetType() == Shape::Type::Image && !shape->GetImagePath().isEmpty())
 			{
-				QString fileName = ImageRepository::Export(
+				QString fileName = ImageStorage::Export(
 					shape->GetImagePath(),
 					imagesDir);
 
@@ -100,12 +100,12 @@ private:
 		}
 	}
 
-	static QList<Shape*> JsonToShapes(const QJsonArray& shapesArray, const QString& filePath)
+	static QList<QSharedPointer<Shape>> JsonToShapes(const QJsonArray& shapesArray, const QString& filePath)
 	{
 		QFileInfo fileInfo(filePath);
 		QString documentDir = fileInfo.absolutePath();
 
-		QList<Shape*> shapes;
+		QList<QSharedPointer<Shape>> shapes;
 
 		for (const QJsonValueConstRef& value : shapesArray)
 		{
@@ -126,12 +126,12 @@ private:
 			Shape::Type type = static_cast<Shape::Type>(typeInt);
 			QRectF rect(x, y, width, height);
 
-			Shape* shape = new Shape(type, rect, layer);
+			auto shape = QSharedPointer<Shape>::create(type, rect, layer);
 
 			if (type == Shape::Type::Image && shapeObj.contains("imagePath"))
 			{
 				QString relativePath = shapeObj["imagePath"].toString();
-				QString tempPath = ImageRepository::LoadFromDocument(
+				QString tempPath = ImageStorage::LoadFromDocument(
 					relativePath,
 					documentDir);
 				shape->SetImagePath(tempPath);

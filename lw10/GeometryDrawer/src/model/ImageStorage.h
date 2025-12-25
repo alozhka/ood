@@ -7,7 +7,7 @@
 #include <QString>
 #include <QUuid>
 
-class ImageRepository
+class ImageStorage
 {
 public:
 	static QString SaveTemporary(const QString& sourcePath)
@@ -90,7 +90,20 @@ public:
 		return destinationPath;
 	}
 
-	// TODO: Итерация 4 - IncrementRefCount(), DecrementRefCount(), CleanupUnusedImages()
+	static void Delete(const QString& imagePath)
+	{
+		if (imagePath.isEmpty())
+		{
+			return;
+		}
+
+		QFileInfo fileInfo(imagePath);
+		if (fileInfo.exists() && imagePath.contains("GeometryDrawer_Images"))
+		{
+			QFile::remove(imagePath);
+		}
+	}
+
 private:
 	static QString GetTemporaryStoragePath()
 	{

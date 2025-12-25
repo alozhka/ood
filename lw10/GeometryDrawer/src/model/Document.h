@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QHash>
 #include <QObject>
+#include <QSharedPointer>
 #include <QUndoStack>
 
 class Document : public QObject
@@ -15,29 +16,26 @@ public:
 	{
 	}
 
-	void AddShapes(const QList<Shape*>& shapes)
+	void AddShapes(const QList<QSharedPointer<Shape>>& shapes)
 	{
-		for (Shape* shape : shapes)
+		for (const auto& shape : shapes)
 		{
-			shape->setParent(this);
 			m_shapesMap.insert(shape->GetId(), shape);
 			qDebug() << "Added shape" << shape->GetId();
 		}
 		emit ShapesAdded(shapes);
 	}
 
-	QList<Shape*> RemoveShapes(const QList<QUuid>& ids)
+	QList<QSharedPointer<Shape>> RemoveShapes(const QList<QUuid>& ids)
 	{
-		QList<Shape*> removedShapes;
+		QList<QSharedPointer<Shape>> removedShapes;
 
 		for (const QUuid& id : ids)
 		{
 			auto it = m_shapesMap.find(id);
 			if (it != m_shapesMap.end())
 			{
-				Shape* shape = it.value();
-				shape->setParent(nullptr);
-				removedShapes.append(shape);
+				removedShapes.append(it.value());
 				m_shapesMap.erase(it);
 			}
 		}
@@ -79,14 +77,14 @@ public:
 		return geometry;
 	}
 
-	QList<Shape*> GetAllShapes() const
+	QList<QSharedPointer<Shape>> ListShapes() const
 	{
 		return m_shapesMap.values();
 	}
 
 signals:
-	void ShapesAdded(QList<Shape*> shapes);
-	void ShapesRemoved(const QList<Shape*>& shapes);
+	void ShapesAdded(const QList<QSharedPointer<Shape>>& shapes);
+	void ShapesRemoved(const QList<QSharedPointer<Shape>>& shapes);
 	void ShapesGeometryChanged(const QHash<QUuid, QRectF>& rects);
 	void Cleared();
 
@@ -96,11 +94,11 @@ private:
 		auto it = m_shapesMap.find(id);
 		if (it != m_shapesMap.end())
 		{
-			Shape* shape = it.value();
+			auto shape = it.value();
 			shape->SetGeometry(rect);
 			qDebug() << "Updated" << shape->GetId().toString() << "to position and geometry" << rect;
 		}
 	}
 
-	QHash<QUuid, Shape*> m_shapesMap;
+	QHash<QUuid, QSharedPointer<Shape>> m_shapesMap;
 };

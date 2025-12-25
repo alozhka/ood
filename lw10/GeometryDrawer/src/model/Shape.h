@@ -1,4 +1,5 @@
 #pragma once
+#include "../model/ImageStorage.h"
 #include <QObject>
 #include <QRectF>
 #include <QString>
@@ -23,6 +24,14 @@ public:
 		, m_type(type)
 		, m_layer(layer)
 	{
+	}
+
+	~Shape()
+	{
+		if (m_type == Type::Image)
+		{
+			ImageStorage::Delete(m_imagePath);
+		}
 	}
 
 	QUuid GetId() const

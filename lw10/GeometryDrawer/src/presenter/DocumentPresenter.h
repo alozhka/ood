@@ -24,8 +24,8 @@ protected:
 	bool eventFilter(QObject* object, QEvent* event) override;
 
 private slots:
-	void OnShapesAdded(const QList<Shape*>& shape);
-	void OnShapesRemoved(const QList<Shape*>& shapes);
+	void OnShapesAdded(const QList<QSharedPointer<Shape>>& shape);
+	void OnShapesRemoved(const QList<QSharedPointer<Shape>>& shapes);
 	void OnShapesGeometryChanged(const QHash<QUuid, QRectF>& rects);
 	void OnDocumentCleared();
 	void OnInteractionFinished();

@@ -1,11 +1,11 @@
 #include "DocumentPresenter.h"
 
+#include "../model/ImageStorage.h"
 #include "../view/EllipseView.h"
 #include "../view/ImageView.h"
 #include "../view/RectangleView.h"
 #include "../view/TriangleView.h"
 #include "Commands.h"
-#include "ImageRepository.h"
 #include "JsonDocumentRepository.h"
 #include "ShapeViewManipulator.h"
 
@@ -44,9 +44,9 @@ void DocumentPresenter::AddEllipse()
 
 void DocumentPresenter::AddImage(const QString& sourceImagePath)
 {
-	QString storedPath = ImageRepository::SaveTemporary(sourceImagePath);
+	QString storedPath = ImageStorage::SaveTemporary(sourceImagePath);
 
-	Shape* shape = new Shape(Shape::Type::Image, DEFAULT_SHAPE_RECT, GetNextLayer());
+	auto shape = QSharedPointer<Shape>::create(Shape::Type::Image, DEFAULT_SHAPE_RECT, GetNextLayer());
 	shape->SetImagePath(storedPath);
 
 	AddShapeCommand* command = new AddShapeCommand(m_document, shape);
@@ -100,12 +100,12 @@ bool DocumentPresenter::eventFilter(QObject* object, QEvent* event)
 	return QObject::eventFilter(object, event);
 }
 
-void DocumentPresenter::OnShapesAdded(const QList<Shape*>& shapes)
+void DocumentPresenter::OnShapesAdded(const QList<QSharedPointer<Shape>>& shapes)
 {
 	m_scene->clearSelection();
-	for (Shape* shape : shapes)
+	for (const auto& shape : shapes)
 	{
-		ShapeView* shapeView = ShapeViewFormShape(shape);
+		ShapeView* shapeView = ShapeViewFormShape(shape.data());
 		connect(shapeView, &ShapeView::InteractionFinished, this, &DocumentPresenter::OnInteractionFinished);
 		shapeView->setData(ITEM_ID_KEY, shape->GetId());
 		shapeView->setZValue(shape->GetLayer());
@@ -115,9 +115,9 @@ void DocumentPresenter::OnShapesAdded(const QList<Shape*>& shapes)
 	}
 }
 
-void DocumentPresenter::OnShapesRemoved(const QList<Shape*>& shapes)
+void DocumentPresenter::OnShapesRemoved(const QList<QSharedPointer<Shape>>& shapes)
 {
-	for (const Shape* shape : shapes)
+	for (const auto& shape : shapes)
 	{
 		auto it = m_views.find(shape->GetId());
 		if (it != m_views.end())
@@ -191,7 +191,7 @@ void DocumentPresenter::OnInteractionFinished()
 
 void DocumentPresenter::AddShape(Shape::Type type)
 {
-	Shape* shape = new Shape(type, DEFAULT_SHAPE_RECT, GetNextLayer());
+	auto shape = QSharedPointer<Shape>::create(type, DEFAULT_SHAPE_RECT, GetNextLayer());
 	AddShapeCommand* command = new AddShapeCommand(m_document, shape);
 	m_history.push(command);
 }
@@ -252,7 +252,7 @@ ShapeView* DocumentPresenter::ShapeViewFormShape(const Shape* shape)
 int DocumentPresenter::GetNextLayer() const
 {
 	int maxLayer = 0;
-	for (const Shape* shape : m_document->GetAllShapes())
+	for (const auto& shape : m_document->ListShapes())
 	{
 		maxLayer = qMax(maxLayer, shape->GetLayer());
 	}
@@ -266,7 +266,7 @@ void DocumentPresenter::SaveToFile(const QString& filePath)
 
 void DocumentPresenter::LoadFromFile(const QString& filePath)
 {
-	QList<Shape*> shapes = JsonDocumentRepository::LoadFromFile(filePath);
+	QList<QSharedPointer<Shape>> shapes = JsonDocumentRepository::LoadFromFile(filePath);
 
 	m_document->Clear();
 	m_document->AddShapes(shapes);

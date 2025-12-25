@@ -1,12 +1,14 @@
 #pragma once
+#include "../model/ImageStorage.h"
 #include "../model/Shape.h"
 #include <QHash>
+#include <QSharedPointer>
 #include <QUndoCommand>
 
 class AddShapeCommand : public QUndoCommand
 {
 public:
-	AddShapeCommand(Document* document, Shape* shape, QUndoCommand* parent = nullptr)
+	AddShapeCommand(Document* document, const QSharedPointer<Shape>& shape, QUndoCommand* parent = nullptr)
 		: QUndoCommand(parent)
 		, m_document(document)
 		, m_shape(shape)
@@ -26,7 +28,7 @@ public:
 
 private:
 	Document* m_document;
-	Shape* m_shape;
+	QSharedPointer<Shape> m_shape;
 };
 
 class RemoveShapesCommand : public QUndoCommand
@@ -51,7 +53,7 @@ public:
 
 private:
 	Document* m_document;
-	QList<Shape*> m_removedShapes{};
+	QList<QSharedPointer<Shape>> m_removedShapes{};
 	QList<QUuid> m_shapeIdsToRemove;
 };
 

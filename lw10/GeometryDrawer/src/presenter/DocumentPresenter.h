@@ -1,10 +1,6 @@
 #pragma once
 #include "../model/Document.h"
-#include "../view/EllipseView.h"
-#include "../view/RectangleView.h"
-#include "../view/ResizeHandle.h"
 #include "../view/ShapeView.h"
-#include "../view/TriangleView.h"
 
 #include <QGraphicsScene>
 #include <QKeyEvent>
@@ -18,6 +14,7 @@ public:
 	void AddRectangle();
 	void AddTriangle();
 	void AddEllipse();
+	void AddImage(const QString& sourceImagePath);
 	void RemoveSelectedShapes();
 
 	void SaveToFile(const QString& filePath);

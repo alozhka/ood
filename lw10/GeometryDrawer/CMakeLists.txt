@@ -18,8 +18,10 @@ add_executable(GeometryDrawer main.cpp
         src/presenter/DocumentPresenter.h
         src/view/ShapeView.h
         src/view/RectangleView.h
+        src/view/ImageView.h
         src/model/Document.h
         src/model/Shape.h
+        src/model/ImageStorageManager.h
         src/view/TriangleView.h
         src/view/EllipseView.h
         src/view/ResizeHandle.h

@@ -1,6 +1,7 @@
 #pragma once
 #include <QObject>
 #include <QRectF>
+#include <QString>
 #include <QUuid>
 
 class Shape : public QObject
@@ -12,6 +13,7 @@ public:
 		Rectangle = 0,
 		Triangle = 1,
 		Ellipse = 2,
+		Image = 3,
 	};
 
 	explicit Shape(Type type, const QRectF& rect, int layer = 0, QObject* parent = nullptr)
@@ -48,9 +50,20 @@ public:
 		return m_layer;
 	}
 
+	QString GetImagePath() const
+	{
+		return m_imagePath;
+	}
+
+	void SetImagePath(const QString& path)
+	{
+		m_imagePath = path;
+	}
+
 private:
 	QUuid m_id;
 	QRectF m_rect;
 	Type m_type;
 	int m_layer = 0;
+	QString m_imagePath;
 };

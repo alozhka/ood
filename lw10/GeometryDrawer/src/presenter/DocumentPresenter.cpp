@@ -1,5 +1,10 @@
 #include "DocumentPresenter.h"
 
+#include "../model/ImageStorageManager.h"
+#include "../view/EllipseView.h"
+#include "../view/ImageView.h"
+#include "../view/RectangleView.h"
+#include "../view/TriangleView.h"
 #include "Commands.h"
 #include "DocumentRepository.h"
 #include "ShapeViewManipulator.h"
@@ -35,6 +40,17 @@ void DocumentPresenter::AddTriangle()
 void DocumentPresenter::AddEllipse()
 {
 	AddShape(Shape::Type::Ellipse);
+}
+
+void DocumentPresenter::AddImage(const QString& sourceImagePath)
+{
+	QString storedPath = ImageStorageManager::ImportImage(sourceImagePath);
+
+	Shape* shape = new Shape(Shape::Type::Image, DEFAULT_SHAPE_RECT, GetNextLayer());
+	shape->SetImagePath(storedPath);
+
+	AddShapeCommand* command = new AddShapeCommand(m_document, shape);
+	m_history.push(command);
 }
 
 void DocumentPresenter::RemoveSelectedShapes()
@@ -216,6 +232,13 @@ ShapeView* DocumentPresenter::ShapeViewFormShape(const Shape* shape)
 	case Shape::Type::Ellipse:
 		shapeView = new EllipseView(
 			shape->GetRect(),
+			std::bind_front(&DocumentPresenter::MoveShapeWithBounds, this),
+			std::bind_front(&DocumentPresenter::ResizeShapeWithBounds, this));
+		break;
+	case Shape::Type::Image:
+		shapeView = new ImageView(
+			shape->GetRect(),
+			shape->GetImagePath(),
 			std::bind_front(&DocumentPresenter::MoveShapeWithBounds, this),
 			std::bind_front(&DocumentPresenter::ResizeShapeWithBounds, this));
 		break;

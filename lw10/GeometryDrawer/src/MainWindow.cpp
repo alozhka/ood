@@ -101,6 +101,29 @@ void MainWindow::OnSaveFile()
 	}
 }
 
+void MainWindow::OnInsertImage()
+{
+	QString filePath = QFileDialog::getOpenFileName(
+		this,
+		"Select Image",
+		"",
+		"Images (*.png *.jpg *.jpeg *.bmp *.gif);;All files (*)");
+
+	if (filePath.isEmpty())
+	{
+		return;
+	}
+
+	try
+	{
+		m_documentPresenter->AddImage(filePath);
+	}
+	catch (const std::exception& e)
+	{
+		QMessageBox::critical(this, "Error", QString("Failed to insert image: %1").arg(e.what()));
+	}
+}
+
 void MainWindow::CreateMenu()
 {
 	m_menu = menuBar()->addMenu("File");
@@ -134,6 +157,11 @@ void MainWindow::CreateToolbar()
 	triangleBtn->setText("△ Triangle");
 	connect(triangleBtn, &QToolButton::clicked, m_documentPresenter, &DocumentPresenter::AddTriangle);
 	m_toolbar->addWidget(triangleBtn);
+
+	QToolButton* imageBtn = new QToolButton(this);
+	imageBtn->setText("🖼 Image");
+	connect(imageBtn, &QToolButton::clicked, this, &MainWindow::OnInsertImage);
+	m_toolbar->addWidget(imageBtn);
 
 	m_toolbar->addSeparator();
 

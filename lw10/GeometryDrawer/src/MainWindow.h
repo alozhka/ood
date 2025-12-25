@@ -16,6 +16,7 @@ public:
 private slots:
 	void OnOpenFile();
 	void OnSaveFile();
+	void OnInsertImage();
 
 private:
 	void CreateMenu();

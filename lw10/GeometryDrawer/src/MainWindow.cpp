@@ -5,6 +5,7 @@
 #include <QAction>
 #include <QFileDialog>
 #include <QMenuBar>
+#include <QMessageBox>
 #include <QToolBar>
 #include <QToolButton>
 #include <QVBoxLayout>
@@ -67,15 +68,18 @@ void MainWindow::OnOpenFile()
 		return;
 	}
 
-	if (!m_documentPresenter->LoadFromFile(filePath))
+	try
 	{
-		qWarning() << "Failed to load file:" << filePath;
+		m_documentPresenter->LoadFromFile(filePath);
+	}
+	catch (const std::exception& e)
+	{
+		QMessageBox::critical(this, "Error", QString("Failed to load file: %1").arg(e.what()));
 	}
 }
 
 void MainWindow::OnSaveFile()
 {
-    // Программировать, не приходя в сознание
 	QString filePath = QFileDialog::getSaveFileName(
 		this,
 		"Save composition",
@@ -87,9 +91,13 @@ void MainWindow::OnSaveFile()
 		return;
 	}
 
-	if (!m_documentPresenter->SaveToFile(filePath))
+	try
 	{
-		qWarning() << "Failed to save file:" << filePath;
+		m_documentPresenter->SaveToFile(filePath);
+	}
+	catch (const std::exception& e)
+	{
+		QMessageBox::critical(this, "Error", QString("Failed to save file: %1").arg(e.what()));
 	}
 }
 

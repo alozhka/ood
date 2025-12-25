@@ -6,15 +6,57 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QString>
+#include <stdexcept>
 
 class DocumentRepository
 {
 public:
-	static bool SaveToFile(const Document* document, const QString& filePath)
+	static void SaveToFile(const Document* document, const QString& filePath)
+	{
+		QJsonArray shapesArray = ShapesToJson(document->GetAllShapes());
+		QJsonObject rootObj;
+		rootObj["shapes"] = shapesArray;
+		QJsonDocument doc(rootObj);
+
+		QFile file(filePath);
+		if (!file.open(QIODevice::WriteOnly))
+		{
+			throw std::runtime_error("Failed to open file");
+		}
+
+		file.write(doc.toJson());
+		file.close();
+	}
+
+	static QList<Shape*> LoadFromFile(const QString& filePath)
+	{
+		QFile file(filePath);
+		if (!file.open(QIODevice::ReadOnly))
+		{
+			throw std::runtime_error("Failed to open file");
+		}
+
+		QByteArray data = file.readAll();
+		file.close();
+
+		QJsonDocument doc = QJsonDocument::fromJson(data);
+		if (!doc.isObject())
+		{
+			throw std::runtime_error("Invalid file format");
+		}
+
+		QJsonObject rootObj = doc.object();
+		EnsureValidRootObject(rootObj);
+
+		QJsonArray shapesArray = rootObj["shapes"].toArray();
+		return JsonToShapes(shapesArray);
+	}
+
+private:
+	static QJsonArray ShapesToJson(const QList<Shape*>& shapes)
 	{
 		QJsonArray shapesArray;
 
-		QList<Shape*> shapes = document->GetAllShapes();
 		for (const Shape* shape : shapes)
 		{
 			QJsonObject shapeObj;
@@ -30,55 +72,22 @@ public:
 			shapesArray.append(shapeObj);
 		}
 
-		QJsonObject rootObj;
-		rootObj["version"] = 1;
-		rootObj["shapes"] = shapesArray;
-
-		QJsonDocument doc(rootObj);
-
-		QFile file(filePath);
-		if (!file.open(QIODevice::WriteOnly))
-		{
-			qWarning() << "Failed to open file for writing:" << filePath;
-			return false;
-		}
-
-		file.write(doc.toJson());
-		file.close();
-
-		return true;
+		return shapesArray;
 	}
 
-	static QList<Shape*> LoadFromFile(const QString& filePath)
+	static void EnsureValidRootObject(const QJsonObject& rootObj)
+	{
+		if (!rootObj.contains("shapes") || !rootObj["shapes"].isArray())
+		{
+			throw std::runtime_error("Failed to parse JSON");
+		}
+	}
+
+	static QList<Shape*> JsonToShapes(const QJsonArray& shapesArray)
 	{
 		QList<Shape*> shapes;
 
-		QFile file(filePath);
-		if (!file.open(QIODevice::ReadOnly))
-		{
-			qWarning() << "Failed to open file for reading:" << filePath;
-			return shapes;
-		}
-
-		QByteArray data = file.readAll();
-		file.close();
-
-		QJsonDocument doc = QJsonDocument::fromJson(data);
-		if (!doc.isObject())
-		{
-			qWarning() << "Invalid JSON format";
-			return shapes;
-		}
-
-		QJsonObject rootObj = doc.object();
-		if (!rootObj.contains("shapes") || !rootObj["shapes"].isArray())
-		{
-			qWarning() << "JSON does not contain shapes array";
-			return shapes;
-		}
-
-		QJsonArray shapesArray = rootObj["shapes"].toArray();
-		for (const QJsonValue& value : shapesArray)
+		for (const QJsonValueConstRef& value : shapesArray)
 		{
 			if (!value.isObject())
 			{

@@ -378,9 +378,8 @@ private slots:
 		QVERIFY(file.open());
 		QString filePath = file.fileName();
 
-		bool result = DocumentRepository::SaveToFile(m_document, filePath);
+		DocumentRepository::SaveToFile(m_document, filePath);
 
-		QVERIFY(result);
 		QVERIFY(QFile::exists(filePath));
 	}
 
@@ -393,8 +392,7 @@ private slots:
 		QVERIFY(file.open());
 		QString filePath = file.fileName();
 
-		bool saveResult = DocumentRepository::SaveToFile(m_document, filePath);
-		QVERIFY(saveResult);
+		DocumentRepository::SaveToFile(m_document, filePath);
 
 		QList<Shape*> loadedShapes = DocumentRepository::LoadFromFile(filePath);
 
@@ -454,9 +452,9 @@ private slots:
 
 	void testLoadFromNonExistentFile()
 	{
-		QList<Shape*> shapes = DocumentRepository::LoadFromFile("/nonexistent/path/file.json");
-
-		QCOMPARE(shapes.size(), 0);
+		QVERIFY_THROWS_EXCEPTION(
+			std::runtime_error,
+			DocumentRepository::LoadFromFile("/nonexistent/path/file.json"));
 	}
 
 	void testLoadFromInvalidJson()
@@ -467,9 +465,9 @@ private slots:
 		file.write("{ invalid json }");
 		file.close();
 
-		QList<Shape*> shapes = DocumentRepository::LoadFromFile(file.fileName());
-
-		QCOMPARE(shapes.size(), 0);
+		QVERIFY_THROWS_EXCEPTION(
+			std::runtime_error,
+			DocumentRepository::LoadFromFile(file.fileName()));
 	}
 
 	void testJsonFormat()
@@ -492,9 +490,7 @@ private slots:
 		QVERIFY(doc.isObject());
 
 		QJsonObject root = doc.object();
-		QVERIFY(root.contains("version"));
 		QVERIFY(root.contains("shapes"));
-		QCOMPARE(root["version"].toInt(), 1);
 
 		QJsonArray shapesArray = root["shapes"].toArray();
 		QCOMPARE(shapesArray.size(), 1);

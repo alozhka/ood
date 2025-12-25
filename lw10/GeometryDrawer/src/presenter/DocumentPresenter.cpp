@@ -236,22 +236,16 @@ int DocumentPresenter::GetNextLayer() const
 	return maxLayer + 1;
 }
 
-bool DocumentPresenter::SaveToFile(const QString& filePath)
+void DocumentPresenter::SaveToFile(const QString& filePath)
 {
-	return DocumentRepository::SaveToFile(m_document, filePath);
+	DocumentRepository::SaveToFile(m_document, filePath);
 }
 
-bool DocumentPresenter::LoadFromFile(const QString& filePath)
+void DocumentPresenter::LoadFromFile(const QString& filePath)
 {
 	QList<Shape*> shapes = DocumentRepository::LoadFromFile(filePath);
-	if (shapes.isEmpty())
-	{
-		return false;
-	}
 
 	m_document->Clear();
 	m_document->AddShapes(shapes);
 	m_scene->clearSelection();
-
-	return true;
 }

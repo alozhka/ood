@@ -25,6 +25,7 @@ public:
 			shapeObj["y"] = rect.y();
 			shapeObj["width"] = rect.width();
 			shapeObj["height"] = rect.height();
+			shapeObj["layer"] = shape->GetLayer();
 
 			shapesArray.append(shapeObj);
 		}
@@ -91,11 +92,12 @@ public:
 			qreal y = shapeObj["y"].toDouble();
 			qreal width = shapeObj["width"].toDouble();
 			qreal height = shapeObj["height"].toDouble();
+			int layer = shapeObj["layer"].toInt(0);
 
 			Shape::Type type = static_cast<Shape::Type>(typeInt);
 			QRectF rect(x, y, width, height);
 
-			Shape* shape = new Shape(type, rect);
+			Shape* shape = new Shape(type, rect, layer);
 			shapes.append(shape);
 		}
 

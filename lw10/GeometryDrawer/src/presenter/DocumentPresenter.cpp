@@ -92,6 +92,7 @@ void DocumentPresenter::OnShapesAdded(const QList<Shape*>& shapes)
 		ShapeView* shapeView = ShapeViewFormShape(shape);
 		connect(shapeView, &ShapeView::InteractionFinished, this, &DocumentPresenter::OnInteractionFinished);
 		shapeView->setData(ITEM_ID_KEY, shape->GetId());
+		shapeView->setZValue(shape->GetLayer());
 		m_scene->addItem(shapeView);
 		m_views.insert(shape->GetId(), shapeView);
 		shapeView->setSelected(true);
@@ -174,7 +175,7 @@ void DocumentPresenter::OnInteractionFinished()
 
 void DocumentPresenter::AddShape(Shape::Type type)
 {
-	Shape* shape = new Shape(type, DEFAULT_SHAPE_RECT);
+	Shape* shape = new Shape(type, DEFAULT_SHAPE_RECT, GetNextLayer());
 	AddShapeCommand* command = new AddShapeCommand(m_document, shape);
 	m_history.push(command);
 }
@@ -223,6 +224,16 @@ ShapeView* DocumentPresenter::ShapeViewFormShape(const Shape* shape)
 	}
 	shapeView->setParent(this);
 	return shapeView;
+}
+
+int DocumentPresenter::GetNextLayer() const
+{
+	int maxLayer = 0;
+	for (const Shape* shape : m_document->GetAllShapes())
+	{
+		maxLayer = qMax(maxLayer, shape->GetLayer());
+	}
+	return maxLayer + 1;
 }
 
 bool DocumentPresenter::SaveToFile(const QString& filePath)

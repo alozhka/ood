@@ -41,6 +41,7 @@ private:
 	void ResizeShapeWithBounds(ShapeView* shapeView, HandleType type, const QPointF& mousePos);
 
 	ShapeView* ShapeViewFormShape(const Shape* shape);
+	int GetNextLayer() const;
 
 	static constexpr QRectF DEFAULT_SHAPE_RECT{ 100, 100, 100, 100 };
 	static constexpr qreal MIN_SHAPE_SIZE = 20;

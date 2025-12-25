@@ -12,7 +12,7 @@ add_executable(GeometryDrawerTests
         ../src/model/Document.h
         ../src/model/Shape.h
         ../src/presenter/Commands.h
-        ../src/presenter/DocumentRepository.h
+        ../src/presenter/JsonDocumentRepository.h
 )
 
 # Подключаем библиотеки Qt

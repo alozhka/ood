@@ -2,12 +2,11 @@
 #include <QSignalSpy>
 #include <QTemporaryFile>
 #include <QTest>
-#include <QUndoStack>
 
 #include "../src/model/Document.h"
 #include "../src/model/Shape.h"
 #include "../src/presenter/Commands.h"
-#include "../src/presenter/DocumentRepository.h"
+#include "../src/presenter/JsonDocumentRepository.h"
 
 // ============================================================================
 // Тесты для класса Document
@@ -393,7 +392,7 @@ private slots:
 		QVERIFY(file.open());
 		QString filePath = file.fileName();
 
-		DocumentRepository::SaveToFile(m_document, filePath);
+		JsonDocumentRepository::SaveToFile(m_document, filePath);
 
 		QVERIFY(QFile::exists(filePath));
 	}
@@ -407,9 +406,9 @@ private slots:
 		QVERIFY(file.open());
 		QString filePath = file.fileName();
 
-		DocumentRepository::SaveToFile(m_document, filePath);
+		JsonDocumentRepository::SaveToFile(m_document, filePath);
 
-		QList<Shape*> loadedShapes = DocumentRepository::LoadFromFile(filePath);
+		QList<Shape*> loadedShapes = JsonDocumentRepository::LoadFromFile(filePath);
 
 		QCOMPARE(loadedShapes.size(), 1);
 		QCOMPARE(loadedShapes[0]->GetType(), Shape::Type::Rectangle);
@@ -431,8 +430,8 @@ private slots:
 		QVERIFY(file.open());
 		QString filePath = file.fileName();
 
-		DocumentRepository::SaveToFile(m_document, filePath);
-		QList<Shape*> loadedShapes = DocumentRepository::LoadFromFile(filePath);
+		JsonDocumentRepository::SaveToFile(m_document, filePath);
+		QList<Shape*> loadedShapes = JsonDocumentRepository::LoadFromFile(filePath);
 
 		QCOMPARE(loadedShapes.size(), 3);
 
@@ -469,7 +468,7 @@ private slots:
 	{
 		QVERIFY_THROWS_EXCEPTION(
 			std::runtime_error,
-			DocumentRepository::LoadFromFile("/nonexistent/path/file.json"));
+			JsonDocumentRepository::LoadFromFile("/nonexistent/path/file.json"));
 	}
 
 	void testLoadFromInvalidJson()
@@ -482,7 +481,7 @@ private slots:
 
 		QVERIFY_THROWS_EXCEPTION(
 			std::runtime_error,
-			DocumentRepository::LoadFromFile(file.fileName()));
+			JsonDocumentRepository::LoadFromFile(file.fileName()));
 	}
 
 	void testJsonFormat()
@@ -494,7 +493,7 @@ private slots:
 		QVERIFY(file.open());
 		QString filePath = file.fileName();
 
-		DocumentRepository::SaveToFile(m_document, filePath);
+		JsonDocumentRepository::SaveToFile(m_document, filePath);
 
 		QFile jsonFile(filePath);
 		QVERIFY(jsonFile.open(QIODevice::ReadOnly));
@@ -517,6 +516,57 @@ private slots:
 		QCOMPARE(shapeObj["width"].toDouble(), 30.0);
 		QCOMPARE(shapeObj["height"].toDouble(), 40.0);
 		QCOMPARE(shapeObj["layer"].toInt(), 5);
+	}
+
+	void testSaveAndLoadImageShape()
+	{
+		QString originalImagePath = QDir::tempPath() + "/test_original.png";
+		QImage testImage(100, 100, QImage::Format_RGB32);
+		testImage.fill(Qt::red);
+		QVERIFY(testImage.save(originalImagePath, "PNG"));
+		QString tempStoragePath = ImageRepository::SaveTemporary(originalImagePath);
+		QFile::remove(originalImagePath);
+
+		auto* imageShape = new Shape(Shape::Type::Image, QRectF(10, 20, 150, 120), 2);
+		imageShape->SetImagePath(tempStoragePath);
+		m_document->AddShapes({ imageShape });
+
+		QTemporaryFile docFile;
+		docFile.setFileTemplate(QDir::tempPath() + "/test_doc_XXXXXX.json");
+		QVERIFY(docFile.open());
+		QString docFilePath = docFile.fileName();
+		docFile.close();
+
+		JsonDocumentRepository::SaveToFile(m_document, docFilePath);
+
+		QVERIFY(QFile::exists(docFilePath));
+
+		QFileInfo docFileInfo(docFilePath);
+		QString imagesDir = docFileInfo.absolutePath() + "/" + docFileInfo.completeBaseName() + "_images";
+		QVERIFY(QDir(imagesDir).exists());
+
+		QDir imagesDirObj(imagesDir);
+		QStringList imageFiles = imagesDirObj.entryList(QDir::Files);
+		QCOMPARE(imageFiles.size(), 1);
+
+		QList<Shape*> loadedShapes = JsonDocumentRepository::LoadFromFile(docFilePath);
+
+		QCOMPARE(loadedShapes.size(), 1);
+		QCOMPARE(loadedShapes[0]->GetType(), Shape::Type::Image);
+		QCOMPARE(loadedShapes[0]->GetRect(), QRectF(10, 20, 150, 120));
+		QCOMPARE(loadedShapes[0]->GetLayer(), 2);
+
+		QString loadedImagePath = loadedShapes[0]->GetImagePath();
+		QVERIFY(loadedImagePath.contains("GeometryDrawer_Images"));
+		QVERIFY(QFile::exists(loadedImagePath));
+
+		QImage loadedImage(loadedImagePath);
+		QVERIFY(!loadedImage.isNull());
+		QCOMPARE(loadedImage.size(), QSize(100, 100));
+
+		qDeleteAll(loadedShapes);
+		QFile::remove(docFilePath);
+		QDir(imagesDir).removeRecursively();
 	}
 };
 

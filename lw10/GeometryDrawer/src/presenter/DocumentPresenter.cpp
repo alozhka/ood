@@ -1,12 +1,12 @@
 #include "DocumentPresenter.h"
 
-#include "../model/ImageStorageManager.h"
 #include "../view/EllipseView.h"
 #include "../view/ImageView.h"
 #include "../view/RectangleView.h"
 #include "../view/TriangleView.h"
 #include "Commands.h"
-#include "DocumentRepository.h"
+#include "ImageRepository.h"
+#include "JsonDocumentRepository.h"
 #include "ShapeViewManipulator.h"
 
 namespace
@@ -44,7 +44,7 @@ void DocumentPresenter::AddEllipse()
 
 void DocumentPresenter::AddImage(const QString& sourceImagePath)
 {
-	QString storedPath = ImageStorageManager::ImportImage(sourceImagePath);
+	QString storedPath = ImageRepository::SaveTemporary(sourceImagePath);
 
 	Shape* shape = new Shape(Shape::Type::Image, DEFAULT_SHAPE_RECT, GetNextLayer());
 	shape->SetImagePath(storedPath);
@@ -261,12 +261,12 @@ int DocumentPresenter::GetNextLayer() const
 
 void DocumentPresenter::SaveToFile(const QString& filePath)
 {
-	DocumentRepository::SaveToFile(m_document, filePath);
+	JsonDocumentRepository::SaveToFile(m_document, filePath);
 }
 
 void DocumentPresenter::LoadFromFile(const QString& filePath)
 {
-	QList<Shape*> shapes = DocumentRepository::LoadFromFile(filePath);
+	QList<Shape*> shapes = JsonDocumentRepository::LoadFromFile(filePath);
 
 	m_document->Clear();
 	m_document->AddShapes(shapes);

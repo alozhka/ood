@@ -16,6 +16,7 @@ public:
 private slots:
 	void OnOpenFile();
 	void OnSaveFile();
+	void OnSaveAsFile();
 	void OnInsertImage();
 
 private:
@@ -26,6 +27,7 @@ private:
 	QToolBar* m_toolbar;
 	QGraphicsView* m_view;
 	QGraphicsScene* m_scene;
+	std::optional<QString> m_saveFilePath;
 
 	DocumentPresenter* m_documentPresenter;
 };

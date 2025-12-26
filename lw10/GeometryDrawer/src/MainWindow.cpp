@@ -57,20 +57,15 @@ MainWindow::MainWindow()
 
 void MainWindow::OnOpenFile()
 {
-	QString filePath = QFileDialog::getOpenFileName(
+	m_saveFilePath = QFileDialog::getOpenFileName(
 		this,
 		"Open composition",
 		"",
 		"JSON files (*.json);;All files (*)");
 
-	if (filePath.isEmpty())
-	{
-		return;
-	}
-
 	try
 	{
-		m_documentPresenter->LoadFromFile(filePath);
+		m_documentPresenter->LoadFromFile(m_saveFilePath.value());
 	}
 	catch (const std::exception& e)
 	{
@@ -80,20 +75,33 @@ void MainWindow::OnOpenFile()
 
 void MainWindow::OnSaveFile()
 {
-	QString filePath = QFileDialog::getSaveFileName(
-		this,
-		"Save composition",
-		"",
-		"JSON files (*.json);;All files (*)");
-
-	if (filePath.isEmpty())
+	if (!m_saveFilePath.has_value())
 	{
+		OnSaveAsFile();
 		return;
 	}
 
 	try
 	{
-		m_documentPresenter->SaveToFile(filePath);
+		m_documentPresenter->SaveToFile(m_saveFilePath.value());
+	}
+	catch (const std::exception& e)
+	{
+		QMessageBox::critical(this, "Error", QString("Failed to save file: %1").arg(e.what()));
+	}
+}
+
+void MainWindow::OnSaveAsFile()
+{
+	m_saveFilePath = QFileDialog::getSaveFileName(
+		this,
+		"Save composition",
+		"",
+		"JSON files (*.json);;All files (*)");
+
+	try
+	{
+		m_documentPresenter->SaveToFile(m_saveFilePath.value());
 	}
 	catch (const std::exception& e)
 	{
@@ -133,10 +141,15 @@ void MainWindow::CreateMenu()
 	connect(openFile, &QAction::triggered, this, &MainWindow::OnOpenFile);
 	m_menu->addAction(openFile);
 
-	QAction* saveFile = new QAction("Save as", this);
-	saveFile->setShortcut(QKeySequence::SaveAs);
+	QAction* saveFile = new QAction("Save", this);
+	saveFile->setShortcut(QKeySequence::Save);
 	connect(saveFile, &QAction::triggered, this, &MainWindow::OnSaveFile);
 	m_menu->addAction(saveFile);
+
+	QAction* saveAsFile = new QAction("Save as", this);
+	saveAsFile->setShortcut(QKeySequence::SaveAs);
+	connect(saveAsFile, &QAction::triggered, this, &MainWindow::OnSaveAsFile);
+	m_menu->addAction(saveAsFile);
 }
 
 void MainWindow::CreateToolbar()
